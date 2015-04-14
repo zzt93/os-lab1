@@ -1,6 +1,6 @@
 #include "common.h"
 #include "x86/x86.h"
-#include "memory.h"
+#include "kernel/memory.h"
 
 
 void init_page(void);

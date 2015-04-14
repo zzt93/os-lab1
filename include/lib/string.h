@@ -9,4 +9,6 @@ void memset(void *, uint8_t, size_t);
 size_t strlen(const char *);
 void strcpy(char *d, const char *s);
 
+void print_str(void (*printer)(char), char *);
+
 #endif

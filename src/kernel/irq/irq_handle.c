@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include "kernel/kernel.h"
 
 #define NR_IRQ_HANDLE 32
 

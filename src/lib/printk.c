@@ -1,5 +1,5 @@
 #include "common.h"
-#include "string.h"
+#include "lib/string.h"
 
 #include "int_stack.h"
 #define HEXA_BI 4

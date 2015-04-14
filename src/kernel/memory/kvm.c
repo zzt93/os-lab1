@@ -1,6 +1,6 @@
 #include "x86/x86.h"
-#include "memory.h"
-#include "string.h"
+#include "kernel/memory.h"
+#include "lib/string.h"
 
 /* This source file involves some hardware details. Please refer to 
  *  _ ____   ___    __    __  __                         _ 
