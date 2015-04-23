@@ -55,7 +55,7 @@ void irq_handle(TrapFrame *tf) {
 		struct IRQ_t *f = handles[irq_id];
 
 		while (f != NULL) { /* call handlers one by one */
-			f->routine(); 
+			f->routine();
 			f = f->next;
 		}
 	}
