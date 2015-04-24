@@ -1,5 +1,6 @@
 #include "lib/malloc.h"
 #include "assert.h"
+#include "lib/printk.h"
 
 static char space[ALLOC_SIZE];
 // the index of last free space
@@ -58,6 +59,7 @@ void *kmalloc(unsigned int size) {
         return NULL;
     }
 
+    printk("head is at %x, size is %d\n", h, s);
     // write header info
     int free = *h;
     int gap = h - head();
@@ -77,6 +79,7 @@ void kfree(void *p) {
     int *nextH = h + *h;
 
     int size = *h;
+    printk("head is at %x, size is %d\n", h, size);
     if (*nextH <= 0) {
         // next is also used, so just release this is fine
         *h = size;

@@ -12,7 +12,8 @@ void init_kmalloc();
 #define ALIGNMENT 4 // the bytes to alignment
 #define HEAD_SIZE (sizeof (int))
 
-#define ALIG(size) ((size) + 4 - ((size) & 0x3))
+#define ALIG(size) _ALIGN_((size), (size - 1))
+#define _ALIGN_(x, a) (((x) + a) & ~(a))
 /*
 typedef struct {
     listhead link;

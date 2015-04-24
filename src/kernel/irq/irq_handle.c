@@ -1,4 +1,5 @@
 #include "kernel/kernel.h"
+#include "lib/printk.h"
 
 #define NR_IRQ_HANDLE 32
 

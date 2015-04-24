@@ -95,4 +95,5 @@ welcome(void) {
     test_free_in_order();
     test_free_random();
     test_malloc_free_large();
+    test_malloc();
 }

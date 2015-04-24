@@ -1,6 +1,16 @@
 #include "lib/malloc.h"
+#include "lib/printk.h"
+
+void test_malloc() {
+    printk("---------test malloc -------\n");
+    unsigned int i = 0;
+    for (; i < 20; ++i) {
+        kmalloc(i);
+    }
+}
 
 void test_malloc_free() {
+    printk("---------test malloc free -------\n");
     int *p1 = kmalloc(6);
     *(p1 + 1) = -1;
     *(p1 + 2) = 1;
@@ -18,6 +28,7 @@ void test_malloc_free() {
 }
 
 void test_free_in_order() {
+    printk("----------test free in order------------\n");
     int *p1 = kmalloc(6);
     *(p1 + 1) = -1;
     *(p1 + 2) = 1;
@@ -53,6 +64,7 @@ void test_free_in_order() {
 }
 
 void test_free_random() {
+    printk("------------test free random-------------\n");
     int *p1 = kmalloc(6);
     *(p1 + 1) = -1;
     *(p1 + 2) = 1;
@@ -71,6 +83,7 @@ void test_free_random() {
 }
 
 void test_malloc_free_large() {
+    printk("-------------test malloc free large\n");
     int *p1 = kmalloc(600);
     *(p1 + 1) = -1;
     *(p1 + 2) = 1;

@@ -4,8 +4,7 @@
 #include "types.h"
 #include "const.h"
 
-void printk(const char *ctl, ...);
-
+#include "lib/printk.h"
 #include "assert.h"
 
 
