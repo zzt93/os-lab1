@@ -7,13 +7,13 @@ void kfree(void *);
 
 void init_kmalloc();
 
-#define ALLOC_SIZE 1048576 // 2**20
+#define ALLOC_SIZE 262144 // 2**20 bytes = 2**18 words
 
 #define ALIGNMENT 4 // the bytes to alignment
-#define HEAD_SIZE (sizeof (int))
+#define HEAD_SIZE 1 // use one word to store head info
 
-#define ALIG(size) _ALIGN_((size), (size - 1))
-#define _ALIGN_(x, a) (((x) + a) & ~(a))
+#define ALIG(size) _ALIGN_((size), (ALIGNMENT - 1))
+#define _ALIGN_(x, a) (((x) + (a)) & ~(a))
 /*
 typedef struct {
     listhead link;

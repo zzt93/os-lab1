@@ -2,12 +2,12 @@
 #include "assert.h"
 #include "lib/printk.h"
 
-static char space[ALLOC_SIZE];
-// the index of last free space
+static int space[ALLOC_SIZE];
+// the index of last free space, words
 int last_i = 0;
 
 static int *head() {
-    return (int *)space;
+    return space;
 }
 
 void init_kmalloc() {
@@ -28,10 +28,13 @@ void init_kmalloc() {
        ------------------------------------
        1/0|xxxx...|1/0|xxxx....
        ------------------------------------
+       
+       the head store the numbers of words(32bits)
 
 */
 void *kmalloc(unsigned int size) {
-    unsigned int s = ALIG(size + HEAD_SIZE);
+    assert (ALIG(size + 4 * HEAD_SIZE)%4 == 0);
+    unsigned int s = ALIG(size + 4 * HEAD_SIZE) / 4;
     // return null if the size is to large
     if (s >= ALLOC_SIZE) {
         return NULL;
@@ -49,7 +52,7 @@ void *kmalloc(unsigned int size) {
         }
         if (h >= head() + ALLOC_SIZE) {
             h = head();
-        } else { // *h >= *s
+        } else { // int_h >= s
             break;
         }
         count--;
@@ -59,8 +62,8 @@ void *kmalloc(unsigned int size) {
         return NULL;
     }
 
-    printk("head is at %x, size is %d\n", h, s);
-    // write header info
+    printk("head is at %x, size is %d words\n", h, s);
+    // write header info -- use int*
     int free = *h;
     int gap = h - head();
     *h = -(s);
@@ -73,7 +76,7 @@ void *kmalloc(unsigned int size) {
 
 void kfree(void *p) {
     int *h = (int *)p - HEAD_SIZE;
-    if(*h > 0 || *h <= - ALLOC_SIZE || *h%4 != 0) {
+    if(*h > 0 || *h <= - ALLOC_SIZE) {
         assert(0);
     }
     int *nextH = h + *h;
