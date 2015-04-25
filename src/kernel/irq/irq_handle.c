@@ -60,7 +60,7 @@ void irq_handle(TrapFrame *tf) {
 			f = f->next;
 		}
 	}
-
+    // save the trap frame pointer for the old process
 	current->tf = tf;
 	schedule();
 }

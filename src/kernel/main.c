@@ -56,7 +56,7 @@ os_init_cont(void) {
     init_kmalloc();
 	welcome();
 
-	sti();
+	sti(); // set interrupt enabled
 
 	/* This context now becomes the idle process. */
 	while (1) {
@@ -81,7 +81,7 @@ welcome(void) {
     printk("=======================================================\n");
     printk("%s %s%scome %co%s", "Hello,", "", "wel", 't', " ");
     printk("%c%c%c%c%c! ", 'O', 'S', 'l', 'a', 'b');
-    printk("I'm the %s of %s. %s 0x%x, %s 0x%x. ", "body", "the game", "Bootblock loads me to the memory position of", 
+    printk("I'm the %s of %s. %s 0x%x, %s 0x%x. ", "body", "the game", "Bootblock loads me to the memory position of",
         0x100000, "and Makefile also tells me that I'm at the location of", 0x100000);
     printk("~!@#$^&*()_+`1234567890-=...... ");
     printk("Now I will test your printk: ");

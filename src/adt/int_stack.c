@@ -1,4 +1,4 @@
-#include "int_stack.h"
+#include "adt/int_stack.h"
 #include "const.h"
 
 LINKLIST_IMPL(Stack, 50)

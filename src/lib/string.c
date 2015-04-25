@@ -1,6 +1,6 @@
 #include "common.h"
 #include "lib/string.h"
-#include "int_stack.h"
+#include "adt/int_stack.h"
 
 /* 注意！itoa只有一个缓冲，因此
  * char *p = itoa(100);

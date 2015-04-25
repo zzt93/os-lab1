@@ -1,5 +1,7 @@
 	#include "x86/memory.h"
-
+    #从i386手册中可以知道, 部分异常会在堆栈上压入错误码,
+    #以提供更多的信息. 但并不是所有异常都会压入错误码, 为了把"陷阱帧"的结构统一起来,
+    #我们为那些不会自动压入错误码的异常和外部中断都手动压入0
 	#----|-----entry------|-errorcode-|-----id-----|---handler---|
 	.globl vec0;    vec0:   pushl $0;  pushl    $0; jmp asm_do_irq
 	.globl vec1;    vec1:   pushl $0;  pushl    $1; jmp asm_do_irq
@@ -36,13 +38,13 @@
 	pushl %es
 	pushl %fs
 	pushl %gs
-	pushal
+	pushal     #EAX, ECX, EDX, EBX, original ESP, EBP, ESI, and EDI
 
 	movw $SELECTOR_KERNEL(SEG_KERNEL_DATA), %ax
 	movw %ax, %ds
 	movw %ax, %es
 
-	pushl %esp
+	pushl %esp #the parameter of irq_handle, tf
 	call irq_handle
 
 	# YOU NEED TO SWITCH STACK TO current->tf
@@ -60,12 +62,13 @@
 
 	#################################################
 	    #addl $4, %esp # when you finish this task, this instruction should be removed
+    # If you don't change the stack, the esp is the same, but you pushl the esp before call irq_handle, so add 4 to skip it.
 
 	popal
 	popl %gs
 	popl %fs
 	popl %es
 	popl %ds
-	addl $8, %esp#remove #irq
+	addl $8, %esp#remove #irq, and error code?
 
 	iret

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "lib/string.h"
 
-#include "int_stack.h"
+#include "adt/int_stack.h"
 #define HEXA_BI 4
 
 void printHexadecimal(void (*printer)(char), int);

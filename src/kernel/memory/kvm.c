@@ -2,14 +2,14 @@
 #include "kernel/memory.h"
 #include "lib/string.h"
 
-/* This source file involves some hardware details. Please refer to 
- *  _ ____   ___    __    __  __                         _ 
+/* This source file involves some hardware details. Please refer to
+ *  _ ____   ___    __    __  __                         _
  * (_)___ \ / _ \  / /   |  \/  |                       | |
  *  _  __) | (_) |/ /_   | \  / | __ _ _ __  _   _  __ _| |
  * | ||__ < > _ <| '_ \  | |\/| |/ _` | '_ \| | | |/ _` | |
  * | |___) | (_) | (_) | | |  | | (_| | | | | |_| | (_| | |
  * |_|____/ \___/ \___/  |_|  |_|\__,_|_| |_|\__,_|\__,_|_|
- */                                                               
+ */
 
 /* These data structures are shared by all kernel threads. */
 static CR3 kcr3;											// kernel CR3
@@ -64,13 +64,13 @@ init_page(void) {
 	cr0.paging = 1;
 	write_cr0(&cr0);
 
-	/* Now we can access global variables! 
+	/* Now we can access global variables!
 	 * Store CR3 in the global variable for future use. */
 	kcr3.val = cr3.val;
 }
 
 /* One TSS will be enough for all processes in ring 3. It will be used in Lab3. */
-static TSS tss; 
+static TSS tss;
 
 inline static void
 set_tss(SegDesc *ptr) {
