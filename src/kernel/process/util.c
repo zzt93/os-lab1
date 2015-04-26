@@ -24,7 +24,7 @@ create_kthread(void *fun) {
 
 void
 init_proc() {
-    create_kthread(A);
-    create_kthread(B);
+    add_process(create_kthread(A));
+    add_process(create_kthread(B));
 }
 

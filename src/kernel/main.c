@@ -3,7 +3,7 @@
 #include "kernel/memory.h"
 
 #include "lib/malloc.h"
-#include "test/test_malloc.h"
+#include "test/test.h"
 
 void init_page(void);
 void init_serial(void);
@@ -49,11 +49,13 @@ os_init_cont(void) {
 	/* Initialize the intel 8259 PIC. */
 	init_intr();
 
+    // initialize kmalloc -- have to initialize it before process,
+    // for using it in allocating memory for PCB
+    init_kmalloc();
+    
 	/* Initialize processes. You should fill this. */
 	init_proc();
 
-    // initialize kmalloc
-    init_kmalloc();
 	welcome();
 
 	sti(); // set interrupt enabled
@@ -91,9 +93,15 @@ welcome(void) {
     printk("=======================================================\n");
     printk("Test end!!! Good luck!!!\n");
     */
+    /*
     test_malloc_free();
     test_free_in_order();
     test_free_random();
     test_malloc_free_large();
     test_malloc();
+    */
+    /*
+    test_queue();
+    test_queue_capacity();
+    */
 }

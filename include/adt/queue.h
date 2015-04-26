@@ -3,34 +3,54 @@
 
 #include "assert.h"
 
-#define SIZE 512
 
-#define QUEUE_DEF(T)                            \
-    T queue[SIZE];                              \
-    int tail = 0;                               \
-    int head = 0;                               \
+/*
+  {T: the type of queue}
+  {m: the max size of your queue}
+  return value:
+  Usage:
+     QUEUE(T, m)
+
+     //then, use your queue
+     if (!is_empty()) {
+         enqueue();
+         //.....
+         dequeue();
+     }
+
+*/
 
 
-#define QUEUE_IMP(T)                            \
-    bool enqueue(T t) {                         \
-        if (tail > SIZE - 1) {                  \
-            tail = tail % SIZE;                 \
-        }                                       \
+#define QUEUE(T, max) QUEUE_DEF(T, max + 1)
+
+#define QUEUE_DEF(T, max)                       \
+    static T queue[max];                        \
+    static int tail = 0;                        \
+    static int head = 0;                        \
+                                                \
+                                                \
+    static void enqueue(T t) {                  \
         queue[tail++] = t;                      \
-        if (head == tail) {                     \
-            return false;                       \
+        if (tail > max - 1) {                   \
+            tail = 0;                           \
         }                                       \
-        return true;                            \
+        if (head == tail) {                     \
+            printk("too many elements\n");      \
+            assert(false);                      \
+        }                                       \
     }                                           \
                                                 \
-    T dequeue() {                               \
-        if (head > SIZE - 1) {                  \
-            head = head % SIZE;                 \
-        }                                       \
+    static T dequeue() {                        \
         int tmp = head++;                       \
-        queue[tmp];                             \
+        if (head > max - 1) {                   \
+            head = 0;                           \
+        }                                       \
+        return queue[tmp];                      \
+    }                                           \
+                                                \
+    static bool is_empty() {                    \
+        return head == tail;                    \
     }                                           \
 
 
-#undef SIZE
 #endif /* __QUEUE_H__ */

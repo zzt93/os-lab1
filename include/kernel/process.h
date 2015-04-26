@@ -34,4 +34,6 @@ typedef struct {
 
 extern PCB *current;
 
+void add_process(PCB*);
+
 #endif
