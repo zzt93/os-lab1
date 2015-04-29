@@ -9,27 +9,27 @@
   {m: the max size of your queue}
   return value:
   Usage:
-     QUEUE(T, m)
+  QUEUE(T, m)
 
-     //then, use your queue
-     if (!is_empty()) {
-         enqueue();
-         //.....
-         dequeue();
-     }
+  //then, use your queue
+  if (!is_empty()) {
+  enqueue();
+  //.....
+  dequeue();
+  }
 
 */
 
 
-#define QUEUE(T, max) QUEUE_DEF(T, max + 1)
+#define QUEUE(T, max, name) QUEUE_DEF(T, max + 1, name)
 
-#define QUEUE_DEF(T, max)                       \
+#define QUEUE_DEF(T, max, name)                 \
     static T queue[max];                        \
     static int tail = 0;                        \
     static int head = 0;                        \
                                                 \
                                                 \
-    static void enqueue(T t) {                  \
+    static void name##_enqueue(T t) {           \
         queue[tail++] = t;                      \
         if (tail > max - 1) {                   \
             tail = 0;                           \
@@ -40,7 +40,7 @@
         }                                       \
     }                                           \
                                                 \
-    static T dequeue() {                        \
+    static T name##_dequeue() {                 \
         int tmp = head++;                       \
         if (head > max - 1) {                   \
             head = 0;                           \
@@ -48,7 +48,7 @@
         return queue[tmp];                      \
     }                                           \
                                                 \
-    static bool is_empty() {                    \
+    static bool name##_is_empty() {             \
         return head == tail;                    \
     }                                           \
 

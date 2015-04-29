@@ -1,16 +1,16 @@
 #include "kernel/kernel.h"
 #include "adt/queue.h"
 
-QUEUE(PCB*, 512)
+QUEUE(PCB*, 512, wake)
 
 PCB idle, *current = &idle;
 
 static PCB* choose_process() {
-    if (is_empty()) {
+    if (wake_is_empty()) {
         return &idle;
     }
-    PCB* tmp = dequeue();
-    enqueue(tmp);
+    PCB* tmp = wake_dequeue();
+    wake_enqueue(tmp);
     return tmp;
 }
 
@@ -21,6 +21,6 @@ schedule(void) {
 }
 
 void add_process(PCB* p) {
-    enqueue(p);
+    wake_enqueue(p);
 }
 
