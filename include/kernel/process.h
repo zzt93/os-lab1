@@ -28,12 +28,14 @@ typedef struct {
     */
     // stack of user
     uint8_t kstack[KSTACK_SIZE];
-    // link
-    ListHead link;
+    // pid
+    int pid;
 } PCB;
 
 extern PCB *current;
 
 void add_process(PCB*);
+void sleep();
+void wake_up(PCB*);
 
 #endif

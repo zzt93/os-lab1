@@ -2,6 +2,8 @@
 #include "test/test_create.h"
 #include "lib/malloc.h"
 
+static int pid_count = 0;
+
 PCB*
 create_kthread(void *fun) {
     // malloc PCB
@@ -19,6 +21,7 @@ create_kthread(void *fun) {
     frame->eflags = 0x200;// set IF = 1, that is enable interrupt
     
     pcb->tf = frame;
+    pcb->pid = pid_count++;
     return pcb;
 }
 
