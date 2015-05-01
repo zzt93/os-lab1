@@ -5,4 +5,6 @@
 #include "test_malloc.h"
 #include "test_queue.h"
 
+void test_list_entry();
+
 #endif /* __TEST_H__ */

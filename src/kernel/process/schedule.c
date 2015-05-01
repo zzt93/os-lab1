@@ -1,8 +1,10 @@
 #include "kernel/kernel.h"
 #include "adt/queue.h"
 
+void vecsys();
+
 QUEUE(PCB*, 256, wake)
-QUEUE(PCB*, 256, blocked)
+//QUEUE(PCB*, 256, blocked)
 
 PCB idle, *current = &idle;
 
@@ -27,16 +29,16 @@ void add_process(PCB* p) {
 
 
 void sleep() {
-    blocked_enqueue(current);
+    //blocked_enqueue(current);
     // delete from wake queue
     
     wait_intr();
-    asm volatile("int $x80");
+    vecsys();
 }
 
 void wake_up(PCB* p) {
     //delete from blocked queue
-    blocked_delete(p);
+    //blocked_delete(p);
     // add to wake queue
     wake_enqueue(p);
 }

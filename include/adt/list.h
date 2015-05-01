@@ -8,8 +8,11 @@ struct ListHead {
 };
 typedef struct ListHead ListHead;
 
+/*
+  return the pointer to the container struct, ie type*
+ */
 #define list_entry(ptr, type, member) \
-	((type*)((char*)(ptr) - (int)(&((type*)0)->member)))
+	((type*)( (char*)(ptr) - (int)(& ((type*)0)->member ) ))
 
 static inline void
 list_add(ListHead *prev, ListHead *next, ListHead *data) {
