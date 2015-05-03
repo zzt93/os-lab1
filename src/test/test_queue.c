@@ -26,4 +26,5 @@ void test_queue_capacity() {
     t_enqueue(20);
     assert(t_dequeue() == 1);
     t_enqueue(21);
+    assert(t_pop_last() == 21);
 }

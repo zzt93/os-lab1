@@ -104,5 +104,10 @@ welcome(void) {
     test_queue();
     test_queue_capacity();
     */
+    /*
     test_list_entry();
+    */
+    /*
+    test_tree();
+    */
 }

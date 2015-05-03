@@ -6,5 +6,6 @@
 #include "test_queue.h"
 
 void test_list_entry();
+void test_tree();
 
 #endif /* __TEST_H__ */

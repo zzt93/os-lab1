@@ -51,6 +51,20 @@
     static bool name##_is_empty() {             \
         return head == tail;                    \
     }                                           \
+                                                \
+    T name##_pop_last() {                       \
+        int tmp = --tail;                       \
+        if (tmp < 0) {                          \
+            tmp = max - 1;                      \
+        }                                       \
+        return queue[tmp];                      \
+    }                                           \
+                                                \
+    static inline bool name##_size() {          \
+        return tail - head;                     \
+    }                                           \
+                                                \
+                                                \
 
 
 #endif /* __QUEUE_H__ */

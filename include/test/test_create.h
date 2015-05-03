@@ -4,4 +4,7 @@
 void A();
 void B();
 
+void C();
+void D();
+
 #endif /* __TEST_CREATE_H__ */

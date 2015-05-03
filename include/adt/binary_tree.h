@@ -3,7 +3,7 @@
 
 #include "assert.h"
 #include "tree.h"
-
+#include "lib/malloc.h"
 
 /*
   T: the type parameter
@@ -27,17 +27,17 @@
         NodeLink link;                                                  \
     } TNode_##name;                                                     \
                                                                         \
+    static TNode_##name h;                                              \
+    static TNode_##name* name##_head = &h;                                     \
                                                                         \
-    static TNode_##name* head = NULL;                                   \
-                                                                        \
-    static inline TNode_##name* left(TNode_##name t) {                  \
+    static inline TNode_##name* left(TNode_##name* t) {                 \
         NodeLink l = t->link;                                           \
         if (l.left == NULL) {                                           \
             return NULL;                                                \
         }                                                               \
         return ptr2container(l.left, TNode_##name, link);               \
     }                                                                   \
-    static inline TNode_##name* right(TNode_##name t) {                 \
+    static inline TNode_##name* right(TNode_##name* t) {                \
         NodeLink l = t->link;                                           \
         if (l.right == NULL) {                                          \
             return NULL;                                                \
@@ -45,32 +45,31 @@
         return ptr2container(l.right, TNode_##name, link);              \
     }                                                                   \
     static inline void set_le(TNode_##name* n, TNode_##name *l) {       \
-        (n->link).left = (l == NULL) ? l : &(l->link);                  \
+        (n->link).left = (l == NULL) ? NULL : &(l->link);               \
     }                                                                   \
     static inline void set_ri(TNode_##name* n, TNode_##name *r) {       \
-        (n->link).right = (r == NULL) ? r : &(r->link);                 \
+        (n->link).right = (r == NULL) ? NULL : &(r->link);              \
     }                                                                   \
                                                                         \
-    void init_node(TNode_##name* n, T t, TNode_##name* l, TNode_##name* r) { \
+    static void init_node(TNode_##name* n, T t, TNode_##name* l, TNode_##name* r) { \
         n->t = t;                                                       \
         set_le(n, l);                                                   \
         set_ri(n, r);                                                   \
     }                                                                   \
                                                                         \
-    static bool empty_subtree(TNode_##name root) {                      \
-        return root == NULL;                                            \
-    }                                                                   \
                                                                         \
-    bool name##_empty(TNode_##name root) {                              \
-        return root == NULL;                                            \
+                                                                        \
+    bool name##_empty() {                                               \
+        return left(name##_head) == NULL &&                             \
+            right(name##_head) == NULL;                                 \
     }                                                                   \
                                                                         \
     static TNode_##name* find_fa(T t) {                                 \
         if (name##_empty()) {                                           \
             return NULL;                                                \
         }                                                               \
-        TNode_##name *fa = head;                                        \
-        TNode_##name *le = left(head);                                  \
+        TNode_##name *fa = name##_head;                                 \
+        TNode_##name *le = left(name##_head);                           \
         assert(le != NULL);                                             \
         int a = f(le->t, t);                                            \
         while(a != 0) {                                                 \
@@ -84,13 +83,11 @@
         return fa;                                                      \
     }                                                                   \
                                                                         \
-    static TNode_##name* find_leaf_by(TNode_##name n, T t) {            \
-        if (empty_subtree(n)) {                                         \
-            return n;                                                   \
-        }                                                               \
+    static TNode_##name* find_leaf_by(TNode_##name* n, T t) {           \
+        assert(n != NULL);                                              \
         TNode_##name *fa = n;                                           \
         int a = f(fa->t, t);                                            \
-        TNode_##name son = (a > 0) ? left(fa) : right (fa);             \
+        TNode_##name* son = (a > 0) ? left(fa) : right (fa);            \
         while(son != NULL) {                                            \
             fa = son;                                                   \
             a = f(son->t, t);                                           \
@@ -104,23 +101,24 @@
                                                                         \
     static TNode_##name* find_leaf(T t) {                               \
         if (name##_empty()) {                                           \
-            return NULL;                                                \
+            return name##_head;                                         \
         }                                                               \
-        return find_leaf_by(left(head), t);                             \
+        return find_leaf_by(left(name##_head), t);                      \
     }                                                                   \
                                                                         \
     void name##_add(T t) {                                              \
         TNode_##name *fa = find_leaf(t);                                \
         TNode_##name *now = kmalloc(sizeof (TNode_##name));             \
         init_node(now, t, NULL, NULL);                                  \
-        if(fa == NULL) {                                                \
-            fa = now;                                                   \
+        if(fa == name##_head) {                                         \
+            set_le(fa, now);                                            \
             return;                                                     \
         }                                                               \
-        if (t > fa->t) {                                                \
-            set_le(fa, now);                                            \
-        } else {                                                        \
+        int a = f(fa->t, t);                                            \
+        if (a <= 0) {                                                   \
             set_ri(fa, now);                                            \
+        } else {                                                        \
+            set_le(fa, now);                                            \
         }                                                               \
     }                                                                   \
                                                                         \
@@ -129,8 +127,8 @@
         if (fa == NULL) {                                               \
             return false;                                               \
         }                                                               \
-        TNode_##name *le =  left(fa);                             \
-        TNode_##name *ri = right(fa);                             \
+        TNode_##name *le =  left(fa);                                   \
+        TNode_##name *ri = right(fa);                                   \
         if ( (le != NULL && f(le->t, t) == 0)                           \
             || (ri != NULL && f(ri->t, t) == 0) ) {                     \
             return true;                                                \
@@ -140,15 +138,17 @@
                                                                         \
     static int count_son(TNode_##name* n) {                             \
         NodeLink link = n->link;                                        \
-        int count = 0;                                                  \
+        int count = 2;                                                  \
         if (link.left == NULL) {                                        \
-            count++;                                                    \
+            count--;                                                    \
         }                                                               \
         if(link.right == NULL) {                                        \
-            count++;                                                    \
+            count--;                                                    \
         }                                                               \
         return count;                                                   \
     }                                                                   \
+                                                                        \
+    static void find_replace(TNode_##name*, int);                       \
                                                                         \
     static void exchange_root(TNode_##name* node,                       \
         TNode_##name *(*get)(TNode_##name*),                            \
@@ -158,32 +158,42 @@
         assert(son != NULL);                                            \
         TNode_##name * l_big = find_leaf_by(son, node->t);              \
         assert(l_big != NULL);                                          \
-        assert(l_big->t < node->t);                                     \
-        node->t = l_big->t;                                             \
+        /*printk("*l_big->t %d, *node->t  %d\n", *l_big->t, *node->t);*/ \
         TNode_##name * fa = find_fa(l_big->t);                          \
         assert(fa != NULL);                                             \
-        set(fa, NULL);                                                  \
-        kfree(l_big);                                                   \
+        /* exchange root and a min/max node*/                           \
+        T tmp = node->t;                                                \
+        node->t = l_big->t;                                             \
+        l_big->t = tmp;                                                 \
+        int count = count_son(l_big);                                    \
+        if (count == 0) {                                               \
+            set(fa, NULL);                                              \
+            kfree(l_big);                                               \
+            return;\
+        }                                                               \
+        assert(count == 1);                                             \
+        find_replace(l_big, count);                                     \
     }                                                                   \
                                                                         \
-    static void find_replace(TNode_##name* node, int count) {           \
+    static void find_replace(TNode_##name* aim, int count) {            \
         if (count == 1) {                                               \
-            TNode_##name *left = left(node);                            \
-            TNode_##name *right = right(node);                          \
-            if (left == NULL) {                                         \
-                exchange_root(node, right, set_ri);                     \
+            TNode_##name *le = left(aim);                               \
+            TNode_##name *ri = right(aim);                              \
+            if (le == NULL) {                                           \
+                exchange_root(aim, right, set_ri);                      \
             } else {                                                    \
-                assert(right == NULL);                                  \
-                exchange_root(node, left, set_le);                      \
+                assert(ri == NULL);                                     \
+                exchange_root(aim, left, set_le);                       \
             }                                                           \
         } else {                                                        \
             assert(count == 2);                                         \
-            exchange_root(node, left, set_le);                          \
+            exchange_root(aim, left, set_le);                           \
         }                                                               \
     }                                                                   \
                                                                         \
     void name##_delete(T t) {                                           \
         if(!name##_has(t)) {                                            \
+            printk("no such elements\n");                               \
             return;                                                     \
         }                                                               \
         TNode_##name* fa = find_fa(t);                                  \
@@ -224,4 +234,11 @@
     }                                                                   \
                                                                         \
     
+/*\
+  bool empty_subtree(TNode_##name* root) {                     \
+  assert(root != NULL);                                           \
+  return left(root) == NULL                                       \
+  && right(root) == NULL;                                     \
+  }  */
+
 #endif /* __BINARY_TREE_H__ */

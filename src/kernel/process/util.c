@@ -25,9 +25,27 @@ create_kthread(void *fun) {
     return pcb;
 }
 
+PCB* a;
+PCB* b;
+PCB* c;
+PCB* d;
+
 void
 init_proc() {
+    b = create_kthread(B);
+    add2blocked(b);
+    c = create_kthread(C);
+    add2blocked(c);
+    d = create_kthread(D);
+    add2blocked(d);
+    a = create_kthread(A);
+    add_process(a);
+}
+
+/*
+void init_proc() {
     add_process(create_kthread(A));
     add_process(create_kthread(B));
 }
 
+*/
