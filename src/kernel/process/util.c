@@ -11,6 +11,7 @@ create_kthread(void *fun) {
     TrapFrame *frame = (TrapFrame*)((char *)pcb + PCB_SIZE - 1 - sizeof(TrapFrame)); // allocate frame at the end of stack
     //init trap frame
     frame->xxx = (uint32_t)(&(frame->xxx) + 4);// see pushal
+    assert (frame->xxx == (uint32_t)(&frame->eax));
     frame->cs = (SEG_KERNEL_CODE << 3) + (0 << 2) + 0;
     frame->ds = (SEG_KERNEL_CODE << 3) + (0 << 2) + 0;
     frame->es = (SEG_KERNEL_DATA << 3) + (0 << 2) + 0;
@@ -33,11 +34,11 @@ PCB* d;
 void
 init_proc() {
     b = create_kthread(B);
-    add2blocked(b);
+    add2sleeped(b);
     c = create_kthread(C);
-    add2blocked(c);
+    add2sleeped(c);
     d = create_kthread(D);
-    add2blocked(d);
+    add2sleeped(d);
     a = create_kthread(A);
     add_process(a);
 }

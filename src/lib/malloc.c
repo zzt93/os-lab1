@@ -82,7 +82,7 @@ void kfree(void *p) {
     int *nextH = h + *h;
 
     int size = *h;
-    printk("head is at %x, size is %d\n", h, size);
+    printk("head is at %x, size is %d words\n", h, size);
     if (*nextH <= 0) {
         // next is also used, so just release this is fine
         *h = size;

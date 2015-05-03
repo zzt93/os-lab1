@@ -11,7 +11,7 @@
    Only when this process stop running:
    1. schedule(ie, choose another process), I
    will enqueue the running process in wake queue.
-   2. sleep, I will add it to blocked tree
+   2. sleep, I will add it to sleeped tree
    
  */
 
@@ -28,7 +28,7 @@ int cmp_pid(PCB* a, PCB* b) {
 
 QUEUE(PCB*, 256, wake)
 
-BI_TREE(PCB*, cmp_pid, blocked)
+BI_TREE(PCB*, cmp_pid, sleeped)
 
 PCB idle = {.pid = -1,
             .state = IDLE,
@@ -40,14 +40,24 @@ static PCB* choose_process() {
         return &idle;
     }
     PCB* tmp = wake_dequeue();
-    //wake_enqueue(tmp);
     return tmp;
 }
+
+/*
+static void print_tree(TNode_sleeped* root) {
+    if (root == NULL) {
+        return;
+    }
+    print_tree(left(root));
+    printk("t is %d\n", root->t->pid);
+    print_tree(right(root));
+}
+*/
 
 void
 schedule(void) {
 	/* implement process/thread schedule here */
-    printk("schedule:\n current is #%d\n", current->pid);
+    //printk("Before schedule: current is #%d\n", current->pid);
     PROCESS_STATE s = current->state;
     switch(s) {
         case IDLE:
@@ -56,60 +66,55 @@ schedule(void) {
             wake_enqueue(current);
             break;
         case SLEEPED:
-            blocked_add(current);
+            sleeped_add(current);
             break;
         default:
             assert(false);
     }
-    printk("size of queue %d\n", wake_size());
+    //printk("in queue %d\n", queue[head]->pid);
     current = choose_process();
+    //printk("in tree:\n");
+    //print_tree(left(sleeped_head));
+    //printk("Now: current is #%d\n", current->pid);
 }
 
 void add_process(PCB* p) {
     p->state = WAKED;
     wake_enqueue(p);
 }
-void add2blocked(PCB* p) {
+void add2sleeped(PCB* p) {
     p->state = SLEEPED;
-    blocked_add(p);
+    sleeped_add(p);
 }
 
-static void print_tree(TNode_blocked* root) {
-    if (root == NULL) {
-        return;
-    }
-    print_tree(left(root));
-    printk("t is %d\n", root->t->pid);
-    print_tree(right(root));
-}
 
 /**
    when a thread invoke sleep, I just set the flag
-   of process state, and it will be added to blocked_tree
+   of process state, and it will be added to sleeped_tree
    at schedule();
  */
 void sleep() {
-    print_tree(left(blocked_head));
+    //print_tree(left(sleeped_head));
     current->state = SLEEPED;
-    //blocked_add(current);
-    // delete from wake queue
-    //PCB* t = wake_pop_last();
-    //assert(t == current);
-    wait_intr();
-    vecsys();
+    
+    // no need to wait_intr(); for int $0x80
+    //wait_intr();
+    asm volatile("int $0x80");
+    //vecsys(); -- use this is wrong!!!! for no eip, cs, elflags
 }
 
 /**
    to wake_up a process will change the state of this
-   process(ie, set the flag) and delete it from blocked and add
+   process(ie, set the flag) and delete it from sleeped and add
    to wake_queue
  */
 void wake_up(PCB* p) {
-    //delete from blocked queue
-    print_tree(left(blocked_head));
-    blocked_delete(p);
-    p->state = WAKED;
-    print_tree(left(blocked_head));
-    // add to wake queue
-    wake_enqueue(p);
+    //delete from sleeped queue
+    //print_tree(left(sleeped_head));
+    if (sleeped_delete(p)) {
+        p->state = WAKED;
+        //print_tree(left(sleeped_head));
+        // add to wake queue
+        wake_enqueue(p);
+    }
 }

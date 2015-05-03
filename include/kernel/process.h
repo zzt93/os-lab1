@@ -43,7 +43,7 @@ typedef struct {
 extern PCB *current;
 
 void add_process(PCB*);
-void add2blocked(PCB*);
+void add2sleeped(PCB*);
 void sleep();
 void wake_up(PCB*);
 

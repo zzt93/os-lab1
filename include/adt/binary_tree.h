@@ -191,10 +191,10 @@
         }                                                               \
     }                                                                   \
                                                                         \
-    void name##_delete(T t) {                                           \
+    bool name##_delete(T t) {                                           \
         if(!name##_has(t)) {                                            \
             printk("no such elements\n");                               \
-            return;                                                     \
+            return false;                                               \
         }                                                               \
         TNode_##name* fa = find_fa(t);                                  \
         assert(fa != NULL);                                             \
@@ -214,7 +214,7 @@
                 if (left_son) {                                         \
                     set_le(fa, NULL);                                   \
                     kfree(le);                                          \
-                    return;                                             \
+                    return true;                                        \
                 }                                                       \
                 set_ri(fa, NULL);                                       \
                 kfree(ri);                                              \
@@ -231,6 +231,7 @@
                 assert(false);                                          \
                 break;                                                  \
         }                                                               \
+        return true;                                                    \
     }                                                                   \
                                                                         \
     

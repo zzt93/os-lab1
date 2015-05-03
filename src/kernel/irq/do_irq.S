@@ -31,6 +31,11 @@
 
 	.globl asm_do_irq
 	.extern irq_handle
+    
+    # the following is for test printk in asm
+    .extern printk
+    .LC0:
+	.string	"%x\n"
 
 	asm_do_irq:
 	cli
@@ -47,6 +52,14 @@
 	pushl %esp #the parameter of irq_handle, tf
 	call irq_handle
 
+    # the following is push parameter to printk
+    # movl current, %eax
+    # movl (%eax), %ebx
+    # pushl %ebx
+    # movl	$.LC0, %edi
+    # pushl %edi
+    # call printk
+    
 	# YOU NEED TO SWITCH STACK TO current->tf
 	# SO YOU NEED TWO ADD TWO LINES OF INTERRUPT CODE
 	# HINT:
