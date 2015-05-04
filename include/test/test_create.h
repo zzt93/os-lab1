@@ -9,4 +9,6 @@ void D();
 
 void keep_stackoverflow();
 
+void print_ch();
+
 #endif /* __TEST_CREATE_H__ */
