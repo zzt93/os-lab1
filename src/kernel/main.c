@@ -52,12 +52,22 @@ os_init_cont(void) {
     // initialize kmalloc -- have to initialize it before process,
     // for using it in allocating memory for PCB
     init_kmalloc();
-    
+
 	/* Initialize processes. You should fill this. */
 	init_proc();
 
 	welcome();
+    /*
+#define PORT_TIME 0x40
+#define FREQ_8253 1193182
+#define HZ        100000
 
+    int count = FREQ_8253 / HZ;
+    assert(count < 65536);
+    out_byte(PORT_TIME + 3, 0x34);
+    out_byte(PORT_TIME    , count % 256);
+    out_byte(PORT_TIME    , count / 256);
+    */
 	sti(); // set interrupt enabled
 
 	/* This context now becomes the idle process. */

@@ -21,7 +21,7 @@ PCB*
 create_kthread(void *fun) {
     // malloc PCB
     PCB* pcb = kmalloc(PCB_SIZE);
-    TrapFrame *frame = (TrapFrame*)((char *)pcb + PCB_SIZE - 1 - sizeof(TrapFrame)); // allocate frame at the end of stack
+    TrapFrame *frame = (TrapFrame*)((char *)(pcb->kstack) + KSTACK_SIZE - 1 - sizeof(TrapFrame)); // allocate frame at the end of stack
     //init trap frame
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
@@ -31,8 +31,8 @@ create_kthread(void *fun) {
 
 PCB* create_kthread_with_args(void* fun, int arg) {
     PCB* pcb = kmalloc(PCB_SIZE);
-    void *last = (char*)pcb + PCB_SIZE - 1;
-    *((int *)last) = arg;
+    void *last = (char*)(pcb->kstack) + KSTACK_SIZE - 1;
+    *((int *)last - 1) = arg;
     TrapFrame *frame = (TrapFrame*)(last - sizeof(TrapFrame) - sizeof(arg));
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
