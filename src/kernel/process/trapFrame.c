@@ -4,8 +4,8 @@
 static int pid_count = 0;
 
 static void init_kernel_tf(TrapFrame* frame, void* fun) {
-    frame->xxx = (uint32_t)(&(frame->xxx) + 4);// see pushal
-    assert (frame->xxx == (uint32_t)(&frame->eax));
+    frame->xxx = (uint32_t)(&(frame->xxx) + 5);// see pushal
+    assert (frame->xxx == (uint32_t)(&frame->gs));
     frame->cs = (SEG_KERNEL_CODE << 3) + (0 << 2) + 0;
     frame->ds = (SEG_KERNEL_CODE << 3) + (0 << 2) + 0;
     frame->es = (SEG_KERNEL_DATA << 3) + (0 << 2) + 0;
@@ -21,7 +21,7 @@ PCB*
 create_kthread(void *fun) {
     // malloc PCB
     PCB* pcb = kmalloc(PCB_SIZE);
-    TrapFrame *frame = (TrapFrame*)((char *)(pcb->kstack) + KSTACK_SIZE - 1 - sizeof(TrapFrame)); // allocate frame at the end of stack
+    TrapFrame *frame = (TrapFrame*)((char *)(pcb->kstack) + KSTACK_SIZE - sizeof(TrapFrame)); // allocate frame at the end of stack
     //init trap frame
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
@@ -31,7 +31,7 @@ create_kthread(void *fun) {
 
 PCB* create_kthread_with_args(void* fun, int arg) {
     PCB* pcb = kmalloc(PCB_SIZE);
-    void *last = (char*)(pcb->kstack) + KSTACK_SIZE - 1;
+    void *last = (char*)(pcb->kstack) + KSTACK_SIZE;
     *((int *)last - 1) = arg;
     TrapFrame *frame = (TrapFrame*)(last - sizeof(TrapFrame) - sizeof(arg));
     init_kernel_tf(frame, fun);

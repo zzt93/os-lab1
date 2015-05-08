@@ -5,13 +5,14 @@
 
 
 
+/*
+  // not implement now:
 void init_proc() {
     int i;
     for(i = 0; i < 7; i ++) {
         add_process(create_kthread_with_args(print_ch, 'a' + i));
     }
 }
-/*
 void init_proc() {
     add_process(create_kthread(keep_stackoverflow));
     add_process(create_kthread(keep_stackoverflow));
@@ -23,7 +24,6 @@ PCB* b;
 PCB* c;
 PCB* d;
 
-/*
 
 void
 init_proc() {
@@ -37,6 +37,7 @@ init_proc() {
     add_process(a);
 }
 
+/*
 void init_proc() {
     add_process(create_kthread(A));
     add_process(create_kthread(B));
