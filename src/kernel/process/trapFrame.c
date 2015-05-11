@@ -1,7 +1,7 @@
 #include "kernel/kernel.h"
 #include "lib/malloc.h"
 
-static int pid_count = 0;
+static int pid_count = START_ID;
 
 static void init_kernel_tf(TrapFrame* frame, void* fun) {
     frame->xxx = (uint32_t)(&(frame->xxx) + 5);// see pushal

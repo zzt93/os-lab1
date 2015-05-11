@@ -1,8 +1,7 @@
 #ifndef __QUEUE_H__
 #define __QUEUE_H__
 
-#include "assert.h"
-
+#include "common.h"
 
 /*
   {T: the type of queue}
@@ -35,12 +34,20 @@
             tail = 0;                           \
         }                                       \
         if (head == tail) {                     \
-            printk("too many elements\n");      \
+            printk(str(name)"_queue: too many elements\n"); \
             assert(false);                      \
         }                                       \
     }                                           \
                                                 \
+    static bool name##_is_empty() {             \
+        return head == tail;                    \
+    }                                           \
+                                                \
     static T name##_dequeue() {                 \
+        if (name##_is_empty()) {                \
+            printk(str(name)"_queue is empty"); \
+            assert(false);                      \
+        }                                       \
         int tmp = head++;                       \
         if (head > max - 1) {                   \
             head = 0;                           \
@@ -48,11 +55,12 @@
         return queue[tmp];                      \
     }                                           \
                                                 \
-    static bool name##_is_empty() {             \
-        return head == tail;                    \
-    }                                           \
                                                 \
     T name##_pop_last() {                       \
+        if (name##_is_empty()) {                \
+            printk(str(name)"_queue is empty"); \
+            assert(false);                      \
+        }                                       \
         int tmp = --tail;                       \
         if (tmp < 0) {                          \
             tmp = max - 1;                      \

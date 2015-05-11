@@ -7,5 +7,5 @@
 #include "lib/printk.h"
 #include "assert.h"
 
-
+#include "macro.h"
 #endif

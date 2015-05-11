@@ -38,6 +38,7 @@ typedef struct {
     // pid
     int pid;
     PROCESS_STATE state;
+    ListHead link;
 } PCB;
 
 extern PCB *current;
@@ -45,6 +46,10 @@ extern PCB *current;
 void add_process(PCB*);
 void add2sleeped(PCB*);
 void sleep();
+void sleep_to(ListHead*, void (*)(ListHead*, PCB*));
+void wake_up_from(ListHead*, PCB* (*)(ListHead*));
 void wake_up(PCB*);
 
+#define IDLE_ID 0
+#define START_ID (IDLE_ID+1)
 #endif

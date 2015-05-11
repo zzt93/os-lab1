@@ -28,7 +28,7 @@
     } TNode_##name;                                                     \
                                                                         \
     static TNode_##name h;                                              \
-    static TNode_##name* name##_head = &h;                                     \
+    static TNode_##name* name##_head = &h;                              \
                                                                         \
     static inline TNode_##name* left(TNode_##name* t) {                 \
         NodeLink l = t->link;                                           \
@@ -51,7 +51,8 @@
         (n->link).right = (r == NULL) ? NULL : &(r->link);              \
     }                                                                   \
                                                                         \
-    static void init_node(TNode_##name* n, T t, TNode_##name* l, TNode_##name* r) { \
+    static void init_node(TNode_##name* n, T t,                         \
+        TNode_##name* l, TNode_##name* r) {                             \
         n->t = t;                                                       \
         set_le(n, l);                                                   \
         set_ri(n, r);                                                   \
@@ -165,11 +166,11 @@
         T tmp = node->t;                                                \
         node->t = l_big->t;                                             \
         l_big->t = tmp;                                                 \
-        int count = count_son(l_big);                                    \
+        int count = count_son(l_big);                                   \
         if (count == 0) {                                               \
             set(fa, NULL);                                              \
             kfree(l_big);                                               \
-            return;\
+            return;                                                     \
         }                                                               \
         assert(count == 1);                                             \
         find_replace(l_big, count);                                     \
@@ -193,7 +194,7 @@
                                                                         \
     bool name##_delete(T t) {                                           \
         if(!name##_has(t)) {                                            \
-            printk("no such elements\n");                               \
+            printk(RED"No such elements"RESET"\n");                     \
             return false;                                               \
         }                                                               \
         TNode_##name* fa = find_fa(t);                                  \

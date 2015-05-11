@@ -1,4 +1,5 @@
 #include "kernel/kernel.h"
+#include "kernel/semaphore.h"
 #include "adt/queue.h"
 #include "adt/binary_tree.h"
 
@@ -30,7 +31,7 @@ QUEUE(PCB*, 256, wake)
 
 BI_TREE(PCB*, cmp_pid, sleeped)
 
-PCB idle = {.pid = -1,
+PCB idle = {.pid = IDLE_ID,
             .state = IDLE,
 };
 PCB *current = &idle;
@@ -61,13 +62,16 @@ schedule(void) {
     PROCESS_STATE s = current->state;
     switch(s) {
         case IDLE:
+        case SLEEPED:
             break;
         case WAKED:
             wake_enqueue(current);
             break;
+            /*
         case SLEEPED:
             sleeped_add(current);
             break;
+            */
         default:
             assert(false);
     }
@@ -88,19 +92,55 @@ void add2sleeped(PCB* p) {
 }
 
 
-/**
+/*
+   Older Version:
    when a thread invoke sleep, I just set the flag
    of process state, and it will be added to sleeped_tree
    at schedule();
  */
-void sleep() {
+/**
+   Now:
+   after change the state of current state,
+   add it to the required queue at once,
+   but because I may have already wake up some
+   other thread, so it become more inclined to
+   cause critical problem.(the other thread may be switched
+   when enqueue current thread)
+*/
+void sleep_to(ListHead* l,
+    void (*enqueue)(ListHead*, PCB*)) {
     //print_tree(left(sleeped_head));
     current->state = SLEEPED;
-    
+    enqueue(l, current);
     // no need to wait_intr(); for int $0x80
     //wait_intr();
     asm volatile("int $0x80");
-    //vecsys(); -- use this is wrong!!!! for no eip, cs, elflags
+    //vecsys(); -- use this is wrong!!!!
+    //for no eip, cs, eflags is pushed
+
+}
+
+void sleep() {
+    lock();
+    //print_tree(left(sleeped_head));
+    current->state = SLEEPED;
+    sleeped_add(current);
+    unlock();
+    // no need to wait_intr(); for int $0x80
+    //wait_intr();
+    asm volatile("int $0x80");
+    //vecsys(); -- use this is wrong!!!!
+    //for no eip, cs, eflags is pushed
+}
+
+void wake_up_from(ListHead* l, PCB* (*dequeue)(ListHead* l)) {
+    PCB* wake = dequeue(l);
+    if (wake == NULL) {
+        printk(RED"Invalid wake up"RESET"\n");
+        return;
+    }
+    wake->state = WAKED;
+    wake_enqueue(wake);
 }
 
 /**
@@ -109,6 +149,7 @@ void sleep() {
    to wake_queue
  */
 void wake_up(PCB* p) {
+    lock();
     //delete from sleeped queue
     //print_tree(left(sleeped_head));
     if (sleeped_delete(p)) {
@@ -117,4 +158,5 @@ void wake_up(PCB* p) {
         // add to wake queue
         wake_enqueue(p);
     }
+    unlock();
 }
