@@ -1,4 +1,5 @@
 #include "kernel/semaphore.h"
+#include "kernel/process.h"
 #include "kernel/trapFrame.h"
 
 
@@ -13,15 +14,15 @@ Sem empty, full, mutex;
 void
 test_producer(void) {
 	while (1) {
-		P(&mutex);
 		P(&empty);
+		P(&mutex);
 		if(g % 10000 == 0) {
 			printk(".");	// tell us threads are really working
 		}
 		buf[f ++] = g ++;
 		f %= NBUF;
-		V(&full);
 		V(&mutex);
+		V(&full);
 	}
 }
 
@@ -29,14 +30,14 @@ void
 test_consumer(void) {
 	int get;
 	while (1) {
-		P(&mutex);
 		P(&full);
+		P(&mutex);
 		get = buf[r ++];
 		assert(last == get - 1);	// the products should be strictly increasing
 		last = get;
 		r %= NBUF;
-		V(&empty);
 		V(&mutex);
+		V(&empty);
 	}
 }
 
@@ -47,9 +48,9 @@ test_setup(void) {
 	create_sem(&mutex, 1);
 	int i;
 	for(i = 0; i < NR_PROD; i ++) {
-		wakeup(create_kthread(test_producer));
+		add_process(create_kthread(test_producer));
 	}
 	for(i = 0; i < NR_CONS; i ++) {
-		wakeup(create_kthread(test_consumer));
+		add_process(create_kthread(test_consumer));
 	}
 }

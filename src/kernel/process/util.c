@@ -43,4 +43,8 @@ void init_proc() {
     add_process(create_kthread(B));
 }
 
+
+void init_proc() {
+    test_setup();
+}
 */

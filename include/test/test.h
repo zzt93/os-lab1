@@ -4,6 +4,7 @@
 #include "test_create.h"
 #include "test_malloc.h"
 #include "test_queue.h"
+#include "test_lock.h"
 
 void test_list_entry();
 void test_tree();

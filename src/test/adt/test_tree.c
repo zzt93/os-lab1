@@ -2,7 +2,7 @@
 #include "assert.h"
 
 
-int f(int* a, int *b) {
+static int f(int* a, int *b) {
     if(*a < *b) {
         return -1;
     } else if (*a > *b) {

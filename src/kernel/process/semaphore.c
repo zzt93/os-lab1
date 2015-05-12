@@ -44,3 +44,9 @@ void V(Sem *s) {
 	}
     unlock();
 }
+
+
+void create_sem(Sem* s, int t) {
+    s->token = t;
+    list_init(&(s->block));
+}

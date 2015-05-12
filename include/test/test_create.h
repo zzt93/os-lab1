@@ -11,4 +11,5 @@ void keep_stackoverflow();
 
 void print_ch();
 
+#include "test_lock.h"
 #endif /* __TEST_CREATE_H__ */

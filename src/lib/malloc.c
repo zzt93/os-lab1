@@ -52,7 +52,7 @@ void *kmalloc(unsigned int size) {
         }
         if (h >= head() + ALLOC_SIZE) {
             h = head();
-        } else { // int_h >= s
+        } else { // *h >= s
             break;
         }
         count--;
@@ -62,7 +62,7 @@ void *kmalloc(unsigned int size) {
         return NULL;
     }
 
-    printk("head is at %x, size is %d words\n", h, s);
+    printk("head is at %x, size is %d words, *h is %x\n", h, s, *h);
     // write header info -- use int*
     int free = *h;
     int gap = h - head();
@@ -79,16 +79,16 @@ void kfree(void *p) {
     if(*h > 0 || *h <= - ALLOC_SIZE) {
         assert(0);
     }
-    int *nextH = h + *h;
+    int *nextH = h + (-*h);
 
     int size = *h;
     printk("head is at %x, size is %d words\n", h, size);
     if (*nextH <= 0) {
         // next is also used, so just release this is fine
-        *h = size;
+        *h = -size;
     } else {
         // next is free, merge it
-        *h = *nextH + size;
+        *h = *nextH + (-size);
     }
     last_i = h - head();
 }
