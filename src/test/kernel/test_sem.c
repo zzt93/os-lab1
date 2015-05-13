@@ -9,7 +9,7 @@
 
 int buf[NBUF], f = 0, r = 0, g = 1;
 int last = 0;
-Sem empty, full, mutex;
+static Sem empty, full, mutex;
 
 void
 test_producer(void) {
