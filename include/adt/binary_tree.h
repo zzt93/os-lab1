@@ -83,7 +83,7 @@
         }                                                               \
         return fa;                                                      \
     }                                                                   \
-                                                                        \
+    /*start from n to find a leaf node*/                                \
     static TNode_##name* find_leaf_by(TNode_##name* n, T t) {           \
         assert(n != NULL);                                              \
         TNode_##name *fa = n;                                           \
@@ -236,6 +236,11 @@
     }                                                                   \
                                                                         \
     
+    /*get a node using the funciton when init as criteria             \
+    TNode_##name* get(T fake) {\
+    \
+    }\
+    */
 /*\
   bool empty_subtree(TNode_##name* root) {                     \
   assert(root != NULL);                                           \

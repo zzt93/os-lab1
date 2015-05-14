@@ -59,6 +59,8 @@ void *kmalloc(unsigned int size) {
     }
     // return null if can't find a place to place it
     if (count == 0) {
+        printk(RED"No where to put it\n"RESET);
+        assert(false);
         return NULL;
     }
 

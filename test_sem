@@ -31,8 +31,9 @@ do
 	elif grep -q 'qemu: fatal:' $logfile
 	then
 		die '\n\033[1;31mqemu has crashed!\033[0m'
-	elif [ `grep -c 'Hello, OS World!' $logfile` != 1 ]
+	elif [ `grep -c 'Hello, OS World!' $logfile` -ge 2 ]
 	then
+		echo -e "\n" `grep -c 'Hello, OS World!' $logfile`
 		die '\n\033[1;31mMysterious reboot is detected!\033[0m'
 	elif [ $i == $maxrun ]
 	then

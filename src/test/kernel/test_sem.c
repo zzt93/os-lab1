@@ -48,9 +48,9 @@ test_setup(void) {
 	create_sem(&mutex, 1);
 	int i;
 	for(i = 0; i < NR_PROD; i ++) {
-		add_process(create_kthread(test_producer));
+		add2wake(create_kthread(test_producer));
 	}
 	for(i = 0; i < NR_CONS; i ++) {
-		add_process(create_kthread(test_consumer));
+		add2wake(create_kthread(test_consumer));
 	}
 }

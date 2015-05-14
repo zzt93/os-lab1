@@ -45,6 +45,7 @@ static PCB* choose_process() {
 }
 
 
+/*
 static void print_tree(TNode_sleeped* root) {
     if (root == NULL) {
         return;
@@ -53,7 +54,7 @@ static void print_tree(TNode_sleeped* root) {
     printk("t is %d\n", root->t->pid);
     print_tree(right(root));
 }
-
+*/
 
 void
 schedule(void) {
@@ -82,13 +83,17 @@ schedule(void) {
     //printk("Now: current is #%d\n", current->pid);
 }
 
-void add_process(PCB* p) {
+void add2wake(PCB* p) {
+    lock();
     p->state = WAKED;
     wake_enqueue(p);
+    unlock();
 }
 void add2sleeped(PCB* p) {
+    lock();
     p->state = SLEEPED;
     sleeped_add(p);
+    unlock();
 }
 
 
@@ -122,10 +127,10 @@ void sleep_to(ListHead* l,
 
 void sleep() {
     lock();
-    print_tree(left(sleeped_head));
+    //print_tree(left(sleeped_head));
     current->state = SLEEPED;
     sleeped_add(current);
-    print_tree(left(sleeped_head));
+    //print_tree(left(sleeped_head));
     unlock();
     // no need to wait_intr(); for int $0x80
     //wait_intr();
@@ -152,10 +157,10 @@ void wake_up_from(ListHead* l, PCB* (*dequeue)(ListHead* l)) {
 void wake_up(PCB* p) {
     lock();
     //delete from sleeped queue
-    print_tree(left(sleeped_head));
+    //print_tree(left(sleeped_head));
     if (sleeped_delete(p)) {
         p->state = WAKED;
-        print_tree(left(sleeped_head));
+        //print_tree(left(sleeped_head));
         // add to wake queue
         wake_enqueue(p);
     }

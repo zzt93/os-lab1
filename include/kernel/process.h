@@ -2,6 +2,8 @@
 #define __PROCESS_H__
 
 #include "adt/list.h"
+#include "kernel/semaphore.h"
+
 #define KSTACK_SIZE 4096
 #define PCB_SIZE (sizeof (PCB))
 
@@ -39,17 +41,23 @@ typedef struct {
     int pid;
     PROCESS_STATE state;
     ListHead link;
+    ListHead mes;
+    Sem mes_lock;
 } PCB;
 
 extern PCB *current;
 
-void add_process(PCB*);
+void add2wake(PCB*);
 void add2sleeped(PCB*);
 void sleep();
 void sleep_to(ListHead*, void (*)(ListHead*, PCB*));
 void wake_up_from(ListHead*, PCB* (*)(ListHead*));
 void wake_up(PCB*);
 
+PCB* fetch_pcb(int);
+void add_process(PCB*);
+
 #define IDLE_ID 0
 #define START_ID (IDLE_ID+1)
+
 #endif

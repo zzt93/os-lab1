@@ -1,5 +1,7 @@
 #include "kernel/kernel.h"
 #include "lib/malloc.h"
+#include "adt/list.h"
+#include "kernel/semaphore.h"
 
 static int pid_count = START_ID;
 
@@ -16,6 +18,13 @@ static void init_kernel_tf(TrapFrame* frame, void* fun) {
     frame->eflags = 0x200;// set IF = 1, that is enable interrupt
 }
 
+static void init_pcb_content(PCB* pcb) {
+    pcb->pid = pid_count++;
+
+    list_init(&(pcb->link));
+    list_init(&(pcb->mes));
+    create_sem(&(pcb->mes_lock), 1);
+}
 
 PCB*
 create_kthread(void *fun) {
@@ -25,7 +34,8 @@ create_kthread(void *fun) {
     //init trap frame
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
-    pcb->pid = pid_count++;
+
+    init_pcb_content(pcb);
     return pcb;
 }
 
@@ -36,6 +46,7 @@ PCB* create_kthread_with_args(void* fun, int arg) {
     TrapFrame *frame = (TrapFrame*)(last - sizeof(TrapFrame) - sizeof(arg));
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
-    pcb->pid = pid_count++;
+
+    init_pcb_content(pcb);
     return pcb;
 }

@@ -1,10 +1,9 @@
-head is at 0xc012b500, size is 1030 words, *h is 0x0003ffff
-head is at 0xc012c518, size is 1030 words, *h is 0x0003fbf9
-head is at 0xc012d530, size is 1030 words, *h is 0x0003f7f3
-head is at 0xc012e548, size is 1030 words, *h is 0x0003f3ed
-head is at 0xc012f560, size is 1030 words, *h is 0x0003efe7
-head is at 0xc0130578, size is 1030 words, *h is 0x0003ebe1
-head is at 0xc0131590, size is 1030 words, *h is 0x0003e7db
+head is at 0xc012b500, size is 1032 words, *h is 0x0003ffff
+head is at 0xc012c520, size is 1032 words, *h is 0x0003fbf7
+head is at 0xc012d540, size is 1032 words, *h is 0x0003f7ef
+head is at 0xc012e560, size is 1032 words, *h is 0x0003f3e7
+head is at 0xc012f580, size is 1032 words, *h is 0x0003efdf
+head is at 0xc01305a0, size is 1032 words, *h is 0x0003ebd7
+head is at 0xc01315c0, size is 1032 words, *h is 0x0003e7cf
 Hello, OS World!
 main-loop: WARNING: I/O thread spun for 1000 iterations
-qemu: terminating on signal 2
