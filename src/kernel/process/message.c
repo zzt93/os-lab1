@@ -9,19 +9,36 @@ void add_message(PCB* p, Msg* m) {
     list_add_after(&(p->mes), &(m->list));
 }
 
-Msg* find_message(PCB* p, pid_t id) {
+static int has_message(PCB* p, pid_t id) {
     ListHead* head = &(p->mes);
     ListHead* ptr = NULL;
     Msg* tmp = NULL;
     list_foreach(ptr, head) {
+        assert(ptr != NULL);
         tmp = list_entry(ptr, Msg, list);
+        assert(tmp != NULL);
         if (tmp->src == id || id == ANY) {
+            break;
+        }
+    }
+    return tmp != NULL;
+}
+
+static Msg* find_message(PCB* p, pid_t id) {
+    ListHead* head = &(p->mes);
+    ListHead* ptr = NULL;
+    Msg* tmp = NULL;
+    list_foreach(ptr, head) {
+        assert(ptr != NULL);
+        tmp = list_entry(ptr, Msg, list);
+        assert(tmp != NULL);
+        if (tmp->src == id || id == ANY) {
+            list_del(&(tmp->list));
             break;
         }
     }
     return tmp;
 }
-
 /**
    get a message from process p's message list, with the right
    id, then copy to m.
@@ -43,12 +60,13 @@ void send(pid_t dest, Msg *m) {
     P(s);
     add_message(de, m);
     V(s);
+    wake_up(de);
     //V(&full);
 }
 
 void receive(pid_t src, Msg *m) {
     Sem* s = &(current->mes_lock);
-    if (find_message(current, src) == NULL) {// no such message
+    if (!has_message(current, src)) {// no such message
         // go to sleep
         sleep();
     }

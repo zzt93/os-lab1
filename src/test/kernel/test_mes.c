@@ -77,7 +77,7 @@ void E () {
 		else if(m1.src == pidD) {c = '\\';m2.dest = pidA;}
 		else assert(0);
 
-		printk("\033[s\033[1000;1000H%c\033[u", c);
+		printk(RED" %c "RESET, c);
 		send(m2.dest, &m2);
 	}
 

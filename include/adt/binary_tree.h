@@ -194,7 +194,7 @@
                                                                         \
     bool name##_delete(T t) {                                           \
         if(!name##_has(t)) {                                            \
-            printk(RED"No such elements"RESET"\n");                     \
+            /*printk(RED"No such elements"RESET"\n"); */                \
             return false;                                               \
         }                                                               \
         TNode_##name* fa = find_fa(t);                                  \
