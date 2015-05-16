@@ -73,7 +73,7 @@ os_init_cont(void) {
 
 	/* This context now becomes the idle process. */
 	while (1) {
-        printk(". ");
+        printk("!");
 		wait_intr();
 	}
 }
@@ -121,6 +121,6 @@ welcome(void) {
     */
     /*
     test_tree();
+    test_map();
     */
-    
 }

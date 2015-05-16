@@ -47,6 +47,7 @@ typedef struct {
 
 extern PCB *current;
 
+// implement in schedule.c
 void add2wake(PCB*);
 void add2sleeped(PCB*);
 void sleep();
@@ -54,10 +55,13 @@ void sleep_to(ListHead*, void (*)(ListHead*, PCB*));
 void wake_up_from(ListHead*, PCB* (*)(ListHead*));
 void wake_up(PCB*);
 
+// implement in process.c
 PCB* fetch_pcb(int);
 void add_process(PCB*);
 
 #define IDLE_ID 0
 #define START_ID (IDLE_ID+1)
+
+#define ANY -1
 
 #endif

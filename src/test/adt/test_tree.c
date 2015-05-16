@@ -13,7 +13,7 @@ static int f(int* a, int *b) {
 
 BI_TREE(int*, f, t)
 
-void print_tree(TNode_t* root) {
+static void print_tree(TNode_t* root) {
     if (root == NULL) {
         return;
     }

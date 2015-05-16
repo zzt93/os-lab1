@@ -75,3 +75,11 @@ void print_str(void (*printer)(char), char *str) {
         str++;
     }
 }
+
+int strcmp(const char* f, const char* s) {
+    int i = 0;
+    while(f[i] == s[i] && f[i] != '\0') {
+        i++;
+    }
+    return f[i] - s[i];
+}

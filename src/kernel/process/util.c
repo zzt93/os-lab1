@@ -43,8 +43,16 @@ void init_proc() {
     add2wake(create_kthread(B));
 }
 
-*/
 
 void init_proc() {
     test_setup();
+}
+*/
+
+void init_proc() {
+    add2wake(create_kthread(A));
+    add2wake(create_kthread(B));
+    add2wake(create_kthread(C));
+    add2wake(create_kthread(D));
+    add2wake(create_kthread(E));
 }

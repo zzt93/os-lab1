@@ -7,6 +7,8 @@ void B();
 void C();
 void D();
 
+void E();
+
 void keep_stackoverflow();
 
 void print_ch();

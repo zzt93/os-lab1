@@ -8,5 +8,6 @@
 
 void test_list_entry();
 void test_tree();
+void test_map();
 
 #endif /* __TEST_H__ */

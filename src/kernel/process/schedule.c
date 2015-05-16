@@ -31,8 +31,9 @@ QUEUE(PCB*, 256, wake)
 
 BI_TREE(PCB*, cmp_pid, sleeped)
 
-PCB idle = {.pid = IDLE_ID,
-            .state = IDLE,
+PCB idle = {
+    .pid = IDLE_ID,
+    .state = IDLE,
 };
 PCB *current = &idle;
 
@@ -87,12 +88,14 @@ void add2wake(PCB* p) {
     lock();
     p->state = WAKED;
     wake_enqueue(p);
+    add_process(p);
     unlock();
 }
 void add2sleeped(PCB* p) {
     lock();
     p->state = SLEEPED;
     sleeped_add(p);
+    add_process(p);
     unlock();
 }
 

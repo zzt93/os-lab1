@@ -3,36 +3,36 @@
 
 LINKLIST_IMPL(Stack, 50)
 
-static Stack_t head = NULL;
+static Stack_t stack_pointer = NULL;
 
 void init(Stack_t s, char c) {
     s->c = c;
 }
 
 void push(int c) {
-    if (head == NULL) {
-        head = Stack_new();
+    if (stack_pointer == NULL) {
+        stack_pointer = Stack_new();
     } else {
         Stack_t now = Stack_new();
-        Stack_insert(NULL, head, now);
-        head = now;
+        Stack_insert(NULL, stack_pointer, now);
+        stack_pointer = now;
     }
     // initailize stack
-    init(head, c);
+    init(stack_pointer, c);
 }
 
 int pop() {
     if (empty()) {
         assert(0);
     }
-    Stack_t next = Stack_next(head);
-    char res = head->c;
-    Stack_remove(head);
-    Stack_free(head);
-    head = next;
+    Stack_t next = Stack_next(stack_pointer);
+    char res = stack_pointer->c;
+    Stack_remove(stack_pointer);
+    Stack_free(stack_pointer);
+    stack_pointer = next;
     return res;
 }
 
 int empty() {
-    return head == NULL;
+    return stack_pointer == NULL;
 }

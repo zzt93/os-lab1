@@ -24,6 +24,7 @@ extern PCB* b;
 extern PCB* c;
 extern PCB* d;
 
+/*
 void A () {
     int x = 0;
     while(1) {
@@ -68,3 +69,4 @@ void D () {
         x ++;
     }
 }
+*/

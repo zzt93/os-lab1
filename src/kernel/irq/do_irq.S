@@ -9,6 +9,7 @@
 	.globl vec3;    vec3:   pushl $0;  pushl    $3; jmp asm_do_irq
 	.globl vec4;    vec4:   pushl $0;  pushl    $4; jmp asm_do_irq
 	.globl vec5;    vec5:   pushl $0;  pushl    $5; jmp asm_do_irq
+    # invalid opcode: call -- dereference null
 	.globl vec6;    vec6:   pushl $0;  pushl    $6; jmp asm_do_irq
 	.globl vec7;    vec7:   pushl $0;  pushl    $7; jmp asm_do_irq
 	.globl vec8;    vec8:              pushl    $8; jmp asm_do_irq
@@ -17,6 +18,7 @@
 	.globl vec11;   vec11:             pushl   $11; jmp asm_do_irq
 	.globl vec12;   vec12:             pushl   $12; jmp asm_do_irq
 	.globl vec13;   vec13:             pushl   $13; jmp asm_do_irq
+    # general protection: cs has wrong content /
 	.globl vec14;   vec14:             pushl   $14; jmp asm_do_irq
 
 	.globl vecsys; vecsys:  pushl $0;  pushl $0x80; jmp asm_do_irq
