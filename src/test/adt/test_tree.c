@@ -32,6 +32,20 @@ void test_tree() {
     d = &di;
     e = &ei;
 
+    /*
+    printk("----------test add--------\n");
+    t_add(b);
+    t_add(c);
+    t_add(a);
+
+    print_tree(left(t_head));
+    t_delete(b);
+    print_tree(left(t_head));
+
+    t_add(d);
+    t_add(e);
+    */
+    /*
     printk("----------test add--------\n");
     t_add(d);
     t_add(b);
@@ -70,7 +84,8 @@ void test_tree() {
         print_tree(left(t_head));
 
     }
-    /*
+    */
+    
     printk("----------test add--------\n");
     t_add(c);
     t_add(b);
@@ -89,7 +104,6 @@ void test_tree() {
     printk("empty %d\n", t_empty());
 
     printk("-------- test delete-------\n");
-    */
     /* delete node without child
     t_delete(d);
     printk("has d %d\n", t_has(d));
@@ -98,7 +112,6 @@ void test_tree() {
     t_delete(b);
     printk("has b %d\n", t_has(b));
     */
-    /*
     t_delete(b);
     printk("has b %d\n", t_has(b));
     print_tree(left(t_head));
@@ -124,5 +137,5 @@ void test_tree() {
     t_add(d);
     t_add(e);
     print_tree(left(t_head));
-    */
+    
 }

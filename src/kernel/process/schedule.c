@@ -45,16 +45,18 @@ static PCB* choose_process() {
     return tmp;
 }
 
-/*
-static void print_tree(TNode_sleeped* root) {
+
+void print_tree(TNode_sleeped* root) {
     if (root == NULL) {
         return;
     }
+    assert(root != left(root));
+    assert(root != right(root));
     print_tree(left(root));
-    printk("t is %d\n", root->t->pid);
+    printk("t is %d ", root->t->pid);
     print_tree(right(root));
 }
-*/
+
 
 void
 schedule(void) {
@@ -133,6 +135,7 @@ void sleep_to(ListHead* l,
 void sleep() {
     lock();
     //print_tree(left(sleeped_head));
+    printk("#%d in sleep\n", current->pid);
     NOINTR;
     current->state = SLEEPED;
     //    sleeped_add(current);
@@ -166,14 +169,23 @@ void wake_up(PCB* p) {
     //delete from sleeped queue
     //printk("before delete: ");
     //print_tree(left(sleeped_head));
+    wake_up_lock(p, 1);
+}
+
+void wake_up_lock(PCB* p, int unl) {
+    lock();
+    //delete from sleeped queue
+    printk("%d in wake\n", current->pid);
+    print_tree(left(sleeped_head));
     if (sleeped_delete(p)) {
         p->state = WAKED;
-        //printk("after delete: ");
-        //print_tree(left(sleeped_head));
+        printk("wake up %d\n", p->pid);
+        print_tree(left(sleeped_head));
         // add to wake queue
         wake_enqueue(p);
         NOINTR;
-        printk("wake up %d\n", p->pid);
     }
-    unlock();
+    if (unl) {
+        unlock();
+    }
 }

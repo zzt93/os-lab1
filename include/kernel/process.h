@@ -53,6 +53,7 @@ void add2sleeped(PCB*);
 void sleep();
 void sleep_to(ListHead*, void (*)(ListHead*, PCB*));
 void wake_up_from(ListHead*, PCB* (*)(ListHead*));
+void wake_up_lock(PCB*, int);
 void wake_up(PCB*);
 
 // implement in process.c

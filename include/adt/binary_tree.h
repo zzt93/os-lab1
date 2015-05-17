@@ -10,12 +10,13 @@
   f: the comparing funciton, bool f(T, T);
   name: the name of tree
 
-  the order:
-  left < mid <= right
+  the order: forbiden to add same element
+  left < mid < right
 
-  the duplicate:
-  if there are more than one same elements,
-  no gurrantee which will be find or delete
+  no duplicate:
+  if there are more than one same elements -- defined by your
+  comparing function -- added, only first is added
+  
   
   implementation detail:
   use a TreeNode* as the head, and only use the left link
@@ -45,9 +46,19 @@
         return ptr2container(l.right, TNode_##name, link);              \
     }                                                                   \
     static inline void set_le(TNode_##name* n, TNode_##name *l) {       \
+        assert(n != NULL);                                              \
+        assert(n != l);                                                 \
+        if (l != NULL) {                                                \
+            assert(f(n->t, l->t) != 0);                                 \
+        }                                                               \
         (n->link).left = (l == NULL) ? NULL : &(l->link);               \
     }                                                                   \
     static inline void set_ri(TNode_##name* n, TNode_##name *r) {       \
+        assert(n != NULL);                                              \
+        assert(n != r);                                                 \
+        if (r != NULL) {                                                \
+            assert(f(n->t, r->t) != 0);                                 \
+        }                                                               \
         (n->link).right = (r == NULL) ? NULL : &(r->link);              \
     }                                                                   \
                                                                         \
@@ -65,6 +76,11 @@
             right(name##_head) == NULL;                                 \
     }                                                                   \
                                                                         \
+    /**
+       return NULL if empty tree
+       return the place to insert if no such element
+       or return the father of that element
+    */                                                                  \
     static TNode_##name* find_fa(T t) {                                 \
         if (name##_empty()) {                                           \
             return NULL;                                                \
@@ -74,6 +90,7 @@
         assert(le != NULL);                                             \
         int a = f(le->t, t);                                            \
         while(a != 0) {                                                 \
+            /*printk("......");*/                                       \
             fa = le;                                                    \
             le = (a > 0) ? left(le) : right(le);                        \
             if(le == NULL) {                                            \
@@ -83,6 +100,7 @@
         }                                                               \
         return fa;                                                      \
     }                                                                   \
+                                                                        \
     /*start from n to find a leaf node*/                                \
     static TNode_##name* find_leaf_by(TNode_##name* n, T t) {           \
         assert(n != NULL);                                              \
@@ -90,6 +108,7 @@
         int a = f(fa->t, t);                                            \
         TNode_##name* son = (a > 0) ? left(fa) : right (fa);            \
         while(son != NULL) {                                            \
+            /*printk(",,,,,,,,"); */                                    \
             fa = son;                                                   \
             a = f(son->t, t);                                           \
             son = (a > 0) ? left(fa) : right(fa);                       \
@@ -107,7 +126,12 @@
         return find_leaf_by(left(name##_head), t);                      \
     }                                                                   \
                                                                         \
+    bool name##_has(T);                                                 \
+                                                                        \
     void name##_add(T t) {                                              \
+        if (name##_has(t)) {                                            \
+            return;                                                     \
+        }                                                               \
         NOINTR;                                                         \
         TNode_##name *fa = find_leaf(t);                                \
         TNode_##name *now = kmalloc(sizeof (TNode_##name));             \
@@ -130,12 +154,13 @@
         if (fa == NULL) {                                               \
             return false;                                               \
         }                                                               \
-        TNode_##name *le =  left(fa);                                   \
+        TNode_##name *le = left(fa);                                    \
         TNode_##name *ri = right(fa);                                   \
         if ( (le != NULL && f(le->t, t) == 0)                           \
             || (ri != NULL && f(ri->t, t) == 0) ) {                     \
             return true;                                                \
         }                                                               \
+        assert(le == NULL || ri == NULL);                               \
         return false;                                                   \
     }                                                                   \
                                                                         \
@@ -153,9 +178,8 @@
                                                                         \
     static void find_replace(TNode_##name*, int);                       \
                                                                         \
-    static void exchange_root(TNode_##name* node,                       \
-        TNode_##name *(*get)(TNode_##name*),                            \
-        void (*set)(TNode_##name*, TNode_##name*) ) {                   \
+static void exchange_root(TNode_##name* node,                           \
+                                  TNode_##name *(*get)(TNode_##name*)) { \
                                                                         \
         TNode_##name * son = get(node);                                 \
         assert(son != NULL);                                            \
@@ -164,13 +188,21 @@
         /*printk("*l_big->t %d, *node->t  %d\n", *l_big->t, *node->t);*/ \
         TNode_##name * fa = find_fa(l_big->t);                          \
         assert(fa != NULL);                                             \
-        /* exchange root and a min/max node*/                           \
+        /* exchange root with a min/max node*/                          \
         T tmp = node->t;                                                \
         node->t = l_big->t;                                             \
         l_big->t = tmp;                                                 \
+                                                                        \
         int count = count_son(l_big);                                   \
         if (count == 0) {                                               \
-            set(fa, NULL);                                              \
+            TNode_##name *fa_l = left(fa);                              \
+            TNode_##name *fa_r = right(fa);                             \
+            if (l_big == fa_l) {                                        \
+                set_le(fa, NULL);                                       \
+            } else {                                                    \
+                assert(fa_r == l_big);                                  \
+                set_ri(fa, NULL);                                       \
+            }                                                           \
             kfree(l_big);                                               \
             return;                                                     \
         }                                                               \
@@ -183,21 +215,21 @@
             TNode_##name *le = left(aim);                               \
             TNode_##name *ri = right(aim);                              \
             if (le == NULL) {                                           \
-                exchange_root(aim, right, set_ri);                      \
+                exchange_root(aim, right);                              \
             } else {                                                    \
                 assert(ri == NULL);                                     \
-                exchange_root(aim, left, set_le);                       \
+                exchange_root(aim, left);                               \
             }                                                           \
         } else {                                                        \
             assert(count == 2);                                         \
-            exchange_root(aim, left, set_le);                           \
+            exchange_root(aim, left);                                   \
         }                                                               \
     }                                                                   \
                                                                         \
     bool name##_delete(T t) {                                           \
         NOINTR;                                                         \
         if(!name##_has(t)) {                                            \
-            /*printk(RED"No such elements"RESET"\n"); */                \
+            printk(RED"No such elements"RESET"\n");                     \
             return false;                                               \
         }                                                               \
         TNode_##name* fa = find_fa(t);                                  \
@@ -206,10 +238,11 @@
         TNode_##name *ri = right(fa);                                   \
         int count = 0;                                                  \
         bool left_son = false;                                          \
-        if (le->t == t) {                                               \
+        if (le != NULL && f(le->t, t) == 0) {                           \
             count = count_son(le);                                      \
             left_son = true;                                            \
         } else {                                                        \
+            assert(ri != NULL && f(ri->t, t) == 0);                     \
             count = count_son(ri);                                      \
         }                                                               \
                                                                         \

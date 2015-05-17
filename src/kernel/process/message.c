@@ -51,34 +51,40 @@ void get_message(PCB* p, pid_t id, Msg* m) {
     memcpy(m, tmp, sizeof(Sem));
 }
 
+/**
+   can't use P() & V() in send
+   and message for P() and V() can
+   happen one after another, may cause deadlocks
+ */
 void send(pid_t dest, Msg *m) {
     /**
        TODO add semaphore or lock
      */
-    printk("%d:----send to %d------\n", current->pid, dest);
+    //printk("%d:----send to %d------\n", current->pid, dest);
+    lock();
     PCB* de = fetch_pcb(dest);
-    Sem* s = &(de->mes_lock);
-    P(s);
+    //Sem* s = &(de->mes_lock);
+    //P(s);
     add_message(de, m);
-    V(s);
-    P(&wake_lock);
-    wake_up(de);
-    V(&wake_lock);
-    printk("%d:---------end send--------\n", current->pid);
-    //V(&full);
+    //V(s);
+    wake_up_lock(de, 0);
+    unlock();
+    //printk("%d:---------end send--------\n", current->pid);
 }
 
 void receive(pid_t src, Msg *m) {
-    printk("%d:--------receive from %d----------\n", current->pid, src);
-    Sem* s = &(current->mes_lock);
+    //printk("%d:--------receive from %d----------\n", current->pid, src);
+    lock();
+    //Sem* s = &(current->mes_lock);
     while (!has_message(current, src)) {// no such message
         // go to sleep
         // if some thread send message to it, it will wake_up this,
         // so return from here and continue
         sleep();
     }
-    P(s);
+    //P(s);
     get_message(current, src, m);
-    V(s);
-    printk("%d:-------end receive------\n", current->pid);
+    unlock();
+    //V(s);
+    //printk("%d:-------end receive------\n", current->pid);
 }

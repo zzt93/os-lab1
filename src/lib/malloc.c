@@ -41,19 +41,25 @@ void *kmalloc(unsigned int size) {
     }
 
     int *h = last_i + space_head();
-    int *nextH = h + *h;
-    if (nextH < space_head() + ALLOC_SIZE && *nextH > 0) {
+    assert(*h != 0);
+    int *nextH = h + (*h > 0 ? *h : -*h);
+    if (*h > 0 &&
+        nextH < space_head() + ALLOC_SIZE && *nextH > 0) {
         *h = *h + *nextH;
     }
-    //assert(*h > 0);
+    assert(*h != 0);
 
     int count = 2;
     while (count) {
-        while (h < space_head() + ALLOC_SIZE && *h < s) {
-            if (*h <= 0) {
+        while (h < space_head() + ALLOC_SIZE && // valid address
+            (*h < 0 || (*h > 0 && *h < s)) ) {
+            //printk("in loop\n");
+            if (*h < 0) {
                 h += -(*h);
-            } else {
+            } else if (*h > 0) {
                 h += *h;
+            } else {
+                assert(0);
             }
         }
         if (h >= space_head() + ALLOC_SIZE) {
@@ -70,15 +76,21 @@ void *kmalloc(unsigned int size) {
         return NULL;
     }
 
+    assert(s > 0);
+    assert(*h >= s);
     printk("head is at %x, size is %d words, *h is %x\n", h, s, *h);
     // write header info -- use int*
     int free = *h;
     int gap = h - space_head();
     *h = -(s);
+    assert(free >= s);
     // update last_i
     last_i = gap + s;
-    // update free space header info
-    *(space_head() + last_i) = free - s;
+    if (free != s) {
+        // update free space header info
+        *(space_head() + last_i) = free - s;
+    }
+
     return h + HEAD_SIZE;
 }
 

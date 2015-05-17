@@ -29,7 +29,7 @@ extern PCB* d;
    it wake_up next thread and before A going to
    sleep, thread-a will put into waked queue rather than
    sleeped tree, which might cause B can't find A in sleeped
-   this test case frozen.
+   which cause thread running not in order -- but still can run
 */
 void A () {
     int x = 0;
