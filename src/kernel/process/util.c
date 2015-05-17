@@ -1,8 +1,7 @@
 #include "kernel/kernel.h"
 #include "test/test_create.h"
 #include "lib/malloc.h"
-#include "kernel/trapFrame.h"
-
+#include "kernel/init_proc.h"
 
 
 /*
@@ -25,7 +24,6 @@ PCB* c;
 PCB* d;
 
 
-/*
 void
 init_proc() {
     b = create_kthread(B);
@@ -38,6 +36,7 @@ init_proc() {
     add2wake(a);
 }
 
+/*
 void init_proc() {
     add2wake(create_kthread(A));
     add2wake(create_kthread(B));
@@ -48,11 +47,15 @@ void init_proc() {
     test_setup();
 }
 */
-
+/*
 void init_proc() {
+    create_sem(&wake_lock, 1);
+    create_sem(&sleeped_lock, 1);
+    
     add2wake(create_kthread(A));
     add2wake(create_kthread(B));
     add2wake(create_kthread(C));
     add2wake(create_kthread(D));
     add2wake(create_kthread(E));
 }
+*/

@@ -1,11 +1,17 @@
 #include "kernel/message.h"
 #include "kernel/process.h"
 
+/**
 static int pidA = 1, pidB = 2,
     pidC = 3, pidD = 4, pidE = 5;
 
 extern PCB* current;
 
+   if send and receive not synchronized,
+   it cause two thread is waked at the same time,
+   might cause frozen
+ */
+/*
 void A () {
 	Msg m1, m2;
 	m1.src = current->pid;
@@ -77,8 +83,9 @@ void E () {
 		else if(m1.src == pidD) {c = '\\';m2.dest = pidA;}
 		else assert(0);
 
-		printk(RED" %c "RESET, c);
+		printk("\033[s\033[1000;1000H%c\033[u", c);
 		send(m2.dest, &m2);
 	}
 
 }
+*/

@@ -22,6 +22,7 @@ static PCB* dequeue(ListHead* l) {
 
 void P(Sem *s) {
     lock();
+    NOINTR;
 	if(s->token > 0) {
 		/* get a token */
         s->token--;
@@ -29,15 +30,18 @@ void P(Sem *s) {
 		/* go to sleep in the queue */
         // and make the context switched
         sleep_to(&(s->block), enqueue);
+        NOINTR;
 	}
     unlock();
 }
 
 void V(Sem *s) {
     lock();
+    NOINTR;
 	if(!list_empty(&(s->block))) {
 		/* wake up one thread sleeping in the queue */
         wake_up_from(s->block.next, dequeue);
+        NOINTR;
 	} else {
 		/* release the token */
         s->token++;

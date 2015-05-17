@@ -3,7 +3,7 @@
 #include "adt/queue.h"
 #include "adt/binary_tree.h"
 
-
+Sem wake_lock, sleeped_lock;
 /**
    NOTICE:
    In my implementation, when a process is running,
@@ -13,7 +13,7 @@
    1. schedule(ie, choose another process), I
    will enqueue the running process in wake queue.
    2. sleep, I will add it to sleeped tree
-   
+
  */
 
 //void vecsys();
@@ -45,7 +45,6 @@ static PCB* choose_process() {
     return tmp;
 }
 
-
 /*
 static void print_tree(TNode_sleeped* root) {
     if (root == NULL) {
@@ -62,26 +61,29 @@ schedule(void) {
 	/* implement process/thread schedule here */
     //printk("Before schedule: current is #%d\n", current->pid);
     PROCESS_STATE s = current->state;
+    lock();
     switch(s) {
         case IDLE:
-        case SLEEPED:
+            //        case SLEEPED:
             break;
         case WAKED:
             wake_enqueue(current);
             break;
-            /*
         case SLEEPED:
             sleeped_add(current);
+            printk("add %d to tree\n", current->pid);
             break;
-            */
         default:
             assert(false);
     }
-    //printk("in queue %d\n", queue[head]->pid);
+    //unlock();
     current = choose_process();
-    //printk("in tree:\n");
+    //printk("in queue %d\n", tail-head);
+    //printk("in queue %d\n", queue[head]->pid);
+    //printk("after add:\n");
     //print_tree(left(sleeped_head));
-    //printk("Now: current is #%d\n", current->pid);
+    NOINTR;
+    printk("Now: current is #%d\n", current->pid);
 }
 
 void add2wake(PCB* p) {
@@ -131,12 +133,14 @@ void sleep_to(ListHead* l,
 void sleep() {
     lock();
     //print_tree(left(sleeped_head));
+    NOINTR;
     current->state = SLEEPED;
-    sleeped_add(current);
+    //    sleeped_add(current);
     //print_tree(left(sleeped_head));
     unlock();
     // no need to wait_intr(); for int $0x80
     //wait_intr();
+    INTR;
     asm volatile("int $0x80");
     //vecsys(); -- use this is wrong!!!!
     //for no eip, cs, eflags is pushed
@@ -160,12 +164,16 @@ void wake_up_from(ListHead* l, PCB* (*dequeue)(ListHead* l)) {
 void wake_up(PCB* p) {
     lock();
     //delete from sleeped queue
+    //printk("before delete: ");
     //print_tree(left(sleeped_head));
     if (sleeped_delete(p)) {
         p->state = WAKED;
+        //printk("after delete: ");
         //print_tree(left(sleeped_head));
         // add to wake queue
         wake_enqueue(p);
+        NOINTR;
+        printk("wake up %d\n", p->pid);
     }
     unlock();
 }

@@ -108,6 +108,7 @@
     }                                                                   \
                                                                         \
     void name##_add(T t) {                                              \
+        NOINTR;                                                         \
         TNode_##name *fa = find_leaf(t);                                \
         TNode_##name *now = kmalloc(sizeof (TNode_##name));             \
         init_node(now, t, NULL, NULL);                                  \
@@ -121,6 +122,7 @@
         } else {                                                        \
             set_le(fa, now);                                            \
         }                                                               \
+        NOINTR;                                                         \
     }                                                                   \
                                                                         \
     bool name##_has(T t) {                                              \
@@ -193,6 +195,7 @@
     }                                                                   \
                                                                         \
     bool name##_delete(T t) {                                           \
+        NOINTR;                                                         \
         if(!name##_has(t)) {                                            \
             /*printk(RED"No such elements"RESET"\n"); */                \
             return false;                                               \
@@ -233,6 +236,7 @@
                 break;                                                  \
         }                                                               \
         return true;                                                    \
+        NOINTR;                                                         \
     }                                                                   \
                                                                         \
     

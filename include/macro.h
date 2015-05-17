@@ -12,5 +12,8 @@
 #define CYAN    "\x1b[36m"
 #define RESET   "\x1b[0m"
 
+#define IF_MASK 0x200
+#define INTR assert(read_eflags() & IF_MASK)
+#define NOINTR assert(~read_eflags() & IF_MASK)
 
 #endif /* __MACRO_H__ */

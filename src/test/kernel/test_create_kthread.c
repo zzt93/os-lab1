@@ -24,13 +24,21 @@ extern PCB* b;
 extern PCB* c;
 extern PCB* d;
 
-/*
+/**
+   if this thread is interrupted exactly after
+   it wake_up next thread and before A going to
+   sleep, thread-a will put into waked queue rather than
+   sleeped tree, which might cause B can't find A in sleeped
+   this test case frozen.
+*/
 void A () {
     int x = 0;
     while(1) {
         if(x % 100000 == 0) {
             printk("thread-a\n");
             wake_up(b);
+            INTR;
+            //asm volatile("int $0x80");
             sleep();
         }
         x ++;
@@ -42,6 +50,8 @@ void B () {
         if(x % 100000 == 0) {
             printk("thread-b\n");
             wake_up(c);
+            INTR;
+            //asm volatile("int $0x80");
             sleep();
         }
         x ++;
@@ -53,6 +63,8 @@ void C () {
         if(x % 100000 == 0) {
             printk("thread-c\n");
             wake_up(d);
+            INTR;
+            //asm volatile("int $0x80");
             sleep();
         }
         x ++;
@@ -64,9 +76,10 @@ void D () {
         if(x % 100000 == 0) {
             printk("thread-d\n");
             wake_up(a);
+            INTR;
+            //asm volatile("int $0x80");
             sleep();
         }
         x ++;
     }
 }
-*/

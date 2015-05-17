@@ -41,11 +41,11 @@ void *kmalloc(unsigned int size) {
     }
 
     int *h = last_i + space_head();
-    assert(*h > 0);
     int *nextH = h + *h;
     if (nextH < space_head() + ALLOC_SIZE && *nextH > 0) {
         *h = *h + *nextH;
     }
+    //assert(*h > 0);
 
     int count = 2;
     while (count) {

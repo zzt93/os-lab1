@@ -55,22 +55,30 @@ void send(pid_t dest, Msg *m) {
     /**
        TODO add semaphore or lock
      */
+    printk("%d:----send to %d------\n", current->pid, dest);
     PCB* de = fetch_pcb(dest);
     Sem* s = &(de->mes_lock);
     P(s);
     add_message(de, m);
     V(s);
+    P(&wake_lock);
     wake_up(de);
+    V(&wake_lock);
+    printk("%d:---------end send--------\n", current->pid);
     //V(&full);
 }
 
 void receive(pid_t src, Msg *m) {
+    printk("%d:--------receive from %d----------\n", current->pid, src);
     Sem* s = &(current->mes_lock);
-    if (!has_message(current, src)) {// no such message
+    while (!has_message(current, src)) {// no such message
         // go to sleep
+        // if some thread send message to it, it will wake_up this,
+        // so return from here and continue
         sleep();
     }
     P(s);
     get_message(current, src, m);
     V(s);
+    printk("%d:-------end receive------\n", current->pid);
 }

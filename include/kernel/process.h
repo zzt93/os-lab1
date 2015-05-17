@@ -64,4 +64,6 @@ void add_process(PCB*);
 
 #define ANY -1
 
+extern Sem wake_lock, sleeped_lock;
+
 #endif

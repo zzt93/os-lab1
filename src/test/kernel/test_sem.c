@@ -1,6 +1,6 @@
 #include "kernel/semaphore.h"
 #include "kernel/process.h"
-#include "kernel/trapFrame.h"
+#include "kernel/init_proc.h"
 
 
 #define NBUF 5
