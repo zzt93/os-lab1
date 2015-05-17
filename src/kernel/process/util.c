@@ -5,7 +5,7 @@
 
 
 /*
-  // not implement now:
+  // not correctly implemented now:
 void init_proc() {
     int i;
     for(i = 0; i < 7; i ++) {
@@ -23,7 +23,7 @@ PCB* b;
 PCB* c;
 PCB* d;
 
-
+/*
 void
 init_proc() {
     b = create_kthread(B);
@@ -35,6 +35,7 @@ init_proc() {
     a = create_kthread(A);
     add2wake(a);
 }
+*/
 
 /*
 void init_proc() {
@@ -42,11 +43,12 @@ void init_proc() {
     add2wake(create_kthread(B));
 }
 
-
+*/
 void init_proc() {
     test_setup();
 }
-*/
+
+
 /*
 void init_proc() {
     create_sem(&wake_lock, 1);

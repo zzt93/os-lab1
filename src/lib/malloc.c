@@ -1,4 +1,5 @@
 #include "lib/malloc.h"
+#include "kernel/semaphore.h"
 #include "assert.h"
 #include "lib/printk.h"
 
@@ -17,7 +18,10 @@ void init_kmalloc() {
 
 
 
-/*
+/**
+   use lock & unlock rather than
+   P & V -- have a try
+
   args: {size: use the sizeof to produce numbers of bytes}
   return value: if has free space, return the pointer to the first char; otherwise return null
   Usage:
@@ -28,7 +32,7 @@ void init_kmalloc() {
        ------------------------------------
        1/0|xxxx...|1/0|xxxx....
        ------------------------------------
-       
+
        the head store the numbers of words(32bits)
 
 */
@@ -40,6 +44,7 @@ void *kmalloc(unsigned int size) {
         return NULL;
     }
 
+    lock();
     int *h = last_i + space_head();
     assert(*h != 0);
     int *nextH = h + (*h > 0 ? *h : -*h);
@@ -92,6 +97,7 @@ void *kmalloc(unsigned int size) {
     }
 
     return h + HEAD_SIZE;
+    unlock();
 }
 
 void kfree(void *p) {
@@ -102,7 +108,8 @@ void kfree(void *p) {
     int *nextH = h + (-*h);
 
     int size = *h;
-    printk("head is at %x, size is %d words\n", h, size);
+    lock();
+    printk("head is at %x, size is %d words, ", h, size);
     if (*nextH <= 0) {
         // next is also used, so just release this is fine
         *h = -size;
@@ -112,4 +119,5 @@ void kfree(void *p) {
     }
     printk("*h is %x\n", *h);
     last_i = h - space_head();
+    unlock();
 }

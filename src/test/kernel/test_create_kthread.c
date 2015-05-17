@@ -31,6 +31,7 @@ extern PCB* d;
    sleeped tree, which might cause B can't find A in sleeped
    which cause thread running not in order -- but still can run
 */
+/*
 void A () {
     int x = 0;
     while(1) {
@@ -83,3 +84,4 @@ void D () {
         x ++;
     }
 }
+*/
