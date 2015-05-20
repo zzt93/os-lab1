@@ -85,7 +85,7 @@ schedule(void) {
     //printk("in queue %d\n", queue[head]->pid);
     //printk("after add:\n");
     //print_tree(left(sleeped_head));
-    //printk("Now: current is #%d\n, count %d", current->pid, current->count_of_lock);
+    printk("Now: current is #%d, count %d\n", current->pid, current->count_of_lock);
     NOINTR;
 }
 
@@ -136,7 +136,7 @@ void sleep_to(ListHead* l,
 void sleep() {
     lock();
     //print_tree(left(sleeped_head));
-    printk("#%d in sleep\n", current->pid);
+    //printk("#%d in sleep\n", current->pid);
     NOINTR;
     current->state = SLEEPED;
     //    sleeped_add(current);
@@ -175,12 +175,12 @@ void wake_up_lock(PCB* p) {
 void wake_up(PCB* p) {
     lock();
     //delete from sleeped queue
-    printk("#%d in wake\n", current->pid);
+    //printk("#%d in wake\n", current->pid);
     print_tree(left(sleeped_head));
     if (sleeped_delete(p)) {
         p->state = WAKED;
-        printk("wake up %d\n", p->pid);
-        print_tree(left(sleeped_head));
+        //printk("wake up %d\n", p->pid);
+        //print_tree(left(sleeped_head));
         // add to wake queue
         wake_enqueue(p);
         NOINTR;

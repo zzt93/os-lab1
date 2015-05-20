@@ -272,7 +272,7 @@ init_consl(int tty_index) {
 static void
 send_updatemsg(void) {
 	if (get_jiffy() % (HZ / 10) == 0) {
-		Msg m;
+		static Msg m;
 		m.src = MSG_HARD_INTR;
 		m.type = MSG_TTY_UPDATE;
 		send(TTY, &m);

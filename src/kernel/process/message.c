@@ -39,6 +39,7 @@ static Msg* find_message(PCB* p, pid_t id) {
             break;
         }
     }
+    assert(ptr != head);
     printk("src %d, dest %d\n", tmp->src, tmp->dest);
     return tmp;
 }
@@ -67,9 +68,9 @@ void send(pid_t dest, Msg *m) {
     lock();
     NOINTR;
     PCB* de = fetch_pcb(dest);
-    assert(de != NULL);
+    assert(de != NULL && dest == de->pid);
     NOINTR;
-    printk("#%d in send ", current->pid);
+    printk("#%d to send src: %d to dest: %d ", current->pid, m->src, dest);
     //Sem* s = &(de->mes_lock);
     //P(s);
     //m->src = current->pid;
@@ -83,9 +84,8 @@ void send(pid_t dest, Msg *m) {
 }
 
 void receive(pid_t src, Msg *m) {
-    //printk("%d:--------receive from %d----------\n", current->pid, src);
+    printk("%d:--------receive from %d----------\n", current->pid, src);
     lock();
-    //Sem* s = &(current->mes_lock);
     NOINTR;
     while (!has_message(current, src)) {// no such message
         // go to sleep

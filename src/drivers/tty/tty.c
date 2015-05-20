@@ -23,12 +23,12 @@ void init_tty(void) {
 
 static void
 ttyd(void) {
-	Msg m;
+	static Msg m;
 
 	while (1) {
         INTR;
 		receive(ANY, &m);
-        printk("position\n");
+        //printk("position\n");
         INTR;
 		if (m.src == MSG_HARD_INTR) {
 			switch (m.type) {

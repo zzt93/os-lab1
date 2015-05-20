@@ -6,7 +6,7 @@
 
 void
 send_keymsg(void) {
-	Msg m;
+	static Msg m;
 	m.type = MSG_TTY_GETKEY;
 	m.src = MSG_HARD_INTR;
 	send(TTY, &m);
@@ -54,7 +54,7 @@ readkey(void) {
 			consl_accept(current_consl, c);
 		}
 		switch (code) {
-			case K_ENTR: 
+			case K_ENTR:
 			case K_BACK:
 			case K_LEFT:
 			case K_RIGHT:
