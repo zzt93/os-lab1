@@ -2,13 +2,22 @@
 #include "kernel/process.h"
 #include "x86/cpu.h"
 
+extern PCB* current;
 
 void lock() {
     cli();
+    current->count_of_lock++;
 }
 
 void unlock() {
-    sti();
+    NOINTR;
+    assert(current != NULL);
+    current->count_of_lock--;
+    assert(current->count_of_lock >= 0);
+    printk("#%d count is %d ", current->pid,current->count_of_lock);
+    if (current->count_of_lock == 0) {
+        sti();
+    }
 }
 
 static void enqueue(ListHead* l, PCB* p) {

@@ -61,9 +61,8 @@ void print_tree(TNode_sleeped* root) {
 void
 schedule(void) {
 	/* implement process/thread schedule here */
-    //printk("Before schedule: current is #%d\n", current->pid);
+    NOINTR;
     PROCESS_STATE s = current->state;
-    lock();
     switch(s) {
         case IDLE:
             //        case SLEEPED:
@@ -78,14 +77,16 @@ schedule(void) {
         default:
             assert(false);
     }
-    //unlock();
+    // to balance the lock in asm_do_irq
+    current->count_of_lock--;
+    //printk("#%d count of lock %d\n", current->pid, current->count_of_lock);
     current = choose_process();
     //printk("in queue %d\n", tail-head);
     //printk("in queue %d\n", queue[head]->pid);
     //printk("after add:\n");
     //print_tree(left(sleeped_head));
+    //printk("Now: current is #%d\n, count %d", current->pid, current->count_of_lock);
     NOINTR;
-    printk("Now: current is #%d\n", current->pid);
 }
 
 void add2wake(PCB* p) {
@@ -143,7 +144,7 @@ void sleep() {
     unlock();
     // no need to wait_intr(); for int $0x80
     //wait_intr();
-    INTR;
+    // programmed exceptions INT N is unmaskable
     asm volatile("int $0x80");
     //vecsys(); -- use this is wrong!!!!
     //for no eip, cs, eflags is pushed
@@ -164,18 +165,17 @@ void wake_up_from(ListHead* l, PCB* (*dequeue)(ListHead* l)) {
    process(ie, set the flag) and delete it from sleeped and add
    to wake_queue
  */
+/*
+void wake_up_lock(PCB* p) {
+    lock();
+    wake_up_lock(p, 1);
+}
+*/
+
 void wake_up(PCB* p) {
     lock();
     //delete from sleeped queue
-    //printk("before delete: ");
-    //print_tree(left(sleeped_head));
-    wake_up_lock(p, 1);
-}
-
-void wake_up_lock(PCB* p, int unl) {
-    lock();
-    //delete from sleeped queue
-    printk("%d in wake\n", current->pid);
+    printk("#%d in wake\n", current->pid);
     print_tree(left(sleeped_head));
     if (sleeped_delete(p)) {
         p->state = WAKED;
@@ -185,7 +185,5 @@ void wake_up_lock(PCB* p, int unl) {
         wake_enqueue(p);
         NOINTR;
     }
-    if (unl) {
-        unlock();
-    }
+    unlock();
 }

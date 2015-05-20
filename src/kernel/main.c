@@ -3,6 +3,7 @@
 #include "kernel/memory.h"
 
 #include "lib/malloc.h"
+#include "kernel/semaphore.h"
 #include "test/test.h"
 
 void init_page(void);
@@ -11,6 +12,7 @@ void init_segment(void);
 void init_idt(void);
 void init_intr(void);
 void init_proc(void);
+void init_driver();
 void welcome(void);
 
 void os_init_cont(void);
@@ -53,11 +55,14 @@ os_init_cont(void) {
     // for using it in allocating memory for PCB
     init_kmalloc();
 
+    NOINTR;
 	/* Initialize processes. You should fill this. */
 	init_proc();
 
+    init_driver();
+    NOINTR;
 	welcome();
-    /*    
+    /*
     //used to make timer interrupt more frequent
 #define PORT_TIME 0x40
 #define FREQ_8253 1193182
@@ -68,8 +73,8 @@ os_init_cont(void) {
     out_byte(PORT_TIME + 3, 0x34);
     out_byte(PORT_TIME    , count % 256);
     out_byte(PORT_TIME    , count / 256);
-*/    
-	sti(); // set interrupt enabled
+*/
+	unlock(); // set interrupt enabled
 
 	/* This context now becomes the idle process. */
 	while (1) {

@@ -43,21 +43,28 @@ void init_proc() {
     add2wake(create_kthread(B));
 }
 
-*/
 void init_proc() {
     test_setup();
 }
 
+*/
+void init_idle() {
+    current->count_of_lock = 1;
+}
 
-/*
 void init_proc() {
+    init_idle();
+    /*
     create_sem(&wake_lock, 1);
     create_sem(&sleeped_lock, 1);
-    
+
     add2wake(create_kthread(A));
+    NOINTR;
     add2wake(create_kthread(B));
     add2wake(create_kthread(C));
     add2wake(create_kthread(D));
     add2wake(create_kthread(E));
+    */
 }
+/*
 */

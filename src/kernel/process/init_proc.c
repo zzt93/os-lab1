@@ -3,6 +3,9 @@
 #include "adt/list.h"
 #include "kernel/semaphore.h"
 
+#define KER_INIT_LOCK 1
+#define USER_INIT_LOCK 0
+
 static int pid_count = START_ID;
 
 static void init_kernel_tf(TrapFrame* frame, void* fun) {
@@ -19,17 +22,21 @@ static void init_kernel_tf(TrapFrame* frame, void* fun) {
 }
 
 static void init_pcb_content(PCB* pcb) {
+    NOINTR;
     pcb->pid = pid_count++;
+    pcb->count_of_lock = 0;
 
     list_init(&(pcb->link));
     list_init(&(pcb->mes));
-    create_sem(&(pcb->mes_lock), 1);
+    //create_sem(&(pcb->mes_lock), 1);
 }
 
 PCB*
 create_kthread(void *fun) {
     // malloc PCB
+    NOINTR;
     PCB* pcb = kmalloc(PCB_SIZE);
+    NOINTR;
     TrapFrame *frame = (TrapFrame*)((char *)(pcb->kstack) + KSTACK_SIZE - sizeof(TrapFrame)); // allocate frame at the end of stack
     //init trap frame
     init_kernel_tf(frame, fun);

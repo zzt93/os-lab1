@@ -1,12 +1,13 @@
 #include "kernel/kernel.h"
 #include "kernel/init_proc.h"
 #include "drivers/tty/tty.h"
+#include "drivers/hal.h"
 
 static int tty_idx = 1;
 
 static void
 getty(void) {
-	char name[] = "tty0";// buf[256];
+	char name[] = "tty0";//, buf[256];
 	lock();
 	name[3] += (tty_idx ++);
 	unlock();
@@ -17,7 +18,7 @@ getty(void) {
 		 * 2. convert all small letters in buf into capitcal letters
 		 * 3. write the result on screen (use dev_write())
 		 */
-
+        //dev_read(name, current->pid, buf, 0, 1);
 	}
 }
 

@@ -26,7 +26,10 @@ ttyd(void) {
 	Msg m;
 
 	while (1) {
+        INTR;
 		receive(ANY, &m);
+        printk("position\n");
+        INTR;
 		if (m.src == MSG_HARD_INTR) {
 			switch (m.type) {
 				case MSG_TTY_GETKEY:
@@ -38,6 +41,7 @@ ttyd(void) {
 				default: assert(0);
 			}
 		} else {
+            INTR;
 			switch(m.type) {
 				case DEV_READ:
 					read_request(&m);
@@ -60,7 +64,9 @@ ttyd(void) {
 					m.src = current->pid;
 					send(dest, &m);
 					break;
-				default: assert(0);
+				default:
+                    printk("type %d", m.type);
+                    assert(0);
 			}
 		}
 	}

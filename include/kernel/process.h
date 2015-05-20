@@ -42,7 +42,8 @@ typedef struct {
     PROCESS_STATE state;
     ListHead link;
     ListHead mes;
-    Sem mes_lock;
+    //Sem mes_lock;
+    int count_of_lock;
 } PCB;
 
 extern PCB *current;

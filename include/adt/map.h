@@ -59,10 +59,11 @@
         }                                                   \
         if (le != NULL && le->k == k) {                     \
             return le->v;                                   \
-        } else {                                            \
-            assert(ri != NULL && ri->k == k);               \
+        } else if ((ri != NULL && ri->k == k)){             \
             return ri->v;                                   \
         }                                                   \
+        printk(RED"no such key "RESET);                     \
+        return NULL;                                        \
     }                                                       \
                                                             \
     void name##_put(K k, V v) {                             \

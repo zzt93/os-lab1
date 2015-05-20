@@ -78,7 +78,6 @@ void *kmalloc(unsigned int size) {
     if (count == 0) {
         printk(RED"No where to put it\n"RESET);
         assert(false);
-        return NULL;
     }
 
     assert(s > 0);
@@ -96,8 +95,9 @@ void *kmalloc(unsigned int size) {
         *(space_head() + last_i) = free - s;
     }
 
-    return h + HEAD_SIZE;
+    NOINTR;
     unlock();
+    return h + HEAD_SIZE;
 }
 
 void kfree(void *p) {
@@ -105,10 +105,10 @@ void kfree(void *p) {
     if(*h > 0 || *h <= - ALLOC_SIZE) {
         assert(0);
     }
+    lock();
     int *nextH = h + (-*h);
 
     int size = *h;
-    lock();
     printk("head is at %x, size is %d words, ", h, size);
     if (*nextH <= 0) {
         // next is also used, so just release this is fine

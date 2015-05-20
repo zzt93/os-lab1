@@ -9,5 +9,6 @@ void add_process(PCB* pcb) {
 }
 
 PCB* fetch_pcb(pid_t id) {
+    printk("id %d", id);
     return all_get(id);
 }

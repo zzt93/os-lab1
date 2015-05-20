@@ -1,17 +1,15 @@
 #include "kernel/message.h"
 #include "kernel/process.h"
 
-/**
 static int pidA = 1, pidB = 2,
     pidC = 3, pidD = 4, pidE = 5;
 
 extern PCB* current;
 
+/**
    if send and receive not synchronized,
    it cause two thread is waked at the same time,
-   might cause frozen
  */
-/*
 void A () {
 	Msg m1, m2;
 	m1.src = current->pid;
@@ -88,4 +86,3 @@ void E () {
 	}
 
 }
-*/

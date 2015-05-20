@@ -33,6 +33,7 @@
 
 	.globl asm_do_irq
 	.extern irq_handle
+    .extern lock
     
     # the following is for test printk in asm
     .extern printk
@@ -40,7 +41,7 @@
 	.string	"%x\n"
 
 	asm_do_irq:
-	cli
+	call lock
 	pushl %ds
 	pushl %es
 	pushl %fs
