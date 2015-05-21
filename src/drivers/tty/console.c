@@ -288,6 +288,7 @@ void init_console(void) {
 		hal_register(ttys[i].name, TTY, i);
 	}
 	current_consl = ttys;
+    // register time change of screen handler
 	add_irq_handle(0, send_updatemsg);
 }
 

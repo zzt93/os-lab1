@@ -85,7 +85,7 @@ schedule(void) {
     //printk("in queue %d\n", queue[head]->pid);
     //printk("after add:\n");
     //print_tree(left(sleeped_head));
-    printk("Now: current is #%d, count %d\n", current->pid, current->count_of_lock);
+    printk("Now: current is #%d\n", current->pid);
     NOINTR;
 }
 

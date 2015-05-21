@@ -31,9 +31,10 @@ static int keychar[2][128] = {
 
 void
 readkey(void) {
+    lock();
 	uint32_t code = in_byte(0x60);
 	in_byte(0x61);
-
+    unlock();
 	if (code >= 128) {
 		code -= 128;
 		switch (code) {

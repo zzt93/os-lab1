@@ -13,6 +13,7 @@ void init_getty(void);
 static void ttyd(void);
 
 void init_tty(void) {
+    // register key-press handler
 	add_irq_handle(1, send_keymsg);
 	PCB *p = create_kthread(ttyd);
 	TTY = p->pid;
