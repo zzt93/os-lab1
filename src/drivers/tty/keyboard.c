@@ -9,6 +9,7 @@ send_keymsg(void) {
 	static Msg m;
 	m.type = MSG_TTY_GETKEY;
 	m.src = MSG_HARD_INTR;
+    //printk("send key msg ");
 	send(TTY, &m);
 }
 

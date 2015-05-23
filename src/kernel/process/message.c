@@ -2,10 +2,14 @@
 #include "kernel/process.h"
 #include "kernel/semaphore.h"
 #include "lib/string.h"
+#include "lib/malloc.h"
 
 
 
-void add_message(PCB* p, Msg* m) {
+void add_message(PCB* p, Msg* msg) {
+    NOINTR;
+    Msg* m = kmalloc(sizeof(Msg));
+    memcpy(m, msg, sizeof(Msg));
     list_add_after(&(p->mes), &(m->list));
 }
 
@@ -40,7 +44,6 @@ static Msg* find_message(PCB* p, pid_t id) {
         }
     }
     assert(ptr != head);
-    printk("src %d, dest %d\n", tmp->src, tmp->dest);
     return tmp;
 }
 /**
@@ -50,11 +53,12 @@ static Msg* find_message(PCB* p, pid_t id) {
 void get_message(PCB* p, pid_t id, Msg* m) {
     // find and delete aim message
     Msg *tmp = find_message(p, id);
-    printk("src %d, dest %d\n", tmp->src, tmp->dest);
+    printk("#%d: src %d, dest %d\n", current->pid, tmp->src, tmp->dest);
     assert(tmp != NULL
         && (tmp->src == id || id == ANY)
         && tmp->dest == current->pid);
     // copy to m
+    kfree(tmp);
     memcpy(m, tmp, sizeof(Msg));
 }
 
@@ -86,6 +90,7 @@ void send(pid_t dest, Msg *m) {
 void receive(pid_t src, Msg *m) {
     printk("%d:--------receive from %d----------\n", current->pid, src);
     lock();
+    printk("list size %d ", list_size(&(current->mes)) );
     NOINTR;
     while (!has_message(current, src)) {// no such message
         // go to sleep
@@ -97,6 +102,7 @@ void receive(pid_t src, Msg *m) {
     NOINTR;
     get_message(current, src, m);
     unlock();
+    INTR;
     //V(s);
     //printk("%d:-------end receive------\n", current->pid);
 }

@@ -15,6 +15,7 @@ void init_hal(void) {
 	for (i = 0; i < NR_DEV; i ++) {
 		list_add_before(&free, &dev_pool[i].list);
 	}
+    NOINTR;
 	list_init(&devices);
 }
 

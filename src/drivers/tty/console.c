@@ -96,6 +96,7 @@ movr(Console *c) {
 void
 consl_sync(Console *c) {
 	int i;
+    lock();
 	for (i = 0; i < SCR_W; i ++) {
 		vmem[i] = (C_BLUE << 12) | (C_LWHITE << 8) | banner[i];
 	}
@@ -107,6 +108,7 @@ consl_sync(Console *c) {
 		out_byte(0x3d4, 0xf);
 		out_byte(0x3d5, pos & 0xff);
 	}
+    unlock();
 }
 
 static void
@@ -167,6 +169,9 @@ read_request(Msg *m) {
 	}
 }
 
+/**
+   to emulate the behavior of newline
+ */
 static void
 cook(Console *c) {
 	printk("Capture: %s\n", c->lbuf);

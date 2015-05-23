@@ -56,8 +56,22 @@ list_empty(ListHead *list) {
 	return list == list->next;
 }
 
+
 #define list_foreach(ptr, head) \
 	for ((ptr) = (head)->next; (ptr) != (head); (ptr) = (ptr)->next)
+
+static inline int list_size(ListHead* list) {
+    assert(list != NULL);
+    int count = 0;
+    ListHead* p = NULL;
+    //printk("%x ", list);
+    list_foreach(p, list) {
+        //printk("%x ", p);
+        assert(p != NULL && p != p->next);
+        count++;
+    }
+    return count;
+}
 
 #endif
 

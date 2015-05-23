@@ -14,7 +14,9 @@ run: disk.img
 	$(QEMU) -serial stdio disk.img
 
 debug: disk.img
+	gnome-terminal -e "bash -c \"gdb -s kernel; exec bash\""
 	$(QEMU) -serial stdio -s -S disk.img
+	
 
 disk.img: kernel
 	@cd boot; make

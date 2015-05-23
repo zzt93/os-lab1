@@ -12,6 +12,11 @@
 
  */
 
+/**
+   lock or not:?
+   lock&unlock may make the printk in NOINTR place invalid
+   if not, buf might be changed
+ */
 char *itoa(int a) {
 	static char buf[30];
 	char *p = buf + sizeof(buf) - 1;
@@ -82,4 +87,18 @@ int strcmp(const char* f, const char* s) {
         i++;
     }
     return f[i] - s[i];
+}
+
+char to_upper(char c) {
+    if (is_letter(c)) {
+        return c & 0xcf;
+    } else {
+        printk(RED"Not a letter\n"RESET);
+        return c;
+    }
+}
+
+int is_letter(char c) {
+    return (c <= 'z' && c >= 'a')
+        || (c <= 'Z' && c >= 'A');
 }

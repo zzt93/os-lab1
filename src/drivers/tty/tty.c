@@ -29,14 +29,18 @@ ttyd(void) {
 	while (1) {
         INTR;
 		receive(ANY, &m);
-        //printk("position\n");
+        //printk("position1\n");
         INTR;
 		if (m.src == MSG_HARD_INTR) {
 			switch (m.type) {
 				case MSG_TTY_GETKEY:
+                    INTR;
+                    //printk("position2\n");
 					readkey();
+                    INTR;
 					break;
 				case MSG_TTY_UPDATE:
+                    //printk("position3\n");
 					update_banner();
 					break;
 				default: assert(0);

@@ -57,11 +57,13 @@ void irq_handle(TrapFrame *tf) {
 
 		while (f != NULL) { /* call handlers one by one */
 			f->routine();
+            NOINTR;
 			f = f->next;
 		}
 	}
     // save the trap frame pointer for the old process
 	current->tf = tf;
+    printk("Stack :%x %x %x ", tf->eip, tf->ebp, tf->xxx);
 	schedule();
 }
 
