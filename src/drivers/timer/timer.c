@@ -19,6 +19,13 @@ static void init_i8253(void);
 static void init_rt(void);
 static void timer_driver_thread(void);
 
+/**
+   设置时钟中断的频率(100Hz)
+   初始化系统时间(选做题, 若不完成, 系统时间将会从2000/01/01 00:00:00开始, 但不会影响系统的正常运行)
+   注册顶半处理update_jiffy(), 每次时钟中断到来时会更新变量jiffy的值, 这个变量记录了距离系统初始化结束期间时钟中断到来的次数
+   创建TIMER主线程
+   注册设备"timer"
+ */
 void init_timer(void) {
 	init_i8253();
 	init_rt();
@@ -32,10 +39,9 @@ void init_timer(void) {
 static void
 timer_driver_thread(void) {
 	static Msg m;
-	
+
 	while (true) {
 		receive(ANY, &m);
-		
 		switch (m.type) {
 			default: assert(0);
 		}
@@ -62,7 +68,7 @@ update_jiffy(void) {
 		if (rt.second >= 60) { rt.second = 0; rt.minute ++; }
 		if (rt.minute >= 60) { rt.minute = 0; rt.hour ++; }
 		if (rt.hour >= 24)   { rt.hour = 0;   rt.day ++;}
-		if (rt.day >= md(rt.year, rt.month)) { rt.day = 1; rt.month ++; } 
+		if (rt.day >= md(rt.year, rt.month)) { rt.day = 1; rt.month ++; }
 		if (rt.month >= 13)  { rt.month = 1;  rt.year ++; }
 	}
 }
@@ -73,7 +79,7 @@ init_i8253(void) {
 	assert(count < 65536);
 	out_byte(PORT_TIME + 3, 0x34);
 	out_byte(PORT_TIME, count & 0xff);
-	out_byte(PORT_TIME, count >> 8);	
+	out_byte(PORT_TIME, count >> 8);
 }
 
 static void
@@ -83,7 +89,10 @@ init_rt(void) {
 
 }
 
-void 
+/**
+   get time by times of timer interrupt
+ */
+void
 get_time(Time *tm) {
 	memcpy(tm, &rt, sizeof(Time));
 }

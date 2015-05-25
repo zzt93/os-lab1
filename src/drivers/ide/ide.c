@@ -20,6 +20,12 @@ void cache_writeback(void);
 uint8_t read_byte(uint32_t);
 void write_byte(uint32_t, uint8_t);
 
+/**
+   初始化IDE的cache
+   注册顶半处理ide_intr()和time_intr(), 前者负责在磁盘就绪时通知IDE, 后者负责通知IDE是否到了需要回写cache的时间
+   创建IDE主线程
+   注册设备"hda"
+ */
 void
 init_ide(void) {
 	cache_init();

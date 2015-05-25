@@ -91,7 +91,7 @@ int strcmp(const char* f, const char* s) {
 
 char to_upper(char c) {
     if (is_letter(c)) {
-        return c & 0xcf;
+        return c & 0xdf;
     } else {
         printk(RED"Not a letter\n"RESET);
         return c;

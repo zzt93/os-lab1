@@ -1,4 +1,6 @@
-/* To understand macros here, see i386 manual. */
+/* To understand macros here, see i386 manual. 
+   Because the selector's structure
+*/
 #define GDT_ENTRY(n)  \
 	((n) << 3)
 

@@ -58,8 +58,8 @@ void get_message(PCB* p, pid_t id, Msg* m) {
         && (tmp->src == id || id == ANY)
         && tmp->dest == current->pid);
     // copy to m
-    kfree(tmp);
     memcpy(m, tmp, sizeof(Msg));
+    kfree(tmp);
 }
 
 /**

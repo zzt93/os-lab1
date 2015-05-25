@@ -83,6 +83,8 @@ dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset,
 	m.buf = buf;
 	m.offset = offset;
 	m.len = len;
+    // send to that device
+    // for tty1 is TTY
 	send(dev->pid, &m);
 	receive(dev->pid, &m);
 

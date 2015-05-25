@@ -12,14 +12,25 @@
 
 typedef struct Console {
 	const char *name;
+    // the buffer in memory
 	uint16_t *vbuf;
+    // the memory mapped screen
 	uint16_t *scr;
+    // width, height, square
 	int w, h, wh;
+    // buffer size and position of cursor
 	int size, pos;
+    // line buffer
 	char lbuf[LBUF_SZ + 1];
+    // cooked buffer -- all the user input except the new line
 	char cbuf[CBUF_SZ + 1];
+    // r -- the index for cooked buffer
+    // f -- the index for already handled char in cooked buf
+    // i -- the index for line buffer
 	int i, f, r;
+    // the index for message stack?
 	int rtop;
+    // the request message stack
 	Msg rstk[RSTK_SZ];
 } Console;
 

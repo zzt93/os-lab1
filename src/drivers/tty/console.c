@@ -11,6 +11,8 @@ Console ttys[NR_TTY];
 Console *current_consl;
 
 static const char *ttynames[NR_TTY] = {"tty1", "tty2", "tty3", "tty4"};
+
+// real memory of screen
 static uint16_t *vmem = (void*)pa_to_va(0xb8000);
 
 static uint16_t vbuf[NR_TTY][SCR_W * SCR_H * 2];
@@ -41,6 +43,7 @@ scrup(Console *c) {
 	c->scr += c->w;
 }
 
+// move the cursor next
 static void
 next(Console *c) {
 	if (c->vbuf + c->pos == c->scr + c->wh - 1) {
@@ -49,11 +52,15 @@ next(Console *c) {
 	c->pos ++;
 }
 
+// put char on now position
 static void
 putc(Console *c, char ch) {
 	*(c->vbuf + c->pos) = draw(ch);
 }
 
+/**
+   make pos back to the begin of this line
+ */
 static void
 cr(Console *c) {
 	c->pos -= c->pos % c->w;
@@ -93,10 +100,16 @@ movr(Console *c) {
 	return false;
 }
 
+/**
+   synchronize the content in memory and screen
+   write to memory mapped io -- screen
+   port mapped io -- for what?
+ */
 void
 consl_sync(Console *c) {
 	int i;
     lock();
+    // write banner
 	for (i = 0; i < SCR_W; i ++) {
 		vmem[i] = (C_BLUE << 12) | (C_LWHITE << 8) | banner[i];
 	}
@@ -143,7 +156,7 @@ get_cooked(Console *c, pid_t pid, char *buf, int count) {
 	assert(c->f != c->r);
 	int nread = 0;
 	while (count --) {
-		if (c->cbuf[c->f] == 0) {
+		if (c->cbuf[c->f] == 0) {// out of range of cooked buffer
 			c->f = (c->f + 1) % CBUF_SZ;
 			break;
 		}
@@ -154,13 +167,20 @@ get_cooked(Console *c, pid_t pid, char *buf, int count) {
 	return nread;
 }
 
+/**
+   only handle other devices read request when an enter is pressed
+   ie, this line can't be changed
+   consl_feed -> cook -> read_request
+   dev_read ->dev_rw -> send to tty -> ttyd -> read_request
+ */
 void
 read_request(Msg *m) {
 	Console *c = &ttys[m->dev_id];
 	if (c->f == c->r) {
 		if (c->rtop == RSTK_SZ) panic("too many read request");
+        // just copy the message when no more input in cooked buffer
 		memcpy(&c->rstk[c->rtop ++], m, sizeof(Msg));
-	} else {
+	} else {// get newly added a line(end with an enter)
 		int nread = get_cooked(c, m->req_pid, m->buf, m->len);
 		m->ret = nread;
 		pid_t dest = m->src;
@@ -177,10 +197,13 @@ cook(Console *c) {
 	printk("Capture: %s\n", c->lbuf);
 	char *p = c->lbuf;
 	do {
+        // copy the content in line buf to cooked buffer
 		c->cbuf[c->r] = *p;
+        // calculate the next valid index
 		c->r = (c->r + 1) % CBUF_SZ;
 		if (c->r == c->f) panic("cooked buffer full");
-	} while (*p ++ != 0);
+	} while (*(++p) != 0);// must add first!!!
+    // set the line buffer clear by set the first char to '\0'
 	c->lbuf[c->i = 0] = 0;
 	cr(c); lf(c);
 	if (c->rtop != 0) {
@@ -203,9 +226,11 @@ consl_writec(Console *c, char ch) {
 void
 consl_accept(Console *c, char ch) {
 	int i, cc = 0;
+    // find the first empty char
 	for (; c->lbuf[c->i + cc] != 0; cc ++);
 	for (i = cc + 1; i > 0; i --) {
 		if (c->i + i >= LBUF_SZ) panic("line buffer full");
+        // move the content after i one place
 		c->lbuf[c->i + i] = c->lbuf[c->i + i - 1];
 		if (c->vbuf + c->pos + i == c->scr + c->wh + 1) {
 			scrup(c);
@@ -215,6 +240,7 @@ consl_accept(Console *c, char ch) {
 	putc(c, ch);
 	next(c);
 	if (c->i >= LBUF_SZ) panic("line buffer full");
+    // put the char in the line buffer
 	c->lbuf[c->i ++] = ch;
 	consl_sync(c);
 }
@@ -274,6 +300,9 @@ init_consl(int tty_index) {
 	consl_sync(c);
 }
 
+/**
+   notice TTY to update the time on the screen
+ */
 static void
 send_updatemsg(void) {
 	if (get_jiffy() % (HZ / 10) == 0) {
@@ -284,12 +313,18 @@ send_updatemsg(void) {
 	}
 }
 
+/**
+   init banner on the screen
+   init console for each tty_
+   register each tty_
+ */
 void init_console(void) {
 	memset(banner, ' ', sizeof(banner));
 	banner[SCR_W] = 0;
 	int i;
 	for (i = 0; i < NR_TTY; i ++) {
 		init_consl(i);
+        // TTY? it is the device pid, and we send to main TTY thread
 		hal_register(ttys[i].name, TTY, i);
 	}
 	current_consl = ttys;
