@@ -151,6 +151,9 @@ backsp(Console *c) {
 	}
 }
 
+/**
+   update the index of resolved cooked buffer -- f
+ */
 static size_t
 get_cooked(Console *c, pid_t pid, char *buf, int count) {
 	assert(c->f != c->r);
@@ -191,18 +194,22 @@ read_request(Msg *m) {
 
 /**
    to emulate the behavior of newline
+   update the index of cooked buffer
  */
 static void
 cook(Console *c) {
 	printk("Capture: %s\n", c->lbuf);
 	char *p = c->lbuf;
-	do {
+	while (*p != '\0') {
         // copy the content in line buf to cooked buffer
 		c->cbuf[c->r] = *p;
         // calculate the next valid index
 		c->r = (c->r + 1) % CBUF_SZ;
-		if (c->r == c->f) panic("cooked buffer full");
-	} while (*(++p) != 0);// must add first!!!
+		if (c->r == c->f) {
+            panic("cooked buffer full");
+        }
+        p++;
+	} // must add first!!!
     // set the line buffer clear by set the first char to '\0'
 	c->lbuf[c->i = 0] = 0;
 	cr(c); lf(c);
@@ -230,7 +237,7 @@ consl_accept(Console *c, char ch) {
 	for (; c->lbuf[c->i + cc] != 0; cc ++);
 	for (i = cc + 1; i > 0; i --) {
 		if (c->i + i >= LBUF_SZ) panic("line buffer full");
-        // move the content after i one place
+        // for insert -- move the content after i one place
 		c->lbuf[c->i + i] = c->lbuf[c->i + i - 1];
 		if (c->vbuf + c->pos + i == c->scr + c->wh + 1) {
 			scrup(c);
