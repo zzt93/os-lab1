@@ -26,4 +26,11 @@ void hal_register(const char *name, pid_t pid, int dev_id);
 void hal_get_id(const char *name, pid_t *pid, int *dev_id);
 void hal_list(void);
 
+extern const char* hda ;// pid
+extern const char* tty1;// pid -- TTY main thread
+extern const char* tty2;// pid -- TTY main thread
+extern const char* tty3;// pid -- TTY main thread
+extern const char* tty4;// pid -- TTY main thread
+extern const char* timer;
+
 #endif

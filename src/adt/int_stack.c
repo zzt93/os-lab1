@@ -1,5 +1,6 @@
 #include "adt/int_stack.h"
 #include "const.h"
+#include "kernel/semaphore.h"
 
 LINKLIST_IMPL(Stack, 50)
 
@@ -10,6 +11,7 @@ void init(Stack_t s, char c) {
 }
 
 void push(int c) {
+    lock();
     if (stack_pointer == NULL) {
         stack_pointer = Stack_new();
     } else {
@@ -17,11 +19,14 @@ void push(int c) {
         Stack_insert(NULL, stack_pointer, now);
         stack_pointer = now;
     }
+    unlock();
     // initailize stack
     init(stack_pointer, c);
 }
 
 int pop() {
+    lock();
+    NOINTR;
     if (empty()) {
         assert(0);
     }
@@ -30,6 +35,7 @@ int pop() {
     Stack_remove(stack_pointer);
     Stack_free(stack_pointer);
     stack_pointer = next;
+    unlock();
     return res;
 }
 

@@ -1,5 +1,6 @@
 #include "kernel/kernel.h"
 #include "test/test_create.h"
+#include "test/test_drivers.h"
 #include "lib/malloc.h"
 #include "kernel/init_proc.h"
 
@@ -52,8 +53,13 @@ void init_idle() {
     current->count_of_lock = 1;
 }
 
+void init_read_MBR() {
+    add2wake(create_kthread(read_MBR));
+}
 void init_proc() {
     init_idle();
+
+    init_read_MBR();
     /*
     create_sem(&wake_lock, 1);
     create_sem(&sleeped_lock, 1);

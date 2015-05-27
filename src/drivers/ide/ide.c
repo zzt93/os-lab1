@@ -10,6 +10,7 @@
 #define WRITEBACK_TIME  1  /* writeback cache for every 1 second */
 
 pid_t IDE;
+const char* hda = "hda";
 
 static void ide_intr(void);
 static void time_intr(void);
@@ -33,7 +34,7 @@ init_ide(void) {
 	add_irq_handle(0 , time_intr);
 	PCB *p = create_kthread(ide_driver_thread);
 	IDE = p->pid;
-	hal_register("hda", IDE, 0);
+	hal_register(hda, IDE, 0);
 	add2wake(p);
 }
 
@@ -86,6 +87,7 @@ ide_intr(void) {
 	m.src = MSG_HARD_INTR;
 	send(IDE, &m);
 }
+
 static void
 time_intr(void) {
 	static Msg m;

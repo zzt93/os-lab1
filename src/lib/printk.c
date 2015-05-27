@@ -63,10 +63,17 @@ extern void serial_printc(char);
   char ch = 'A';
   printf("%c", ch); // ch要被提升为int型之后再传给printf。
 */
+void lock();
+void unlock();
+/**
+   Lock or not???
+ */
 void __attribute__((__noinline__))
 printk(const char *ctl, ...) {
 	void **args = (void **)&ctl + 1;
+    //lock();
 	vfprintf(serial_printc, ctl, args);
+    //unlock();
 }
 
 void printHexadecimal(void (*printer)(char), int c) {
@@ -101,7 +108,8 @@ void printHexadecimal(void (*printer)(char), int c) {
         }
         c = c >> HEXA_BI;
     }
-    while (!empty()) {
+    while (i > 0 && !empty()) {
+        i--;
         printer(pop());
     }
 }

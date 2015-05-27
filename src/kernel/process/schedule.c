@@ -85,6 +85,11 @@ schedule(void) {
     //printk("in queue %d\n", queue[head]->pid);
     //printk("after add:\n");
     //print_tree(left(sleeped_head));
+    /**
+       if I add lock in printk, it will unlock thread
+       and arise some problem about critical section;
+       if I don't add lock, printk may be interrupt
+     */
     printk("Now: current is #%d\n", current->pid);
     NOINTR;
 }

@@ -12,6 +12,10 @@
  */
 
 /* These data structures are shared by all kernel threads. */
+
+/*  The physical address of the current page directory is stored in the CPU
+    register CR3, also called the page directory base register (PDBR)
+*/
 static CR3 kcr3;											// kernel CR3
 static PDE kpdir[NR_PDE] align_to_page;						// kernel page directory
 static PTE kptable[PHY_MEM / PAGE_SIZE] align_to_page;		// kernel page tables
@@ -32,6 +36,11 @@ inline PTE* get_kptable() {
 /* Build a page table for the kernel */
 void
 init_page(void) {
+    /*Page translation is in effect only
+      when the PG bit of CR0 is set.
+      This bit is typically set by the operating
+      system during software initialization
+    */
 	CR0 cr0;
 	CR3 cr3;
 	PDE *pdir = (PDE *)va_to_pa(kpdir);

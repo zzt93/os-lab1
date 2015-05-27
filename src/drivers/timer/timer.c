@@ -13,6 +13,7 @@
 pid_t TIMER;
 static long jiffy = 0;
 static Time rt;
+const char* timer = "timer";
 
 static void update_jiffy(void);
 static void init_i8253(void);
@@ -33,7 +34,7 @@ void init_timer(void) {
 	PCB *p = create_kthread(timer_driver_thread);
 	TIMER = p->pid;
 	add2wake(p);
-	hal_register("timer", TIMER, 0);
+	hal_register(timer, TIMER, 0);
 }
 
 static void

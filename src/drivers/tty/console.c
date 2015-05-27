@@ -80,6 +80,10 @@ del(Console *c) {
 	putc(c, ' ');
 }
 
+/**
+   update index of current input -- i
+   and the cursor -- pos
+ */
 static bool
 movl(Console *c) {
 	if (c->i != 0) {
@@ -209,7 +213,7 @@ cook(Console *c) {
             panic("cooked buffer full");
         }
         p++;
-	} // must add first!!!
+	}
     // set the line buffer clear by set the first char to '\0'
 	c->lbuf[c->i = 0] = 0;
 	cr(c); lf(c);
@@ -332,6 +336,7 @@ void init_console(void) {
 	for (i = 0; i < NR_TTY; i ++) {
 		init_consl(i);
         // TTY? it is the device pid, and we send to main TTY thread
+        // register the pid of drivers thread
 		hal_register(ttys[i].name, TTY, i);
 	}
 	current_consl = ttys;
