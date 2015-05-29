@@ -26,8 +26,11 @@
 
 /* 32bit x86 uses 4KB page size */
 #define PAGE_SIZE					4096
+// 2**10 page tables/pdt == NR_PDE
 #define NR_PDE						1024
+// 2**10 pages/page table == NR_PTE
 #define NR_PTE						1024
+// the size one page directory can access -- 2**22
 #define PD_SIZE						((NR_PTE) * (PAGE_SIZE))
 
 /* force the data to be aligned with page boundary.

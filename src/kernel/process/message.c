@@ -96,7 +96,7 @@ void receive(pid_t src, Msg *m) {
         // go to sleep
         // if some thread send message to it, it will wake_up this,
         // so return from here and continue
-        sleep();//TODO lock or not!!!
+        sleep();
     }
     //P(s);
     NOINTR;

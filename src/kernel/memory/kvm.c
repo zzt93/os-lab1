@@ -18,6 +18,8 @@
 */
 static CR3 kcr3;											// kernel CR3
 static PDE kpdir[NR_PDE] align_to_page;						// kernel page directory
+// kernel page table has the access of all the page, ie it's
+// page table has all the base address of page -- 2**15 pages
 static PTE kptable[PHY_MEM / PAGE_SIZE] align_to_page;		// kernel page tables
 
 /* You may use these interfaces in the future */
@@ -43,20 +45,35 @@ init_page(void) {
     */
 	CR0 cr0;
 	CR3 cr3;
+    /**
+       for the `ld` option `-Ttext 0xC0100000` which make the program
+       arrange its global variables from this address, but the loader load kernel at 0x100000
+       so to access them right now
+       have to minus the gap -- KOFFSET
+     */
 	PDE *pdir = (PDE *)va_to_pa(kpdir);
 	PTE *ptable = (PTE *)va_to_pa(kptable);
 	uint32_t pdir_idx, ptable_idx, pframe_idx;
 
 
 	for (pdir_idx = 0; pdir_idx < NR_PDE; pdir_idx ++) {
+        // initialize page directory entry as invalid -- set to 0
 		make_invalid_pde(&pdir[pdir_idx]);
 	}
 
 	pframe_idx = 0;
+    // loop until all the physical memory is set to some page
+    // loop 2**27/2**22 = 2**5, so just 32 page directory entries are filled
 	for (pdir_idx = 0; pdir_idx < PHY_MEM / PD_SIZE; pdir_idx ++) {
+        // TODO make a same entry for what ??
 		make_pde(&pdir[pdir_idx], ptable);
+        // the page for kernel, from KOFFSET to KOFFSET + PHY_MEM
 		make_pde(&pdir[pdir_idx + KOFFSET / PD_SIZE], ptable);
 		for (ptable_idx = 0; ptable_idx < NR_PTE; ptable_idx ++) {
+            /**
+               virtual address: pdir_idx | ptable_idx | offset
+               physical address: ptable[ptable_idx] == pframe_idx , + offset
+             */
 			make_pte(ptable, (void*)(pframe_idx << 12));
 			pframe_idx ++;
 			ptable ++;

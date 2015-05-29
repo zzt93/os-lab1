@@ -4,6 +4,9 @@
 #define NR_MAX_FILE 8
 #define NR_FILE_SIZE (128 * 1024)
 
+#include "kernel/message.h"
+
 void init_ram();
+void read_ram(Msg*);
 
 #endif /* __RAM_H__ */

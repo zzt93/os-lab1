@@ -180,6 +180,7 @@ get_cooked(Console *c, pid_t pid, char *buf, int count) {
    consl_feed -> cook -> read_request
    dev_read ->dev_rw -> send to tty -> ttyd -> read_request
  */
+// TODO sending back using the same message
 void
 read_request(Msg *m) {
 	Console *c = &ttys[m->dev_id];

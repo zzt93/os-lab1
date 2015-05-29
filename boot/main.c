@@ -1,11 +1,11 @@
 /* start.S has put the processor into protected 32-bit mode,
-	 and set up the right segmentation. The layout of our hard
-	 disk is shown below:
-	 +-----------+------------------.        .-----------------+
-	 | bootblock |  The game binary    ...     (in ELF format) |
-	 +-----------+------------------`        '-----------------+
-	 So the task of the C code is to load the game binary into
-	 correct memory location (0x100000), and jump to it. */
+   and set up the right segmentation. The layout of our hard
+   disk is shown below:
+   +-----------+------------------.        .-----------------+
+   | bootblock |  The kernel binary    ...     (in ELF format) |
+   +-----------+------------------`        '-----------------+
+   So the task of the C code is to load the kernel binary into
+   correct memory location (0x100000), and jump to it. */
 
 #include "boot.h"
 
@@ -30,7 +30,7 @@ bootmain(void) {
 	   The first several bytes is the ELF header. */
 	readseg((unsigned char*)elf, 4096, 0);
 
-	/* Load each program segment */
+	/* Load each program segment from disk to memory*/
 	ph = (struct ProgramHeader*)((char *)elf + elf->phoff);
 	eph = ph + elf->phnum;
 	for(; ph < eph; ph ++) {

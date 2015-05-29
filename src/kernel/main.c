@@ -22,8 +22,9 @@ os_init(void) {
 	/* Notice that when we are here, IF is always 0 (see bootloader) */
 
 	/* We must set up kernel virtual memory first because our kernel
-	   thinks it is located in 0xC0000000.
+	   thinks it is located in 0xC0100000.
 	   Before setting up correct paging, no global variable can be used. */
+    // Before it, the address is physical address
 	init_page();
 
 	/* After paging is enabled, we can jump to the high address to keep
@@ -49,6 +50,7 @@ os_init_cont(void) {
 	init_idt();
 
 	/* Initialize the intel 8259 PIC. */
+    //The Intel 8259 is a Programmable Interrupt Controller (PIC)
 	init_intr();
 
     // initialize kmalloc -- have to initialize it before process,

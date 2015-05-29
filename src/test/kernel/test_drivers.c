@@ -7,7 +7,10 @@ extern PCB* current;
 
 void read_MBR() {
     char buf[NUM_MBR];
-    int offset = 0;
+    /**
+       TODO why printk will fail
+     */
+    int offset = 510;
     while (true) {
         dev_read(hda, current->pid, buf, offset, NUM_MBR - offset);
         int i;

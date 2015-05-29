@@ -3,7 +3,7 @@
 #include "lib/string.h"
 #include "drivers/hal.h"
 
-#define NR_DEV 16
+#define NR_DEV 32
 
 static Dev dev_pool[NR_DEV];
 static ListHead free, devices;
@@ -41,7 +41,7 @@ void hal_get_id(const char *name, pid_t *pid, int *dev_id) {
 	*dev_id = dev->dev_id;
 }
 
-void hal_register(const char *name, pid_t pid, int dev_id) {
+void hal_register(const char *name, pid_t driver_pid, int dev_id) {
 	lock();
 	if (list_empty(&free)) {
 		panic("no room for more device");
@@ -52,7 +52,7 @@ void hal_register(const char *name, pid_t pid, int dev_id) {
 	Dev *dev = list_entry(free.next, Dev, list);
 	list_del(&dev->list);
 	dev->name = name;
-	dev->pid = pid;
+	dev->pid = driver_pid;
 	dev->dev_id = dev_id;
 	list_add_before(&devices, &dev->list);
 	unlock();
@@ -83,7 +83,7 @@ dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset,
 	m.buf = buf;
 	m.offset = offset;
 	m.len = len;
-    // send to that device
+    // send to that device's driver
     // for tty1 is TTY
 	send(dev->pid, &m);
 	receive(dev->pid, &m);
@@ -92,11 +92,11 @@ dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset,
 }
 
 size_t
-dev_read(const char *dev_name, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
-	return dev_rw(dev_name, DEV_READ, reqst_pid, buf, offset, len);
+dev_read(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
+	return dev_rw(aim, DEV_READ, reqst_pid, buf, offset, len);
 }
 
 size_t
-dev_write(const char *dev_name, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
-	return dev_rw(dev_name, DEV_WRITE, reqst_pid, buf, offset, len);
+dev_write(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
+	return dev_rw(aim, DEV_WRITE, reqst_pid, buf, offset, len);
 }

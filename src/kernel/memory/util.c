@@ -10,7 +10,7 @@ make_invalid_pte(PTE *p) {
 }
 
 /* For simplicity, we make all pages readable and writable for all ring 3 processes.
- * In Lab3, you may set different flags for different pages to perform the whole 
+ * In Lab3, you may set different flags for different pages to perform the whole
  * page level protection. */
 
 void

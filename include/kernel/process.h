@@ -64,8 +64,10 @@ void add_process(PCB*);
 #define IDLE_ID 0
 #define START_ID (IDLE_ID+1)
 
+// for message
 #define ANY -1
 
 extern Sem wake_lock, sleeped_lock;
 
+#include "init_proc.h"
 #endif
