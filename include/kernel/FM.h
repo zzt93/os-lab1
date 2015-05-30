@@ -11,4 +11,5 @@ enum {
 void init_FM();
 void read_file(Msg*);
 
+extern int FM;
 #endif /* __FM_H__ */

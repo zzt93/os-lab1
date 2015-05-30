@@ -13,7 +13,7 @@ static uint8_t file[NR_MAX_FILE][NR_FILE_SIZE] = {
 static uint8_t *disk = (void*)file;
 
 void init_ram() {
-    printk("%d ", disk[0]);
+    printk("%c ", disk[0]);
 }
 
 

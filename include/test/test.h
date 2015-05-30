@@ -10,4 +10,7 @@ void test_list_entry();
 void test_tree();
 void test_map();
 
+// implemented in util.c
+void init_test_proc();
+
 #endif /* __TEST_H__ */

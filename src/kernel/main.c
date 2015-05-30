@@ -5,6 +5,7 @@
 #include "lib/malloc.h"
 #include "kernel/semaphore.h"
 #include "test/test.h"
+#include "kernel/manager.h"
 
 void init_page(void);
 void init_serial(void);
@@ -58,24 +59,30 @@ os_init_cont(void) {
     init_kmalloc();
 
     NOINTR;
-	/* Initialize processes. You should fill this. */
+	/* Initialize the state of process idle, ie the running
+       process for set up right lock num to avoid other
+       initialization enable the interrupt and cause problem
+    */
 	init_proc();
 
     init_driver();
+    init_manager();
+
     NOINTR;
 	welcome();
+    init_test_proc();
     /*
     //used to make timer interrupt more frequent
-#define PORT_TIME 0x40
-#define FREQ_8253 1193182
-#define HZ        100000
+    #define PORT_TIME 0x40
+    #define FREQ_8253 1193182
+    #define HZ        100000
 
     int count = FREQ_8253 / HZ;
     assert(count < 65536);
     out_byte(PORT_TIME + 3, 0x34);
     out_byte(PORT_TIME    , count % 256);
     out_byte(PORT_TIME    , count / 256);
-*/
+    */
 	unlock(); // set interrupt enabled
 
 	/* This context now becomes the idle process. */

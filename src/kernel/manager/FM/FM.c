@@ -2,6 +2,8 @@
 #include "kernel/FM.h"
 #include "kernel/message.h"
 
+int FM;
+
 static void FM_job() {
     static Msg m;
 
@@ -20,6 +22,7 @@ static void FM_job() {
 
 void init_FM() {
     PCB* p = create_kthread(FM_job);
+    FM = p->pid;
     add2wake(p);
 }
 
