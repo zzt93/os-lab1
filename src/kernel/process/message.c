@@ -72,9 +72,10 @@ void send(pid_t dest, Msg *m) {
     lock();
     NOINTR;
     PCB* de = fetch_pcb(dest);
-    assert(de != NULL && dest == de->pid);
     NOINTR;
     printk("-------#%d to send src: %d to dest: %d------", current->pid, m->src, dest);
+    assert(de != NULL && dest == de->pid);
+    NOINTR;
     //Sem* s = &(de->mes_lock);
     //P(s);
     //m->src = current->pid;

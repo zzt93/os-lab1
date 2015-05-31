@@ -5,6 +5,8 @@
 #include "lib/malloc.h"
 #include "assert.h"
 
+#include "kernel/semaphore.h"
+
 
 /**
    Using the binary search tree to implement map,
@@ -16,6 +18,10 @@
    Value might as well be a pointer, for the behaviour of
    copy of v
 */
+
+/**
+   TODO Why call left then interrupt then cause page fault
+ */
 #define MAP(K, V, name)                                     \
     typedef struct {                                        \
         K k;                                                \
@@ -43,6 +49,7 @@
                                                             \
     /*get a node using the funciton when init as criteria*/ \
     V name##_get(K k) {                                     \
+        lock();                                             \
         aim.k = k;                                          \
         TNode_##name* e = find_fa(&aim);                    \
         if (e == NULL) {                                    \
@@ -57,6 +64,7 @@
         if (right(e)) {                                     \
             ri = right(e)->t;                               \
         }                                                   \
+        unlock();                                           \
         if (le != NULL && le->k == k) {                     \
             return le->v;                                   \
         } else if ((ri != NULL && ri->k == k)){             \

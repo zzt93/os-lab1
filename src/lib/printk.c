@@ -4,6 +4,12 @@
 #include "adt/int_stack.h"
 #define HEXA_BI 4
 
+void lock();
+void unlock();
+/**
+   Lock or not???
+ */
+
 void printHexadecimal(void (*printer)(char), int);
 
 /* implement this function to support printk */
@@ -18,7 +24,13 @@ void vfprintf(void (*printer)(char), const char *ctl, void **tmp) {
 		if (*ctl != '%') {
             printer(*ctl);
 		} else {
+            /**
+               TODO why this solve the problem when switch (cmp) then interrupt comes print
+               go to the default option
+             */
+            lock();
             char c = *(++ctl);
+            unlock();
             switch(c) {
                 case 'x'://TODO suppose x is for int32
                 {
@@ -63,11 +75,6 @@ extern void serial_printc(char);
   char ch = 'A';
   printf("%c", ch); // ch要被提升为int型之后再传给printf。
 */
-void lock();
-void unlock();
-/**
-   Lock or not???
- */
 void __attribute__((__noinline__))
 printk(const char *ctl, ...) {
 	void **args = (void **)&ctl + 1;

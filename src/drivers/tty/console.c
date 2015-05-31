@@ -119,6 +119,7 @@ consl_sync(Console *c) {
 	}
 	if (current_consl == c) {
 		memcpy(vmem + c->w, c->scr, c->wh * 2);
+        // draw corsor then clear it
 		int pos = c->pos - (c->scr - c->vbuf) + c->w;
 		out_byte(0x3d4, 0xe);
 		out_byte(0x3d5, pos >> 8);
@@ -180,7 +181,6 @@ get_cooked(Console *c, pid_t pid, char *buf, int count) {
    consl_feed -> cook -> read_request
    dev_read ->dev_rw -> send to tty -> ttyd -> read_request
  */
-// TODO sending back using the same message
 void
 read_request(Msg *m) {
 	Console *c = &ttys[m->dev_id];
@@ -341,7 +341,7 @@ void init_console(void) {
 		hal_register(ttys[i].name, TTY, i);
 	}
 	current_consl = ttys;
-    // register time change of screen handler
+    // register time change on the screen and cursor of screen handler
 	add_irq_handle(0, send_updatemsg);
 }
 

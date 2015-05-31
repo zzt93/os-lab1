@@ -90,7 +90,7 @@ schedule(void) {
        and arise some problem about critical section;
        if I don't add lock, printk may be interrupt
      */
-    printk("Now: current is #%d\n", current->pid);
+    //printk("Now: current is #%d\n", current->pid);
     NOINTR;
 }
 

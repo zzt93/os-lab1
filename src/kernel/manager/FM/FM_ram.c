@@ -11,5 +11,9 @@ static void do_read(uint8_t *buf, off_t offset, size_t len) {
 
 void read_file(Msg* m) {
     do_read(m->buf, m->offset, m->len);
+    m->ret = m->len;
+    pid_t dest = m->src;
+    m->src = current->pid;
+    send(dest, m);
 }
 

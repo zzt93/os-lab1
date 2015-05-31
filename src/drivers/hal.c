@@ -72,9 +72,21 @@ void hal_list(void) {
 
 static size_t
 dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
+    // TODO why need lock it!!!
+    lock();
 	Dev *dev = hal_get(dev_name);
+    unlock();
+    printk("%x ", dev);
 	assert(dev != NULL);
+    printk("%d %s %x ", dev->pid, dev_name, dev);
 
+    /**
+       This one shouldn't be static: for may be different devices
+       want to read or write at the same time, they may influence
+       others' message.
+       Using a local variable is safe here for the stack won't
+       disappear util we receive a message back.
+     */
 	Msg m;
 	m.src = current->pid;
 	m.type = type;

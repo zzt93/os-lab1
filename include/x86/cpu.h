@@ -13,8 +13,8 @@ typedef union CR0 {
 		uint32_t extension_type      : 1;
 		uint32_t numeric_error       : 1;
 		uint32_t pad0                : 10;
-		uint32_t write_protect       : 1; 
-		uint32_t pad1                : 1; 
+		uint32_t write_protect       : 1;
+		uint32_t pad1                : 1;
 		uint32_t alignment_mask      : 1;
 		uint32_t pad2                : 10;
 		uint32_t no_write_through    : 1;
@@ -42,6 +42,14 @@ read_cr0() {
 	uint32_t val;
 	asm volatile("movl %%cr0, %0" : "=r"(val));
 	return val;
+}
+
+/* read cr2 for debug */
+static inline uint32_t
+read_cr2() {
+    uint32_t val;
+    asm volatile("movl %%cr2, %0" : "=r"(val));
+    return val;
 }
 
 /* write CR0 */

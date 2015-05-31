@@ -32,6 +32,7 @@
     static TNode_##name* name##_head = &h;                              \
                                                                         \
     static inline TNode_##name* left(TNode_##name* t) {                 \
+        assert(t != NULL);                                              \
         NodeLink l = t->link;                                           \
         if (l.left == NULL) {                                           \
             return NULL;                                                \
@@ -39,6 +40,7 @@
         return ptr2container(l.left, TNode_##name, link);               \
     }                                                                   \
     static inline TNode_##name* right(TNode_##name* t) {                \
+        assert(t != NULL);                                              \
         NodeLink l = t->link;                                           \
         if (l.right == NULL) {                                          \
             return NULL;                                                \
