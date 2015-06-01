@@ -4,6 +4,15 @@
 
 int FM;
 
+/**
+   The message sent to FM should specify:
+   m->type
+   m->buf
+   m->offset
+   m->len
+   The message send from FM specify:
+   m->ret -- len successfully read
+ */
 static void FM_job() {
     static Msg m;
 

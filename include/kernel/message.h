@@ -1,6 +1,7 @@
 #ifndef __MESSAGE_H__
 #define __MESSAGE_H__
 
+#include "kernel/message.h"
 #include "types.h"
 #include "adt/list.h"
 
@@ -25,5 +26,12 @@ typedef struct Message {
 
 void send(pid_t dest, Msg *m);
 void receive(pid_t src, Msg *m);
+
+void init_meg(
+    Msg* m,
+    int type_request,
+    pid_t r, int d, void *b, off_t o, size_t l);
+
+#define INVALID_ID -1
 
 #endif /* __MESSAGE_H__ */

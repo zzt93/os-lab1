@@ -7,6 +7,7 @@
 #define K_CTRL   29
 #define K_ALT    56
 
+//#define K_TAB 15
 #define K_ENTR   28
 #define K_BACK   14
 

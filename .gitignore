@@ -1,5 +1,5 @@
 *.[oad]
-a.out
+*.out
 *.swp
 *.SKEL
 *.ans
@@ -11,3 +11,6 @@ a.out
 *~
 
 log
+
+*.elf
+*.dump

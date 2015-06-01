@@ -107,3 +107,15 @@ void receive(pid_t src, Msg *m) {
     //V(s);
     //printk("%d:-------end receive------\n", current->pid);
 }
+
+void init_meg(
+    Msg *m,
+    int tr,
+    pid_t r, int d, void *b, off_t o, size_t l) {
+    m->type = tr;
+    m->req_pid = r;
+    m->dev_id = d;
+    m->buf = b;
+    m->offset = o;
+    m->len = l;
+}

@@ -1,3 +1,6 @@
+#ifndef __ELF_H__
+#define __ELF_H__
+
 /* Structure of a ELF binary header */
 struct ELFHeader {
 	unsigned int   magic;
@@ -38,23 +41,6 @@ struct ProgramHeader {
 	unsigned int align;
 };
 
-/* The I/O wrapper functions.
-   See "GCC-Inline-Assembly-HOWTO" for more detials.
-   the keyword "volatile" cannot be ommited otherwise the compiler
-   optimizier will move the assembly out of a loop. */
-static inline char
-in_byte(short port) {
-	char data;
-	asm volatile("in %1,%0" : "=a" (data) : "d" (port));
-	return data;
-}
-static inline int
-in_long(short port) {
-	int data;
-	asm volatile("in %1, %0" : "=a" (data) : "d" (port));
-	return data;
-}
-static inline void
-out_byte(short port, char data) {
-	asm volatile("out %0,%1" : : "a" (data), "d" (port));
-}
+
+
+#endif /* __ELF_H__ */
