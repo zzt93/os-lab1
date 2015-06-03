@@ -3,6 +3,7 @@
 
 #include "adt/list.h"
 #include "kernel/semaphore.h"
+#include "x86/cpu.h"
 
 #define KSTACK_SIZE 4096
 #define PCB_SIZE (sizeof (PCB))
@@ -44,6 +45,8 @@ typedef struct {
     ListHead mes;
     //Sem mes_lock;
     int count_of_lock;
+
+    CR3 pdir;
 } PCB;
 
 extern PCB *current;

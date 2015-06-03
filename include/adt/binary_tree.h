@@ -16,8 +16,8 @@
   no duplicate:
   if there are more than one same elements -- defined by your
   comparing function -- added, only first is added
-  
-  
+
+
   implementation detail:
   use a TreeNode* as the head, and only use the left link
 */

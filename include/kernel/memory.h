@@ -26,4 +26,11 @@ void make_pte(PTE *, void *);
 /* Nanos has 128MB physical memory  */
 #define PHY_MEM   (128 * 1024 * 1024)
 
+// kernel starting physical address
+#define KERNEL_PA_START 0
+// kernel ending physical address
+#define KERNEL_PA_END KMEM
+// kernel starting virtual memory
+#define KERNEL_VA_START (0xc0000000)
+
 #endif

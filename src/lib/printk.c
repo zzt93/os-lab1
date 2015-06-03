@@ -25,12 +25,12 @@ void vfprintf(void (*printer)(char), const char *ctl, void **tmp) {
             printer(*ctl);
 		} else {
             /**
-               TODO why this solve the problem when switch (cmp) then interrupt comes print
+               TODO why switch (cmp) then interrupt comes print
                go to the default option
              */
-            lock();
+            //lock();
             char c = *(++ctl);
-            unlock();
+            //unlock();
             switch(c) {
                 case 'x'://TODO suppose x is for int32
                 {

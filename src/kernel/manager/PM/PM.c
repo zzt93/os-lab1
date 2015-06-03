@@ -4,6 +4,8 @@
 
 #include "kernel/manager.h"
 
+#include "kernel/memory.h"
+
 #define B_SIZE 512
 
 extern PCB* current;
@@ -48,6 +50,10 @@ void create_process(Msg* m) {
     int name = m->i[0];
     assert(name >= 0);
     char buf[B_SIZE];
+
+    // create page directory for new process
+    uint32_t pdir = ;
+    assert(pdir&0xfff == 0);
     /* read 512 bytes starting from offset 0 from file "0" into buf */
 	/* it contains the ELF header and program header table */
     init_meg(m,
@@ -67,32 +73,40 @@ void create_process(Msg* m) {
 
 		va = (unsigned char*)ph_table->vaddr; /* virtual address */
         //assert(va >= 0x08048000);
-        assert(va >= (unsigned char*)0);
-        assert(va <= (unsigned char*)0xc0000000);
+        assert(va > (unsigned char*)0);
+        assert(va < (unsigned char*)KERNEL_VA_START);
 		/* allocate pages starting from va, with memory size no less than ph->memsz */
         init_meg(m,
             NEW_PAGE,
-            INVALID_ID, INVALID_ID, NULL, (int)va, ph_table->memsz);
+            INVALID_ID, INVALID_ID, pdir, (int)va, ph_table->memsz);
 		send(MM, m);
         receive(MM, m);
 
-        pa = m->buf;
-        assert(pa >= (unsigned char*)0);
-        assert(pa <= (unsigned char*)0xc0000000);
+        pa = m->buf; // TODO pa is physical address???
+        // MM should already set the mapping from va to pa,
+        // but the pdir is not this process's page directory,
+        // using it can't find the right physical address,
+        // so have to use physical address directly
+        assert(pa > (unsigned char*)KERNEL_PA_END);
+        assert(pa < (unsigned char*)PHY_MEM);
 		/* read ph->filesz bytes starting from offset ph->off from file "0" into pa */
         init_meg(m,
             FM_READ,
             INVALID_ID, INVALID_ID, pa, ph_table->off, ph_table->filesz);
 		send(FM, m);
         receive(FM, m);
-        // initialize the gap between [file_size, memory_size]
+        // initialize the gap between [file_size, memory_size)
         // all to zero
 		for (i = pa + ph_table->filesz; i < pa + ph_table->memsz; *i ++ = 0);
 	}
 
-    // send back
+    // initialize PCB for user process
     void *f = (void*)elf->entry;
-    add2wake(create_kthread(f));
+    // TODO using create_kthread???
+    PCB* p = create_kthread(f);
+    set_pdir(p, pdir);
+    add2wake(p);
+    // send back
     m->ret = 1;
     int dest = m->src;
     m->src = current->pid;

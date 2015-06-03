@@ -57,7 +57,11 @@ void print_tree(TNode_sleeped* root) {
     print_tree(right(root));
 }
 
-
+/**
+   关于页目录, 它是通过CR3寄存器寻找到的.
+   由于每个进程都拥有自己的页目录, 所以在进行上下文切换的时候,
+   我们必须将被调度进程的页目录基地址载入CR3寄存器, 否则被调度进程将会运行在其它进程的地址空间上, 从而产生错误.
+ */
 void
 schedule(void) {
 	/* implement process/thread schedule here */
@@ -81,6 +85,9 @@ schedule(void) {
     current->count_of_lock--;
     //printk("#%d count of lock %d\n", current->pid, current->count_of_lock);
     current = choose_process();
+    // load this process's cr3寄存器
+    write_cr3(&(current->pdir));
+
     //printk("in queue %d\n", tail-head);
     //printk("in queue %d\n", queue[head]->pid);
     //printk("after add:\n");
@@ -90,7 +97,7 @@ schedule(void) {
        and arise some problem about critical section;
        if I don't add lock, printk may be interrupt
      */
-    //printk("Now: current is #%d\n", current->pid);
+    printk("Now: current is #%d\n", current->pid);
     NOINTR;
 }
 

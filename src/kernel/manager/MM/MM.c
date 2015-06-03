@@ -6,12 +6,13 @@ int MM;
 
 /**
    The message sent to MM should specify:
-   m->type
-   m->offset -- allocate pages from this offset
-   m->len -- allocate no less than this len
+   m->type == NEW_PAGE:
+      m->buf -- the address of page directory
+      m->offset -- allocate pages from this offset
+      m->len -- allocate no less than this len
 
-   The message send from MM specify:
-   m->buf -- the allocated pages' starting physical address
+      The message send from MM specify:
+      m->buf -- the allocated pages' starting physical address
  */
 static void MM_job() {
     static Msg m;
@@ -19,6 +20,7 @@ static void MM_job() {
     while (true) {
         receive(ANY, &m);
         switch(m.type) {
+            //case NEW_PDIR:
             case NEW_PAGE:
                 alloc_page(&m);
                 break;

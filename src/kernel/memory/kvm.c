@@ -62,7 +62,7 @@ init_page(void) {
 	}
 
 	pframe_idx = 0;
-    // loop until all the physical memory is set to some page
+    // loop until all the physical memory are set to some page
     // loop 2**27/2**22 = 2**5, so just 32 page directory entries are filled
 	for (pdir_idx = 0; pdir_idx < PHY_MEM / PD_SIZE; pdir_idx ++) {
         // TODO make a same entry for what ??

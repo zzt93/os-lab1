@@ -28,7 +28,7 @@ static void set_mes(Msg* m, char *buf) {
     m->dest = FM;
     m->buf = buf;
     m->offset = 0;
-    m->len = 500;
+    m->len = 5;
 }
 
 void read_FM() {
@@ -41,7 +41,7 @@ void read_FM() {
         receive(FM, &m);
         int i;
         for (i = 0; i < m.len; i++) {
-            printk("%d ", buf[i]);
+            printk("%x ", buf[i]);
         }
         printk("\n\n");
         set_mes(&m, buf);

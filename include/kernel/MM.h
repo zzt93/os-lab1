@@ -6,6 +6,7 @@
 
 enum {
     NEW_PAGE,
+    NEW_PDIR,
 };
 
 void init_MM();

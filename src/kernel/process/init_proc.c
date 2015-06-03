@@ -21,14 +21,17 @@ static void init_kernel_tf(TrapFrame* frame, void* fun) {
     frame->eflags = 0x200;// set IF = 1, that is enable interrupt
 }
 
-static void init_pcb_content(PCB* pcb) {
+static void init_pcb_content(PCB* pcb, uint32_t val) {
     NOINTR;
     pcb->pid = pid_count++;
-    pcb->count_of_lock = 0;
 
     list_init(&(pcb->link));
     list_init(&(pcb->mes));
     //create_sem(&(pcb->mes_lock), 1);
+    pcb->count_of_lock = 0;
+    // initialize the page directory address
+    assert(val&0xfff == 0);
+    pcb->pdir.page_directory_base = val >> 12;
 }
 
 PCB*
@@ -42,8 +45,12 @@ create_kthread(void *fun) {
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
 
-    init_pcb_content(pcb);
+    init_pcb_content(pcb, get_kcr3()->val);
     return pcb;
+}
+
+void set_pdir(PCB* p, uint32_t val) {
+    p->pdir.page_directory_base = val >> 12;
 }
 
 PCB* create_kthread_with_args(void* fun, int arg) {
