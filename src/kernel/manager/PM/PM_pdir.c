@@ -25,7 +25,8 @@ PDE* pdir_alloc() {
 }
 
 void init_kernel_image(PDE* pdir) {
-    PTE* ptable = get_kptable();
+    // fill page directory using physical address
+    PTE* ptable = (PTE*)va_to_pa(get_kptable());
     uint32_t pdir_idx;
     for (pdir_idx = 0; pdir_idx < KMEM / PD_SIZE; pdir_idx++) {
         make_pde(&pdir[pdir_idx + KERNEL_VA_START / PD_SIZE], ptable);

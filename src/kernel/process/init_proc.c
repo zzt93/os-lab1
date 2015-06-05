@@ -12,7 +12,7 @@ static void init_kernel_tf(TrapFrame* frame, void* fun) {
     frame->xxx = (uint32_t)(&(frame->xxx) + 5);// see pushal
     assert (frame->xxx == (uint32_t)(&frame->gs));
     frame->cs = (SEG_KERNEL_CODE << 3) + (0 << 2) + 0;
-    frame->ds = (SEG_KERNEL_CODE << 3) + (0 << 2) + 0;
+    frame->ds = (SEG_KERNEL_DATA << 3) + (0 << 2) + 0;
     frame->es = (SEG_KERNEL_DATA << 3) + (0 << 2) + 0;
     frame->fs = (SEG_KERNEL_DATA << 3) + (0 << 2) + 0;
     frame->gs = (SEG_KERNEL_DATA << 3) + (0 << 2) + 0;
@@ -22,8 +22,10 @@ static void init_kernel_tf(TrapFrame* frame, void* fun) {
 }
 
 static void init_pcb_content(PCB* pcb, uint32_t val) {
-    NOINTR;
+    //NOINTR;
+    lock();
     pcb->pid = pid_count++;
+    unlock();
 
     list_init(&(pcb->link));
     list_init(&(pcb->mes));
@@ -37,9 +39,9 @@ static void init_pcb_content(PCB* pcb, uint32_t val) {
 PCB*
 create_kthread(void *fun) {
     // malloc PCB
-    NOINTR;
+    //NOINTR;
     PCB* pcb = kmalloc(PCB_SIZE);
-    NOINTR;
+    //NOINTR;
     TrapFrame *frame = (TrapFrame*)((char *)(pcb->kstack) + KSTACK_SIZE - sizeof(TrapFrame)); // allocate frame at the end of stack
     //init trap frame
     init_kernel_tf(frame, fun);
@@ -50,6 +52,7 @@ create_kthread(void *fun) {
 }
 
 void set_pdir(PCB* p, uint32_t val) {
+    p->pdir.val = 0;
     p->pdir.page_directory_base = val >> 12;
 }
 

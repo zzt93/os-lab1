@@ -48,11 +48,13 @@ void init_PM() {
  */
 void create_process(Msg* m) {
     int name = m->i[0];
+    int dest = m->src;
     assert(name >= 0);
     char buf[B_SIZE];
 
     // create page directory for new process
-    PDE* pdir = pdir_alloc();
+    // must using physical address for cr3 should only store pa
+    PDE* pdir = (PDE*)va_to_pa(pdir_alloc());
     assert( ((int)pdir&0xfff) == 0);
     /* read 512 bytes starting from offset 0 from file "0" into buf */
 	/* it contains the ELF header and program header table */
@@ -68,7 +70,8 @@ void create_process(Msg* m) {
     unsigned char *va, *pa, *i;
 
 	ph_table = (struct ProgramHeader*)((char *)elf + elf->phoff);
-    end_ph = ph_table + elf->phnum;
+    // ignore the stack header for the time being
+    end_ph = ph_table + elf->phnum - 1;
 	for (; ph_table < end_ph; ph_table++) {
 		/* scan the program header table, load each segment into memory */
 
@@ -116,7 +119,6 @@ void create_process(Msg* m) {
     add2wake(p);
     // send back
     m->ret = 1;
-    int dest = m->src;
     m->src = current->pid;
     send(dest, m);
 }

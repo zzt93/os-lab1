@@ -66,6 +66,9 @@ init_page(void) {
     // loop 2**27/2**22 = 2**5, so just 32 page directory entries are filled
 	for (pdir_idx = 0; pdir_idx < PHY_MEM / PD_SIZE; pdir_idx ++) {
         // TODO make a same entry for what ??
+        // ANSWER:
+        // so we can use va in substitute of pa
+        // for the same mapping from [0, 0x01000000)
 		make_pde(&pdir[pdir_idx], ptable);
         // the page for kernel, from KOFFSET to KOFFSET + PHY_MEM
 		make_pde(&pdir[pdir_idx + KOFFSET / PD_SIZE], ptable);
