@@ -110,8 +110,10 @@ void receive(pid_t src, Msg *m) {
 
 void init_meg(
     Msg *m,
+    pid_t src,
     int tr,
     pid_t r, int d, void *b, off_t o, size_t l) {
+    m->src = src;
     m->type = tr;
     m->req_pid = r;
     m->dev_id = d;

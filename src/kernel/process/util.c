@@ -47,11 +47,7 @@ void init_proc() {
 void init_proc() {
     test_setup();
 }
-
 */
-void init_idle() {
-    current->count_of_lock = 1;
-}
 
 void init_driver_test() {
     //add2wake(create_kthread(read_MBR));
@@ -59,8 +55,15 @@ void init_driver_test() {
 }
 
 void init_test_proc() {
-    init_driver_test();
+    //init_driver_test();
+    add2wake(create_kthread(user_process));
 }
+
+void init_idle() {
+    current->count_of_lock = 1;
+    current->pdir.val = get_kcr3()->val;
+}
+
 
 void init_proc() {
     init_idle();

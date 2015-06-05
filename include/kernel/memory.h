@@ -31,6 +31,8 @@ void make_pte(PTE *, void *);
 // kernel ending physical address
 #define KERNEL_PA_END KMEM
 // kernel starting virtual memory
-#define KERNEL_VA_START (0xc0000000)
+#define KERNEL_VA_START KOFFSET
+// user available pages
+#define USER_FREE_PAGES ((PHY_MEM - KMEM) / PAGE_SIZE)
 
 #endif

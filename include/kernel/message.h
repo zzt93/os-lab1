@@ -29,7 +29,8 @@ void receive(pid_t src, Msg *m);
 
 void init_meg(
     Msg* m,
-    int type_request,
+    pid_t src,
+    int type_return,
     pid_t r, int d, void *b, off_t o, size_t l);
 
 #define INVALID_ID -1

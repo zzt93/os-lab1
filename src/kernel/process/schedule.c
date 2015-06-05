@@ -86,6 +86,7 @@ schedule(void) {
     //printk("#%d count of lock %d\n", current->pid, current->count_of_lock);
     current = choose_process();
     // load this process's cr3寄存器
+    //assert(get_kcr3()->val == current->pdir.val);
     write_cr3(&(current->pdir));
 
     //printk("in queue %d\n", tail-head);

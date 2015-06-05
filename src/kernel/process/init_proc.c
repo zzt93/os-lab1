@@ -30,8 +30,8 @@ static void init_pcb_content(PCB* pcb, uint32_t val) {
     //create_sem(&(pcb->mes_lock), 1);
     pcb->count_of_lock = 0;
     // initialize the page directory address
-    assert(val&0xfff == 0);
-    pcb->pdir.page_directory_base = val >> 12;
+    assert((val&0xfff) == 0);
+    pcb->pdir.val = val;
 }
 
 PCB*
@@ -61,6 +61,6 @@ PCB* create_kthread_with_args(void* fun, int arg) {
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
 
-    init_pcb_content(pcb);
+    init_pcb_content(pcb, get_kcr3()->val);
     return pcb;
 }

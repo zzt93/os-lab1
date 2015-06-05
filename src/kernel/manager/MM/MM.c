@@ -22,7 +22,7 @@ static void MM_job() {
         switch(m.type) {
             //case NEW_PDIR:
             case NEW_PAGE:
-                alloc_page(&m);
+                init_va(&m);
                 break;
             default:
                 assert(false);

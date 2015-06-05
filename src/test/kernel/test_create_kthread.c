@@ -1,5 +1,7 @@
 #include "common.h"
 #include "kernel/process.h"
+#include "kernel/message.h"
+#include "kernel/PM.h"
 
 /*
 void A () {
@@ -85,3 +87,16 @@ void D () {
     }
 }
 */
+
+
+void user_process() {
+    Msg m;
+    init_meg(&m,
+        current->pid,
+        PM_CREATE,
+        0, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
+    send(PM, &m);
+    while (true) {
+        wait_intr();
+    }
+}

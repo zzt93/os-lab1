@@ -10,8 +10,10 @@ enum {
 };
 
 void init_MM();
-void alloc_page(Msg*);
+void init_va(Msg*);
 
 extern int MM;
+
+#include "MM_alloc.h"
 
 #endif /* __MM_H__ */

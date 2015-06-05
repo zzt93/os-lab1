@@ -11,7 +11,7 @@ SFILES  = $(shell find src/ -name "*.S")
 OBJS    = $(CFILES:.c=.o) $(SFILES:.S=.o)
 
 run: disk.img
-	$(QEMU) -serial stdio disk.img
+	$(QEMU) -no-reboot -serial stdio disk.img
 
 debug: disk.img
 	gnome-terminal -e "bash -c \"gdb -s kernel; exec bash\""

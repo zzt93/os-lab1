@@ -13,4 +13,6 @@ void create_process(Msg*);
 
 extern int PM;
 
+#include "PM_pdir.h"
+
 #endif /* __PM_H__ */
