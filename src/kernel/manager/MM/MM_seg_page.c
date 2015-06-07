@@ -30,9 +30,9 @@ void init_va(Msg* m) {
     Page *page = NULL;
 
 	uint32_t pdir_idx, ptable_idx;
-    pdir_idx = off >> 22;
-    ptable_idx = (off >> 12) & 0x3ff;
-    assert(pdir[pdir_idx].present == 0);
+    //pdir_idx = off >> 22;
+    //ptable_idx = (off >> 12) & 0x3ff;
+    //assert(pdir[pdir_idx].present == 0);
     for (; off < m->offset + m->len; off++) {
         pdir_idx = off >> 22;
         ptable_idx = (off >> 12) & 0x3ff;
@@ -40,6 +40,8 @@ void init_va(Msg* m) {
             ptable = alloc_page();
             assert((((int)ptable & 0xfff) == 0) && ptable != NULL);
             make_pde(&pdir[pdir_idx], ptable);
+        } else {
+            ptable = (PTE*)(pdir[pdir_idx].page_frame << 12);
         }
         if (ptable[ptable_idx].present == 0) {
             page = alloc_page();

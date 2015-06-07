@@ -1,4 +1,5 @@
 #include "kernel/kernel.h"
+#include "kernel/syscall.h"
 #include "lib/printk.h"
 
 #define NR_IRQ_HANDLE 32
@@ -44,8 +45,10 @@ void irq_handle(TrapFrame *tf) {
 	if (irq < 0) {
 		panic("Unhandled exception!");
 	}
-    
-	if (irq != 0x80 && irq < 1000) {
+
+    if (irq == 0x80) {
+        do_syscall(tf);
+    } else if (irq < 1000) {
         printk("error code: %x ;cr2: %x ", tf->error_code, read_cr2());
 		extern uint8_t logo[];
 		panic("Unexpected exception #%d\n\33[1;31mHint: The machine is always right! For more details about exception #%d, see\n%s\n\33[0m", irq, irq, logo);
