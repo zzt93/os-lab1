@@ -37,9 +37,15 @@ add_irq_handle(int irq, void (*func)(void) ) {
 	ptr->next = handles[irq]; /* insert into the linked list */
 	handles[irq] = ptr;
 }
+
 void schedule();
+extern PCB* current;
 
 void irq_handle(TrapFrame *tf) {
+    NOINTR;
+    assert(current != NULL);
+    current->count_of_lock++;
+    NOINTR;
 	int irq = tf->irq;
 
 	if (irq < 0) {

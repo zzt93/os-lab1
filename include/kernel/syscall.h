@@ -2,8 +2,9 @@
 #define __SYSCALL_H__
 
 #include "x86/memory.h"
+#include "assert.h"
 
-void int syscall(int, ...);
+int syscall(int, ...);
 void do_syscall(TrapFrame*);
 
 enum {

@@ -41,7 +41,8 @@
 	.string	"%x\n"
 
 	asm_do_irq:
-	call lock
+    # have to use cli, for using lock change some registers values
+    cli
 	pushl %ds
 	pushl %es
 	pushl %fs

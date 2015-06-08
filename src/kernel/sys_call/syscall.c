@@ -13,18 +13,21 @@ syscall(int id, ...) {
 
 void do_syscall(TrapFrame *tf) {
 	int id = tf->eax; // system call id
+    //Msg m;
 
 	switch (id) {
 		case SYS_read:
-			send(FM, m);
-			receive(FM, m);
-			int nread = m.ret;
-			tf->eax = nread;   // return value is stored in eax
+			//send(FM, m);
+			//receive(FM, m);
+			//int nread = m.ret;
+			//tf->eax = nread;   // return value is stored in eax
 			break;
 		case SYS_write:
-			tf->eax = nwrite;
+            printk(RED"sys write"RESET);
+			//tf->eax = nwrite;
 			break;
         default:
-            assert(0);
+            printk(RED"no such system call"RESET);
+            //assert(0);
 	}
 }
