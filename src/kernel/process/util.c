@@ -51,12 +51,12 @@ void init_proc() {
 
 void init_driver_test() {
     //add2wake(create_kthread(read_MBR));
-    add2wake(create_kthread(read_FM));
+    //add2wake(create_kthread(read_FM));
 }
 
 void init_test_proc() {
     //init_driver_test();
-    add2wake(create_kthread(user_process));
+    //add2wake(create_kthread(user_process));
 }
 
 void init_idle() {

@@ -68,6 +68,7 @@ void* alloc_page() {
     return page;
 }
 
+// TODO test
 void free_page(void *p) {
     assert(((uint32_t)p & 0xfff) == 0);
     Page* page = (Page*)p;

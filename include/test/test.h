@@ -10,6 +10,8 @@ void test_list_entry();
 void test_tree();
 void test_map();
 
+void test_page_alloc();
+
 // implemented in util.c
 void init_test_proc();
 

@@ -14,15 +14,16 @@ ARRAYS  = $(OBJS:.out=.ar)
 
 compile: $(OBJS)
 
-xxd: $(ARRAYS)
+#xxd: $(ARRAYS)
 
 $(OBJS): %.out : %.o
 	$(LD) $(LDFLAGS) -o $@ $<
 	objdump -D $@ > $(subst out,dump,$@)
 	readelf -a $@ > $(subst out,elf,$@)
-	
-$(ARRAYS): %.ar : %.out
-	xxd -c 4 -s 0 -i $< > $@	
+	xxd -c 4 -s 0 -i $@ > $(subst out,ar,$@)
+
+#$(ARRAYS): %.ar : %.out
+#	xxd -c 4 -s 0 -i $< > $@	
 
 clean:
 	rm -f $(OBJS) $(OBJS:.o=.d) $(OBJS:.c=.dump) $(OBJS:.c=.elf)

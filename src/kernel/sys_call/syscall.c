@@ -22,12 +22,16 @@ void do_syscall(TrapFrame *tf) {
 			//int nread = m.ret;
 			//tf->eax = nread;   // return value is stored in eax
 			break;
-		case SYS_write:
-            printk(RED"sys write"RESET);
+        case SYS_write:
 			//tf->eax = nwrite;
+            break;
+        case SYS_fork:
 			break;
+		case 111:
+            printk(RED"user process test "RESET);
+            break;
         default:
-            printk(RED"no such system call"RESET);
-            //assert(0);
+            printk(RED"no such system call %d "RESET, id);
+            assert(0);
 	}
 }

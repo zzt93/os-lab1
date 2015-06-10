@@ -107,15 +107,18 @@ void create_process(Msg* m) {
 	}
 
     // TODO initialize the va for stack
-
+    //ss =
+    
     // initialize the va for kernel
     init_kernel_image(pdir);
 
     // initialize PCB for user process
     void *f = (void*)elf->entry;
     // TODO using create_kthread???
-    PCB* p = create_kthread(f);
-    set_pdir(p, (uint32_t)pdir);
+    //PCB* p = create_kthread(f);
+    //set_pdir(p, (uint32_t)pdir);
+    //set_user_tf(p, ss, esp);
+    PCB* p = create_user_thread(f, (uint32_t)pdir, 0, 0);
     add2wake(p);
     // send back
     m->ret = 1;

@@ -9,7 +9,9 @@ extern PCB* current;
 void read_MBR() {
     char buf[NUM_MBR];
     /**
-       TODO why printk will fail when switch then interrupt
+       why printk will fail when switch then interrupt
+       for I use lock in context switch which change the
+       values of $eax, $ebx
      */
     int offset = 510;
     while (true) {
@@ -28,7 +30,7 @@ static void set_mes(Msg* m, char *buf) {
     m->dest = FM;
     m->buf = buf;
     m->offset = 0;
-    m->len = 5;
+    m->len = 500;
 }
 
 void read_FM() {
@@ -36,7 +38,7 @@ void read_FM() {
     char buf[NUM_MBR];
     set_mes(&m, buf);
     send(FM, &m);
-    
+
     while (true) {
         receive(FM, &m);
         int i;

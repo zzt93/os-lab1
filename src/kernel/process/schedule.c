@@ -88,6 +88,9 @@ schedule(void) {
     // load this process's cr3寄存器
     //assert(get_kcr3()->val == current->pdir.val);
     write_cr3(&(current->pdir));
+    //TODO set new kernel stack for user process
+    //set_tss_esp0(current->kstack);
+
 
     //printk("in queue %d\n", tail-head);
     //printk("in queue %d\n", queue[head]->pid);
