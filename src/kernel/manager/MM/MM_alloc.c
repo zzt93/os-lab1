@@ -32,7 +32,7 @@ static void set_free(int i, int val) {
     int j = i % BITS;
     int bit = val << j;
     assert(bit == (val << i));
-    // TODO if last assert fail change all << i
+    // if upper assert fail change all << i
     assert((free[index]&(1 << j)) != bit);
     // set that bit to val
     free[index] ^= (-val ^ free[index])
@@ -68,7 +68,6 @@ void* alloc_page() {
     return page;
 }
 
-// TODO test
 void free_page(void *p) {
     assert(((uint32_t)p & 0xfff) == 0);
     Page* page = (Page*)p;

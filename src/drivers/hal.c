@@ -72,10 +72,11 @@ void hal_list(void) {
 
 static size_t
 dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
-    // TODO why need lock it!!!
-    lock();
+    // why need lock it!!! -- for the lock in asm_do_irq will
+    // change the value of $eax, $edx
+    //lock();
 	Dev *dev = hal_get(dev_name);
-    unlock();
+    //unlock();
     printk("%x ", dev);
 	assert(dev != NULL);
     printk("%d %s %x ", dev->pid, dev_name, dev);

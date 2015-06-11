@@ -87,7 +87,7 @@ void create_process(Msg* m) {
 		send(MM, m);
         receive(MM, m);
 
-        pa = m->buf; // TODO pa is physical address???
+        pa = m->buf; // pa is physical address
         // MM should already set the mapping from va to pa,
         // but the pdir is not this process's page directory,
         // using it can't find the right physical address,
@@ -106,19 +106,33 @@ void create_process(Msg* m) {
 		for (i = pa + ph_table->filesz; i < pa + ph_table->memsz; *i ++ = 0);
 	}
 
-    // TODO initialize the va for stack
-    //ss =
-    
+    // initialize the va for stack
+    // set the page directory, page table for user stack
+    // and allocate page
+    va = (unsigned char*)USER_STACK_POINTER;
+    assert(va == (unsigned char*)0xbffff000);
+    init_meg(m,
+        current->pid,
+        NEW_PAGE,
+        INVALID_ID, INVALID_ID, pdir, (int)va, USER_STACK_SIZE);
+
+    send(MM, m);
+    receive(MM, m);
+    // TODO which segment
+    uint32_t ss = SELECTOR_USER(SEG_USER_DATA);
+    uint32_t esp = (uint32_t)(va + USER_STACK_SIZE);
+    assert(esp == KOFFSET);
+
     // initialize the va for kernel
     init_kernel_image(pdir);
 
     // initialize PCB for user process
     void *f = (void*)elf->entry;
-    // TODO using create_kthread???
+    // old way: -- now replaced by create_user_thread
     //PCB* p = create_kthread(f);
     //set_pdir(p, (uint32_t)pdir);
     //set_user_tf(p, ss, esp);
-    PCB* p = create_user_thread(f, (uint32_t)pdir, 0, 0);
+    PCB* p = create_user_thread(f, (uint32_t)pdir, ss, esp);
     add2wake(p);
     // send back
     m->ret = 1;

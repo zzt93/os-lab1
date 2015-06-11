@@ -65,9 +65,9 @@ init_page(void) {
     // loop until all the physical memory are set to some page
     // loop 2**27/2**22 = 2**5, so just 32 page directory entries are filled
 	for (pdir_idx = 0; pdir_idx < PHY_MEM / PD_SIZE; pdir_idx ++) {
-        // TODO make a same entry for what ??
+        // make a same entry for what ??
         // ANSWER:
-        // so we can use va in substitute of pa
+        // so we can use va in substitute with pa
         // for the same mapping from [0, 0x01000000)
 		make_pde(&pdir[pdir_idx], ptable);
         // the page for kernel, from KOFFSET to KOFFSET + PHY_MEM
@@ -129,6 +129,9 @@ inline void set_tss_esp0(uint32_t esp) {
 /* GDT in the kernel's memory, whose virtual memory is greater than 0xC0000000. */
 static SegDesc gdt[NR_SEGMENTS];
 
+/**
+   all segment's base are set to zero
+ */
 static void
 set_segment(SegDesc *ptr, uint32_t pl, uint32_t type) {
 	ptr->limit_15_0  = 0xFFFF;

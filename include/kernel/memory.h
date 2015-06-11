@@ -14,6 +14,8 @@ void make_invalid_pte(PTE *);
 void make_pde(PDE *, void *);
 void make_pte(PTE *, void *);
 
+void set_tss_esp0(uint32_t);
+
 #define va_to_pa(addr) \
 	((void*)(((uint32_t)(addr)) - KOFFSET))
 
@@ -34,5 +36,9 @@ void make_pte(PTE *, void *);
 #define KERNEL_VA_START KOFFSET
 // user available pages
 #define USER_FREE_PAGES ((PHY_MEM - KMEM) / PAGE_SIZE)
+
+#define USER_STACK_BASE KOFFSET
+#define USER_STACK_POINTER (USER_STACK_BASE - PAGE_SIZE)
+#define USER_STACK_SIZE PAGE_SIZE
 
 #endif

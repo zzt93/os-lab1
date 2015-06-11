@@ -136,6 +136,6 @@ welcome(void) {
     /*
     test_tree();
     test_map();
-    */
     test_page_alloc();
+    */
 }

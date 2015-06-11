@@ -56,7 +56,7 @@ void init_driver_test() {
 
 void init_test_proc() {
     //init_driver_test();
-    //add2wake(create_kthread(user_process));
+    add2wake(create_kthread(user_process));
 }
 
 void init_idle() {

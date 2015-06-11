@@ -25,7 +25,7 @@ void vfprintf(void (*printer)(char), const char *ctl, void **tmp) {
             printer(*ctl);
 		} else {
             /**
-               TODO why switch (cmp) then interrupt comes print
+               why switch (cmp) then interrupt comes print
                go to the default option
              */
             //lock();

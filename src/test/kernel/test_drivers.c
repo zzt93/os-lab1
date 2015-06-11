@@ -11,9 +11,9 @@ void read_MBR() {
     /**
        why printk will fail when switch then interrupt
        for I use lock in context switch which change the
-       values of $eax, $ebx
+       values of $eax, $edx
      */
-    int offset = 510;
+    int offset = 0;
     while (true) {
         dev_read(hda, current->pid, buf, offset, NUM_MBR - offset);
         int i;

@@ -81,26 +81,23 @@ schedule(void) {
         default:
             assert(false);
     }
-    // to balance the lock in asm_do_irq
+    // to balance the lock in do_irq
     current->count_of_lock--;
     //printk("#%d count of lock %d\n", current->pid, current->count_of_lock);
     current = choose_process();
     // load this process's cr3寄存器
     //assert(get_kcr3()->val == current->pdir.val);
     write_cr3(&(current->pdir));
-    //TODO set new kernel stack for user process
-    //set_tss_esp0(current->kstack);
+    // set new kernel stack for user process
+    // for stack grow down and push will minus first
+    // then push content in it. --@see push i386
+    set_tss_esp0((uint32_t)(current->kstack + KSTACK_SIZE));
 
 
     //printk("in queue %d\n", tail-head);
     //printk("in queue %d\n", queue[head]->pid);
     //printk("after add:\n");
     //print_tree(left(sleeped_head));
-    /**
-       if I add lock in printk, it will unlock thread
-       and arise some problem about critical section;
-       if I don't add lock, printk may be interrupt
-     */
     printk("Now: current is #%d\n", current->pid);
     NOINTR;
 }
