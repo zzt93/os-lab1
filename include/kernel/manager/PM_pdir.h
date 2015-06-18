@@ -1,7 +1,7 @@
 #ifndef __PM_PDIR_H__
 #define __PM_PDIR_H__
 
-#include "memory.h"
+#include "kernel/memory.h"
 
 typedef struct {
     PDE dir[NR_PDE];

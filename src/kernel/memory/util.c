@@ -14,20 +14,29 @@ make_invalid_pte(PTE *p) {
  * page level protection. */
 
 void
-make_pde(PDE *p, void *addr) {
+make_specific_pde(PDE *p, void *addr, int us, int rw) {
 	p->val = 0;
 	p->page_frame = ((uint32_t)addr) >> 12;
 	p->present = 1;
-	p->read_write = 1;
-	p->user_supervisor = 1;
+	p->read_write = rw;
+	p->user_supervisor = us;
 }
 
 void
-make_pte(PTE *p, void *addr) {
+make_specific_pte(PTE *p, void *addr, int us, int rw) {
 	p->val = 0;
 	p->page_frame = ((uint32_t)addr) >> 12;
 	p->present = 1;
-	p->read_write = 1;
-	p->user_supervisor = 1;
+	p->read_write = rw;
+	p->user_supervisor = us;
+}
+
+
+void make_pde(PDE *p, void *addr) {
+    make_specific_pde(p, addr, 1, 1);
+}
+
+void make_pte(PTE *p, void *addr) {
+    make_specific_pte(p, addr, 1, 1);
 }
 

@@ -1,4 +1,4 @@
-#include "kernel/MM.h"
+#include "kernel/manager/MM.h"
 #include "kernel/message.h"
 #include "kernel/process.h"
 
@@ -14,17 +14,20 @@ extern PCB* current;
    并填写页表项.
    FM需要把程序加载到这些物理页面中,
    使得将来用户进程运行的时候, 能够通过我们填写的页目录和页表, 找到一些物理页面, 同时这些物理页面中正好包含着程序的内容, 这样用户进程才能正确运行, 否则将会抛出异常.
-   填写页目录项和页表项分别使用make_pde()函数和make_pte()函数, 它们都在src/kernel/memory/util.c中定义, 你可以在src/kernel/memory/kvm.c中参考内核启动分页机制的过程, 来看看如何使用它们.
+   填写页目录项和页表项分别使用make_pde()函数和make_pte()函数, 它们都在src/kernel/memory/util.c中定义, 你可以在src/kernel/memory/kvm.c中参考内核启动分页机制的过程.
    内核映像占用0xc0000000及以上的虚拟地址, 我们只需要让相应的页目录项指向相应的内核页表就可以了, 无须为内核映像重新分配页表.
  */
 void init_va(Msg* m) {
     unsigned int off = (unsigned int)m->offset;
+    //assert(m->i[1] == m->dev_id);
     assert(off >= 0 && off < KERNEL_VA_START);
     assert(m->len > 0);
     assert(((int)m->buf & 0xfff) == 0);
 
+    int US = m->i[1] >> 2;
+    int RW = (m->i[1] >> 1) & 0x1;
     int count = 0;
-    
+
     PDE *pdir = (PDE*)m->buf;
     PTE *ptable = NULL;
     Page *page = NULL;
@@ -32,7 +35,6 @@ void init_va(Msg* m) {
 	uint32_t pdir_idx, ptable_idx;
     //pdir_idx = off >> 22;
     //ptable_idx = (off >> 12) & 0x3ff;
-    //assert(pdir[pdir_idx].present == 0);
     for (; off < m->offset + m->len; off++) {
         pdir_idx = off >> 22;
         ptable_idx = (off >> 12) & 0x3ff;
@@ -50,7 +52,7 @@ void init_va(Msg* m) {
                 m->buf = page;
             }
             assert((((int)page & 0xfff) == 0) && page != NULL);
-            make_pte(&ptable[ptable_idx], page);
+            make_specific_pte(&ptable[ptable_idx], page, US, RW);
         }
     }
 

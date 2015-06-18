@@ -1,5 +1,5 @@
 #include "kernel/syscall.h"
-#include "kernel/manager.h"
+#include "kernel/manager/manager.h"
 #include "kernel/message.h"
 
 
@@ -13,7 +13,7 @@ syscall(int id, ...) {
 
 void do_syscall(TrapFrame *tf) {
 	int id = tf->eax; // system call id
-    //Msg m;
+    Msg m;
 
 	switch (id) {
 		case SYS_read:
@@ -26,6 +26,10 @@ void do_syscall(TrapFrame *tf) {
 			//tf->eax = nwrite;
             break;
         case SYS_fork:
+            send(PM, &m);
+            receive(PM, &m);
+            int pid = m.ret;
+            tf->eax = pid;
 			break;
 		case 111:
             printk(RED"user process test "RESET);

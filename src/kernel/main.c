@@ -5,7 +5,7 @@
 #include "lib/malloc.h"
 #include "kernel/semaphore.h"
 #include "test/test.h"
-#include "kernel/manager.h"
+#include "kernel/manager/manager.h"
 
 void init_page(void);
 void init_serial(void);

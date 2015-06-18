@@ -2,7 +2,7 @@
 #define __MM_ALLOC_H__
 
 #include "common.h"
-#include "memory.h"
+#include "kernel/memory.h"
 
 typedef struct {
     uint8_t p[PAGE_SIZE];

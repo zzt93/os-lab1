@@ -11,6 +11,11 @@
 typedef enum {
     IDLE, SLEEPED, WAKED,
 } PROCESS_STATE;
+
+typedef enum {
+    KERNEL, USER,
+} Thread_t;
+
 /*
   for the stack is grow to small address,
   the first item on the stack, should be the
@@ -47,6 +52,8 @@ typedef struct {
     int count_of_lock;
 
     CR3 pdir;
+
+    Thread_t type;
 } PCB;
 
 extern PCB *current;

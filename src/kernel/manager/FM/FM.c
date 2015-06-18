@@ -1,5 +1,5 @@
 #include "kernel/process.h"
-#include "kernel/FM.h"
+#include "kernel/manager/FM.h"
 #include "kernel/message.h"
 
 int FM;

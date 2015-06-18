@@ -1,7 +1,7 @@
 #ifndef __MM_H__
 #define __MM_H__
 
-#include "elf.h"
+#include "kernel/elf.h"
 #include "kernel/message.h"
 
 enum {

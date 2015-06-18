@@ -6,6 +6,7 @@
 
 enum {
     PM_CREATE,
+    PM_fork,
 };
 
 void init_PM();

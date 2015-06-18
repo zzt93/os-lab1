@@ -2,9 +2,11 @@
 #include "kernel/init_proc.h"
 #include "kernel/message.h"
 
-#include "kernel/manager.h"
+#include "kernel/manager/manager.h"
 
 #include "kernel/memory.h"
+
+#include "kernel/manager/PM_syscall.h"
 
 #define B_SIZE 512
 
@@ -28,6 +30,9 @@ static void PM_job() {
         switch(m.type) {
             case PM_CREATE:
                 create_process(&m);
+                break;
+            case PM_fork:
+                kfork(&m);
                 break;
             default:
                 assert(false);
@@ -80,10 +85,14 @@ void create_process(Msg* m) {
         assert(va > (unsigned char*)0);
         assert(va < (unsigned char*)KERNEL_VA_START);
 		/* allocate pages starting from va, with memory size no less than ph->memsz */
+        /*
+          flags: RWE is the lowest three bits
+          TODO: is always user?
+         */
         init_meg(m,
             current->pid,
             NEW_PAGE,
-            INVALID_ID, INVALID_ID, pdir, (int)va, ph_table->memsz);
+            INVALID_ID, (ph_table->flags & 0x2) | (USER_PAGE_ENTRY << 2), pdir, (int)va, ph_table->memsz);
 		send(MM, m);
         receive(MM, m);
 

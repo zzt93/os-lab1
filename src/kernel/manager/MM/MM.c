@@ -1,6 +1,6 @@
 #include "kernel/message.h"
 #include "kernel/process.h"
-#include "kernel/MM.h"
+#include "kernel/manager/MM.h"
 
 int MM;
 
@@ -10,6 +10,7 @@ int MM;
       m->buf -- the address of page directory
       m->offset -- allocate pages from this offset
       m->len -- allocate no less than this len
+      m->i[1] -- the flag of page entry
 
       The message send from MM specify:
       m->buf -- the allocated pages' starting physical address

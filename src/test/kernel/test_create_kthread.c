@@ -1,7 +1,7 @@
 #include "common.h"
 #include "kernel/process.h"
 #include "kernel/message.h"
-#include "kernel/PM.h"
+#include "kernel/manager/PM.h"
 
 /*
 void A () {

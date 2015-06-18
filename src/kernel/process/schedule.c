@@ -85,12 +85,19 @@ schedule(void) {
     current->count_of_lock--;
     //printk("#%d count of lock %d\n", current->pid, current->count_of_lock);
     current = choose_process();
-    // load this process's cr3寄存器
+    // load this process's cr3寄存器 when user -> kerenl
+    // or kernel -> user
     //assert(get_kcr3()->val == current->pdir.val);
     write_cr3(&(current->pdir));
     // set new kernel stack for user process
-    // for stack grow down and push will minus first
-    // then push content in it. --@see push i386
+    /**
+       for stack grow down and push will minus first
+    // then push content in it. --@see push in i386 manual
+    // @checked -- set breakpoint at asm_do_irq() when
+    // current thread is user test process(13 now),
+    // the values of $eflags is clear to see what is the
+    // location os trap frame is at esp0 - 4
+    */
     set_tss_esp0((uint32_t)(current->kstack + KSTACK_SIZE));
 
 

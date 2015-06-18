@@ -67,7 +67,7 @@ init_page(void) {
 	for (pdir_idx = 0; pdir_idx < PHY_MEM / PD_SIZE; pdir_idx ++) {
         // make a same entry for what ??
         // ANSWER:
-        // so we can use va in substitute with pa
+        // so we can use va in substitute with pa(eg in MM_alloc.c)
         // for the same mapping from [0, 0x01000000)
 		make_pde(&pdir[pdir_idx], ptable);
         // the page for kernel, from KOFFSET to KOFFSET + PHY_MEM

@@ -49,7 +49,7 @@ static inline void set_pdir(PCB* p, uint32_t val) {
     p->pdir.page_directory_base = val >> 12;
 }
 
-static void init_pcb_content(PCB* pcb, uint32_t val) {
+static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type) {
     //NOINTR;
     lock();
     pcb->pid = pid_count++;
@@ -61,6 +61,8 @@ static void init_pcb_content(PCB* pcb, uint32_t val) {
     pcb->count_of_lock = 0;
     // initialize the page directory address
     set_pdir(pcb, val);
+    // kernel thread or user process
+    pcb->type = type;
 }
 
 PCB*
@@ -74,7 +76,7 @@ create_kthread(void *fun) {
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
 
-    init_pcb_content(pcb, get_kcr3()->val);
+    init_pcb_content(pcb, get_kcr3()->val, KERNEL);
     return pcb;
 }
 
@@ -89,7 +91,7 @@ PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp) {
     init_user_tf(frame, f);
     pcb->tf = frame;
 
-    init_pcb_content(pcb, pdir);
+    init_pcb_content(pcb, pdir, USER);
     /**
        in order to switch back to user stack
      */
@@ -108,6 +110,6 @@ PCB* create_kthread_with_args(void* fun, int arg) {
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
 
-    init_pcb_content(pcb, get_kcr3()->val);
+    init_pcb_content(pcb, get_kcr3()->val, KERNEL);
     return pcb;
 }
