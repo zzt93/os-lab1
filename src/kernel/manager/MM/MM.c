@@ -12,8 +12,13 @@ int MM;
       m->len -- allocate no less than this len
       m->i[1] -- the flag of page entry
 
-      The message send from MM specify:
+      @return: The message send from MM specify:
       m->buf -- the allocated pages' starting physical address
+
+   m->type == COPY_page:
+      m->i[0] -- src PCB's address
+      m->i[1] -- dest PCB's address
+      @return:
  */
 static void MM_job() {
     static Msg m;
@@ -24,6 +29,9 @@ static void MM_job() {
             //case NEW_PDIR:
             case NEW_PAGE:
                 init_va(&m);
+                break;
+            case COPY_page:
+                page_copy(&m);
                 break;
             default:
                 assert(false);

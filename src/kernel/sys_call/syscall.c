@@ -1,6 +1,7 @@
 #include "kernel/syscall.h"
 #include "kernel/manager/manager.h"
 #include "kernel/message.h"
+#include "kernel/process.h"
 
 
 int __attribute__((__noinline__))
@@ -26,6 +27,7 @@ void do_syscall(TrapFrame *tf) {
 			//tf->eax = nwrite;
             break;
         case SYS_fork:
+            m.buf = current;
             send(PM, &m);
             receive(PM, &m);
             int pid = m.ret;

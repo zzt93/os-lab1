@@ -1,7 +1,9 @@
 #ifndef __PM_SYSCALL_H__
 #define __PM_SYSCALL_H__
 
-int kfork();
+#include "kernel/message.h"
+
+void kfork(Msg*);
 
 
 #endif /* __PM_SYSCALL_H__ */

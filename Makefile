@@ -32,3 +32,8 @@ kernel: $(OBJS)
 clean:
 	@cd boot; make clean
 	rm -f kernel disk.img $(OBJS) $(OBJS:.o=.d)
+	make disk.img
+
+user_pro:
+	@cd user_program; make
+

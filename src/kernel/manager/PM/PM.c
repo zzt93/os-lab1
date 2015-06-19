@@ -17,10 +17,17 @@ int PM;
 /**
    The message sent to PM should specify:
    m->type
-   m->i[0] -- the program/file name
+       @type:PM_CREATE
+       m->i[0] -- the program/file name
 
-   The message send from PM specify:
-   m->ret -- whether successfully create a user process
+       @return The message send from PM specify:
+       m->ret -- whether successfully create a user process
+
+       @type:PM_fork
+       m->buf -- the father's PCB's address
+
+       @return:
+       m->ret -- the child pid
 */
 static void PM_job() {
     static Msg m;

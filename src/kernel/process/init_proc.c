@@ -21,7 +21,7 @@ static void init_kernel_tf(TrapFrame* frame, void* fun) {
     frame->eflags = 0x200;// set IF = 1, that is enable interrupt
 }
 
-void init_user_tf(TrapFrame* frame, void* fun) {
+static void init_user_tf(TrapFrame* frame, void* fun) {
     frame->xxx = (uint32_t)(&(frame->xxx) + 5);// see pushal
     assert (frame->xxx == (uint32_t)(&frame->gs));
     frame->cs = SELECTOR_USER(SEG_USER_CODE);
@@ -33,21 +33,7 @@ void init_user_tf(TrapFrame* frame, void* fun) {
 
     frame->eflags = 0x200;// set IF = 1, that is enable interrupt
 }
-/**
-   set the tf store the content of user stack
-   for user process running on it
- */
-static inline void set_user_stack(PCB* p, uint32_t ss, uint32_t esp) {
-    TrapFrame* frame = (TrapFrame*)p->tf;
-    frame->ss = ss;
-    frame->esp = esp;
-}
 
-static inline void set_pdir(PCB* p, uint32_t val) {
-    assert((val&0xfff) == 0);
-    p->pdir.val = 0;
-    p->pdir.page_directory_base = val >> 12;
-}
 
 static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type) {
     //NOINTR;
@@ -112,4 +98,11 @@ PCB* create_kthread_with_args(void* fun, int arg) {
 
     init_pcb_content(pcb, get_kcr3()->val, KERNEL);
     return pcb;
+}
+
+int new_id() {
+    lock();
+    int pid = pid_count++;
+    unlock();
+    return pid;
 }
