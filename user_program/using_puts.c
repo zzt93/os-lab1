@@ -1,4 +1,4 @@
-#include "lib/out.h"
+#include "sys_call/io/out.h"
 
 volatile int x = 0;
 int main() {

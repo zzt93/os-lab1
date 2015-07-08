@@ -3,7 +3,7 @@
 #include "kernel/message.h"
 #include "kernel/process.h"
 
-
+/*
 int __attribute__((__noinline__))
 syscall(int id, ...) {
 	int ret;
@@ -11,6 +11,7 @@ syscall(int id, ...) {
 	asm volatile("int $0x80": "=a"(ret) : "a"(args[0]), "b"(args[1]), "c"(args[2]), "d"(args[3]));
 	return ret;
 }
+*/
 
 void do_syscall(TrapFrame *tf) {
 	int id = tf->eax; // system call id
