@@ -16,7 +16,7 @@ run: disk.img
 debug: disk.img
 	gnome-terminal -e "bash -c \"gdb -s kernel; exec bash\""
 	$(QEMU) -serial stdio -s -S disk.img
-	
+
 
 disk.img: kernel
 	@cd boot; make
@@ -34,6 +34,9 @@ clean:
 	rm -f kernel disk.img $(OBJS) $(OBJS:.o=.d)
 	make disk.img
 
-user_pro:
+user_pro: lib_comp
 	@cd user_program; make
+
+lib_comp:
+	@cd user_program; make lib_comp
 

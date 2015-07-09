@@ -134,12 +134,13 @@ void create_process(Msg* m) {
 
     send(MM, m);
     receive(MM, m);
-    // TODO which segment
+    // TODO which segment, although all segment are
+    // the same for time being
     uint32_t ss = SELECTOR_USER(SEG_USER_DATA);
     uint32_t esp = (uint32_t)(va + USER_STACK_SIZE);
     assert(esp == KOFFSET);
 
-    // initialize the va for kernel
+    // initialize the va for kernel image
     init_kernel_image(pdir);
 
     // initialize PCB for user process

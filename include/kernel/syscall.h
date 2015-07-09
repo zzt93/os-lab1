@@ -16,6 +16,7 @@ enum {
     SYS_exec,
     SYS_sleep,
     // user test
+    SYS_print_serial,
 };
 
 

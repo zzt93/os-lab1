@@ -37,6 +37,9 @@ void do_syscall(TrapFrame *tf) {
 		case 111:
             printk(RED"user process test "RESET);
             break;
+        case SYS_print_serial:
+            printk("%s ", tf->ebx);
+            break;
         default:
             printk(RED"no such system call %d "RESET, id);
             assert(0);

@@ -3,11 +3,14 @@ os-lab1
 
 Try to learn os by lab
 
+------------------------------
 
+Wed Jul 8 2015 update:
 
 The functionalities that I have already implemented:
 
 printk -- printf in kernel  
+kmalloc -- malloc in kernel -- using next-fit algorithm  
 the key press interrupt handler  
 a simple maze game  
 the context switch between threads  
@@ -15,19 +18,47 @@ the creation of thread
 the schedule of thread -- now using Round-Robin algorithm  
 the sleep and wake_up of thread  
 the semaphore(P&V) and lock(cli&sti) to slove critical section  
-the send and receive between threads  
+the send and receive between threads  -- send it asynchronized and receive is synchronized  
 add timer-- clock diver, ide-- hard disk driver, tty -- terminal driver  
 very very simple file system  
 user process  
-using page allocation  
+using page allocation  -- using bit-map algorithm  
 add page protection  
 put user in ring3  
 
 
-Implement some ADT:
+Implement some ADT:  
 circular queue  
 BST  
-hash-map  
+map  
 linked-list  
 
 -----------------------------
+
+Wed Jul 8 2015 update:
+
+Thread and it's pid:  
+idle -- 0  
+Timer -- 1  
+TTY -- 2  
+getty -- 3-6  
+IDE -- 7  
+RAMDISK -- 8  
+FM -- 9  
+PM -- 10  
+MM -- 11  
+user process invoker -- 12  
+first user process -- 13  
+
+
+----------------------
+
+The kernel's virtual address space: [0xc000 0000, 0xffff ffff]  
+The user process's virtual address space: [0x0, 0xbfff ffff]  
+
+
+-----------------
+
+The kernel default has **16M** memory
+
+

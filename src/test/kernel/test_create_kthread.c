@@ -96,6 +96,7 @@ void user_process() {
         PM_CREATE,
         0, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
     send(PM, &m);
+    receive(PM, &m);
     while (true) {
         wait_intr();
     }

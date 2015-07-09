@@ -9,6 +9,7 @@
 static int pid_count = START_ID;
 
 static void init_kernel_tf(TrapFrame* frame, void* fun) {
+    // using xxx to represent the second pushed esp
     frame->xxx = (uint32_t)(&(frame->xxx) + 5);// see pushal
     assert (frame->xxx == (uint32_t)(&frame->gs));
     frame->cs = SELECTOR_KERNEL(SEG_KERNEL_CODE);
@@ -57,7 +58,8 @@ create_kthread(void *fun) {
     //NOINTR;
     PCB* pcb = kmalloc(PCB_SIZE);
     //NOINTR;
-    TrapFrame *frame = (TrapFrame*)((char *)(pcb->kstack) + KSTACK_SIZE - sizeof(TrapFrame)); // allocate frame at the end of stack
+    // allocate frame at the end of stack, ie frame is [base + all_size - frame_size, base + all_size)
+    TrapFrame *frame = (TrapFrame*)((char *)(pcb->kstack) + KSTACK_SIZE - sizeof(TrapFrame));
     //init trap frame
     init_kernel_tf(frame, fun);
     pcb->tf = frame;

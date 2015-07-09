@@ -3,6 +3,6 @@
 
 //#include "kernel/syscall.h"
 
-int puts(const char *ctl, ...);
+int puts(const char *ctl);
 
 #endif /* __OUT_H__ */

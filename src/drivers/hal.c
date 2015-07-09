@@ -77,9 +77,9 @@ dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset,
     //lock();
 	Dev *dev = hal_get(dev_name);
     //unlock();
-    printk("%x ", dev);
+    //printk("%x ", dev);
 	assert(dev != NULL);
-    printk("%d %s %x ", dev->pid, dev_name, dev);
+    //printk("%d %s %x ", dev->pid, dev_name, dev);
 
     /**
        This one shouldn't be static: for may be different devices

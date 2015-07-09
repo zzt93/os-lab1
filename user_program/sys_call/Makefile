@@ -2,7 +2,7 @@
 
 CC      = gcc
 LD      = ld
-CFLAGS  = -m32 -static -ggdb -MD -Wall -Werror -I../include -O0 \
+CFLAGS  = -m32 -static -ggdb -MD -Wall -Werror -I../../include -O0 \
 		 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer
 LDFLAGS = -melf_i386 -e main
 

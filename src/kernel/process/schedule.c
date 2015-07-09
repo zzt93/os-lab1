@@ -94,7 +94,7 @@ schedule(void) {
        for stack grow down and push will minus first
     // then push content in it. --@see push in i386 manual
     // @checked -- set breakpoint at asm_do_irq() when
-    // current thread is user test process(13 now),
+    // current thread is user test process(13 2015.4),
     // the values of $eflags is clear to see what is the
     // location os trap frame is at esp0 - 4
     */
