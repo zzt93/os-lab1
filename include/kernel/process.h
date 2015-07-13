@@ -5,6 +5,7 @@
 #include "kernel/semaphore.h"
 #include "x86/cpu.h"
 
+#include "manager/Virtual_mem.h"
 #define KSTACK_SIZE 4096
 #define PCB_SIZE (sizeof (PCB))
 
@@ -34,11 +35,11 @@ typedef struct {
     /* the content in the trapFrame, ie *tf
     // context info
     uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-    uint16_t gs, fs, ed, ds;
+    uint32_t gs, fs, ed, ds;
     int irq;
     int error_code;
     unsigned int eip;
-    uint16_t cs;
+    uint32_t cs;
     unsigned int eflags;
     */
     // stack of user
@@ -54,6 +55,8 @@ typedef struct {
     CR3 pdir;
 
     Thread_t type;
+
+    ListHead vir_mem;
 } PCB;
 
 extern PCB *current;

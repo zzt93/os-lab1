@@ -8,6 +8,7 @@
 
 #include "kernel/manager/PM_syscall.h"
 
+#include "lib/malloc.h"
 #define B_SIZE 512
 
 extern PCB* current;
@@ -80,6 +81,8 @@ void create_process(Msg* m) {
     struct ELFHeader *elf = (struct ELFHeader*)buf;
     struct ProgramHeader *ph_table, *end_ph;
     unsigned char *va, *pa, *i;
+    //store virtual address space in loop
+    ListHead vir_range;
 
 	ph_table = (struct ProgramHeader*)((char *)elf + elf->phoff);
     // ignore the stack header for the time being
@@ -91,6 +94,13 @@ void create_process(Msg* m) {
         //assert(va >= 0x08048000);
         assert(va > (unsigned char*)0);
         assert(va < (unsigned char*)KERNEL_VA_START);
+        /*
+          store the information about virtual address
+         */
+        Vir_mem *tmp = kmalloc(sizeof(Vir_mem));
+        vir_init(tmp,
+            (uint32_t)va, (uint32_t)va + ph_table->memsz, ph_table->flags);
+        list_add_after(&vir_range, &(tmp->link));
 		/* allocate pages starting from va, with memory size no less than ph->memsz */
         /*
           flags: RWE is the lowest three bits
@@ -103,7 +113,7 @@ void create_process(Msg* m) {
 		send(MM, m);
         receive(MM, m);
 
-        pa = m->buf; // pa is physical address
+        pa = m->buf; // pa a is physical address
         // MM should already set the mapping from va to pa,
         // but the pdir is not this process's page directory,
         // using it can't find the right physical address,
@@ -149,7 +159,7 @@ void create_process(Msg* m) {
     //PCB* p = create_kthread(f);
     //set_pdir(p, (uint32_t)pdir);
     //set_user_tf(p, ss, esp);
-    PCB* p = create_user_thread(f, (uint32_t)pdir, ss, esp);
+    PCB* p = create_user_thread(f, (uint32_t)pdir, ss, esp, &vir_range);
     add2wake(p);
     // send back
     m->ret = 1;

@@ -50,6 +50,8 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type) {
     set_pdir(pcb, val);
     // kernel thread or user process
     pcb->type = type;
+    // process virtual memory range
+    list_init(&(pcb->vir_mem));
 }
 
 PCB*
@@ -68,8 +70,12 @@ create_kthread(void *fun) {
     return pcb;
 }
 
+void store_vir(PCB *pcb, ListHead *link) {
+    list_add_after(link, &(pcb->vir_mem));
+    list_del(link);
+}
 
-PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp) {
+PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListHead *vir) {
     PCB* pcb = kmalloc(PCB_SIZE);
     /**
        trapFrame is always located on the kernel stack
@@ -80,8 +86,10 @@ PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp) {
     pcb->tf = frame;
 
     init_pcb_content(pcb, pdir, USER);
+    store_vir(pcb, vir);
     /**
        in order to switch back to user stack
+       after interrupt handle
      */
     set_user_stack(pcb, ss, esp);
     return pcb;

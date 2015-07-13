@@ -10,6 +10,7 @@ typedef struct ListHead ListHead;
 
 /*
   return the pointer to the container struct, ie type*
+  eg PCB *pcb = list_entry(ptr, PCB, link)
  */
 #define list_entry(ptr, type, member) \
 	((type*)( (char*)(ptr) - (int)(& ((type*)0)->member ) ))
