@@ -83,6 +83,7 @@ void create_process(Msg* m) {
     unsigned char *va, *pa, *i;
     //store virtual address space in loop
     ListHead vir_range;
+    list_init(&vir_range);
 
 	ph_table = (struct ProgramHeader*)((char *)elf + elf->phoff);
     // ignore the stack header for the time being
