@@ -7,7 +7,7 @@ Try to learn os by lab
 
 Wed Jul 8 2015 update:
 
-The functionalities that I have already implemented:
+## The functionalities that I have already implemented:
 
 printk -- printf in kernel  
 kmalloc -- malloc in kernel -- using next-fit algorithm  
@@ -37,7 +37,7 @@ linked-list
 
 Wed Jul 8 2015 update:
 
-Thread and it's pid:  
+## Thread and it's pid:  
 idle -- 0  
 Timer -- 1  
 TTY -- 2  
@@ -53,12 +53,19 @@ first user process -- 13
 
 ----------------------
 
+## Virtual address
 The kernel's virtual address space: [0xc000 0000, 0xffff ffff]  
 The user process's virtual address space: [0x0, 0xbfff ffff]  
 
 
 -----------------
 
-The kernel default has **16M** memory
+The kernel default has **16M** memory  
+
+-----------------------
+
+## i386 ISA
+1. push -- first minus 2/4 bytes, then store values, ie the esp always point to old value.
+For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %esp` is the pointer of it.
 
 
