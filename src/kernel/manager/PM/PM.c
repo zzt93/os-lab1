@@ -55,6 +55,26 @@ void init_PM() {
     add2wake(p);
 }
 
+// initialize the va for stack
+// set the page directory, page table for user stack
+// and allocate page
+void create_va_stack(PDE* pdir, uint32_t *ss, uint32_t *esp) {
+    unsigned char *va = (unsigned char*)USER_STACK_POINTER;
+    assert(va == (unsigned char*)0xbffff000);
+    Msg m;
+    init_meg(&m,
+        current->pid,
+        NEW_PAGE,
+        INVALID_ID, INVALID_ID, pdir, (int)va, USER_STACK_SIZE);
+
+    send(MM, &m);
+    receive(MM, &m);
+    // TODO which segment, although all segment are
+    // the same for time being
+    *ss = SELECTOR_USER(SEG_USER_DATA);
+    *esp = (uint32_t)(va + USER_STACK_SIZE);
+    assert(*esp == KOFFSET);
+}
 
 /**
    whether to use this message to send
@@ -136,7 +156,7 @@ void create_process(Msg* m) {
     // initialize the va for stack
     // set the page directory, page table for user stack
     // and allocate page
-    va = (unsigned char*)USER_STACK_POINTER;
+    /*    va = (unsigned char*)USER_STACK_POINTER;
     assert(va == (unsigned char*)0xbffff000);
     init_meg(m,
         current->pid,
@@ -150,6 +170,10 @@ void create_process(Msg* m) {
     uint32_t ss = SELECTOR_USER(SEG_USER_DATA);
     uint32_t esp = (uint32_t)(va + USER_STACK_SIZE);
     assert(esp == KOFFSET);
+    */
+    uint32_t ss = 0;
+    uint32_t esp = 0;
+    create_va_stack(pdir, &ss, &esp);
 
     // initialize the va for kernel image
     init_kernel_image(pdir);

@@ -14,7 +14,7 @@ static void s_copy(PCB* src, PCB* dest) {
 }
 
 /**
-   TODO check whether every field in pcb is correctly setted
+   TODO check whether every field in pcb is correctly copied
    @see init_proc.c; process.h
  */
 // return the pid of child process

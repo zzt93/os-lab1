@@ -82,7 +82,7 @@ void *kmalloc(unsigned int size) {
 
     assert(s > 0);
     assert(*h >= s);
-    printk("head is at %x, size is %d words, *h is %x\n", h, s, *h);
+    printk("head is at %x, size is %d words, before allocating have %x\n", h, s, *h);
     // write header info -- use int*
     int free = *h;
     int gap = h - space_head();
@@ -117,7 +117,7 @@ void kfree(void *p) {
         // next is free, merge it
         *h = *nextH + (-size);
     }
-    printk("*h is %x\n", *h);
+    printk("after free have %x\n", *h);
     last_i = h - space_head();
     unlock();
 }
