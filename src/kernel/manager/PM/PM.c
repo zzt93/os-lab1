@@ -62,7 +62,7 @@ void create_va_stack(PDE* pdir, uint32_t *ss, uint32_t *esp) {
     unsigned char *va = (unsigned char*)USER_STACK_POINTER;
     assert(va == (unsigned char*)0xbffff000);
     Msg m;
-    init_meg(&m,
+    init_msg(&m,
         current->pid,
         NEW_PAGE,
         INVALID_ID, INVALID_ID, pdir, (int)va, USER_STACK_SIZE);
@@ -91,7 +91,7 @@ void create_process(Msg* m) {
     assert( ((int)pdir&0xfff) == 0);
     /* read 512 bytes starting from offset 0 from file "0" into buf */
 	/* it contains the ELF header and program header table */
-    init_meg(m,
+    init_msg(m,
         current->pid,
         FM_READ,
         INVALID_ID, name, buf, 0, B_SIZE);
@@ -127,7 +127,7 @@ void create_process(Msg* m) {
           flags: RWE is the lowest three bits
           TODO: is always user?
          */
-        init_meg(m,
+        init_msg(m,
             current->pid,
             NEW_PAGE,
             INVALID_ID, (ph_table->flags & 0x2) | (USER_PAGE_ENTRY << 2), pdir, (int)va, ph_table->memsz);
@@ -142,7 +142,7 @@ void create_process(Msg* m) {
         assert(pa >= (unsigned char*)KERNEL_PA_END);
         assert(pa < (unsigned char*)PHY_MEM);
 		/* read ph->filesz bytes starting from offset ph->off from file "0" into pa */
-        init_meg(m,
+        init_msg(m,
             current->pid,
             FM_READ,
             INVALID_ID, name, pa, ph_table->off, ph_table->filesz);
@@ -158,7 +158,7 @@ void create_process(Msg* m) {
     // and allocate page
     /*    va = (unsigned char*)USER_STACK_POINTER;
     assert(va == (unsigned char*)0xbffff000);
-    init_meg(m,
+    init_msg(m,
         current->pid,
         NEW_PAGE,
         INVALID_ID, INVALID_ID, pdir, (int)va, USER_STACK_SIZE);

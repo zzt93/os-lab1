@@ -5,6 +5,8 @@
 
 #include "kernel/memory.h"
 
+#include "lib/string.h"
+
 void page_copy(Msg *m) {
     PCB* src = (PCB*)m->i[0];
     PCB* dest = (PCB*)m->i[1];
@@ -20,6 +22,8 @@ void page_copy(Msg *m) {
 
     uint32_t pdir_i, ptable_idx;
     for (pdir_i = 0; pdir_i < NR_PDE; pdir_i++) {
+        // if source process has a page directory entry,
+        //ie a page table
         if (s_p[pdir_i].present == 1) {
             ptable = alloc_page();
             assert((((int)ptable & 0xfff) == 0) && ptable != NULL);
@@ -35,6 +39,8 @@ void page_copy(Msg *m) {
                     make_specific_pte(
                         &ptable[ptable_idx], page,
                         s_pt[ptable_idx].user_supervisor, s_pt[ptable_idx].read_write);
+                    // copy the content in page
+                    memcpy(page, (void *)(s_pt[ptable_idx].page_frame << 12), PAGE_SIZE);
                 }
 
             }
@@ -48,3 +54,28 @@ void page_copy(Msg *m) {
     send(aim, m);
 }
 
+/**
+   Copy `page directory, page table, page` from source process
+   to destination process by the information stored in the vir_mem
+void copy_page_by_vir(Msg* m) {
+    PCB* src = (PCB*)m->i[0];
+    PCB* dest = (PCB*)m->i[1];
+    pid_t aim = m->src;
+    // allocate page directory
+    PDE *pdir = (PDE*)va_to_pa(pdir_alloc());
+    set_pdir(dest, (uint32_t)pdir);
+    PDE *s_p = (PDE*)(src->pdir.page_directory_base << 12);
+    assert( ((int)s_p&0xfff) == 0);
+    // copy page table and page
+    PTE *ptable = NULL, *s_pt = NULL;
+    Page *page = NULL;
+
+    uint32_t pdir_i, ptable_idx;
+    //for each vir_mem, allocate page directory, page table, page
+
+    // reply message
+    m->ret = 1;
+    m->src = current->pid;
+    send(aim, m);
+}
+*/

@@ -108,7 +108,7 @@ void receive(pid_t src, Msg *m) {
     //printk("%d:-------end receive------\n", current->pid);
 }
 
-void init_meg(
+void init_msg(
     Msg *m,
     pid_t src,
     int tr,

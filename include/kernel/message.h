@@ -27,7 +27,7 @@ typedef struct Message {
 void send(pid_t dest, Msg *m);
 void receive(pid_t src, Msg *m);
 
-void init_meg(
+void init_msg(
     Msg* m,
     pid_t src,
     int type_return,

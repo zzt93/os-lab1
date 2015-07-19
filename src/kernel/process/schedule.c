@@ -85,19 +85,27 @@ schedule(void) {
     current->count_of_lock--;
     //printk("#%d count of lock %d\n", current->pid, current->count_of_lock);
     current = choose_process();
-    // load this process's cr3寄存器 when user -> kerenl
+    // load this process's cr3寄存器 when user -> kernel
     // or kernel -> user
-    //assert(get_kcr3()->val == current->pdir.val);
+    //assert(get_kcr3()->val == current->pdir.val); -- it is
+    // only right when current is kernel thread.
     write_cr3(&(current->pdir));
     // set new kernel stack for user process
     /**
        for stack grow down and push will minus first
-    // then push content in it. --@see push in i386 manual
-    // @checked -- set breakpoint at asm_do_irq() when
-    // current thread is user test process(13 2015.4),
-    // the values of $eflags is clear to see what is the
-    // location os trap frame is at esp0 - 4
+    then push content in it. --@see push in i386 manual,
+    so set esp0 at the end of kernel stack.
+    @checked -- setting breakpoint at asm_do_irq() when
+    current thread is user test process(13 2015.4),
+    by calculating the size of already pushed content
+    (including (ss, esp), eflags, cs, eip) and irq_no, error_code
+    , we can see the location of trap frame is at esp0 - 4.
+    (verify by checking the positions of eflags, cs on the
+    kernel stack -- [0xc0000000, 0xc1000000)
+    -- using commands `x/10x ...` and `p $eflags`...)
     */
+    // set tss esp0 for current thread
+    //-- return from user stack to kernel stack
     set_tss_esp0((uint32_t)(current->kstack + KSTACK_SIZE));
 
 

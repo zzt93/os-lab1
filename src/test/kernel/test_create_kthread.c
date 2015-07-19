@@ -91,7 +91,7 @@ void D () {
 
 void user_process() {
     Msg m;
-    init_meg(&m,
+    init_msg(&m,
         current->pid,
         PM_CREATE,
         0, INVALID_ID, NULL, INVALID_ID, INVALID_ID);

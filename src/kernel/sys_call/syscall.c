@@ -16,6 +16,7 @@ syscall(int id, ...) {
 void do_syscall(TrapFrame *tf) {
 	int id = tf->eax; // system call id
     Msg m;
+    NOINTR;
 
 	switch (id) {
 		case SYS_read:

@@ -11,6 +11,7 @@ static int pid_count = START_ID;
 static void init_kernel_tf(TrapFrame* frame, void* fun) {
     // using xxx to represent the second pushed esp
     frame->xxx = (uint32_t)(&(frame->xxx) + 5);// see pushal
+    frame->ebp = 0;// @see PM_syscall.c:kfork fork ebp
     assert (frame->xxx == (uint32_t)(&frame->gs));
     frame->cs = SELECTOR_KERNEL(SEG_KERNEL_CODE);
     frame->ds = SELECTOR_KERNEL(SEG_KERNEL_DATA);
@@ -24,6 +25,7 @@ static void init_kernel_tf(TrapFrame* frame, void* fun) {
 
 static void init_user_tf(TrapFrame* frame, void* fun) {
     frame->xxx = (uint32_t)(&(frame->xxx) + 5);// see pushal
+    frame->ebp = 0;// @see PM_syscall.c:kfork fork ebp
     assert (frame->xxx == (uint32_t)(&frame->gs));
     frame->cs = SELECTOR_USER(SEG_USER_CODE);
     frame->ds = SELECTOR_USER(SEG_USER_DATA);
