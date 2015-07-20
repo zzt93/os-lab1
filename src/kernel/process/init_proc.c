@@ -63,6 +63,18 @@ create_kthread(void *fun) {
     PCB* pcb = kmalloc(PCB_SIZE);
     //NOINTR;
     // allocate frame at the end of stack, ie frame is [base + all_size - frame_size, base + all_size)
+    /**
+       @checked after pop all the field in the TrapFrame,
+       the esp point to the end of kernel stack
+       (set breakpoint in asm_do_irq at iret, the %esp is
+       0x14 smaller than the end of kernel stack, which are
+       eip, cs, eflags, ss3, esp3)
+       (set breakpoint at the start of a thread function, %esp
+       is 0x8 smaller than the end of kernel stack, which are
+       ss3, esp3)
+       notice that in kernel thread, ss3 and esp3 will not be poped
+       by hardware so esp will not exactly at the end of kernel stack (kstack)
+     */
     TrapFrame *frame = (TrapFrame*)((char *)(pcb->kstack) + KSTACK_SIZE - sizeof(TrapFrame));
     //init trap frame
     init_kernel_tf(frame, fun);
@@ -98,6 +110,7 @@ PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListH
 }
 
 
+// TODO try finish it
 PCB* create_kthread_with_args(void* fun, int arg) {
     PCB* pcb = kmalloc(PCB_SIZE);
     // the address which out of boundary

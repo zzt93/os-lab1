@@ -18,7 +18,7 @@ the creation of thread
 the schedule of thread -- now using Round-Robin algorithm  
 the sleep and wake_up of thread  
 the semaphore(P&V) and lock(cli&sti) to slove critical section  
-the send and receive between threads  -- send it asynchronized and receive is synchronized  
+the send and receive between threads  -- send it asynchronized and will always succeed; receive is synchronized and may be blocked   
 add timer-- clock diver, ide-- hard disk driver, tty -- terminal driver  
 very very simple file system  
 user process  
@@ -38,6 +38,7 @@ linked-list
 Wed Jul 8 2015 update:
 
 ## Thread and it's pid:  
+ANY -- -1 used by server like FM, MM, PM  
 idle -- 0  
 Timer -- 1  
 TTY -- 2  
@@ -65,7 +66,15 @@ The kernel default has **16M** memory
 -----------------------
 
 ## i386 ISA
-1. push -- first minus 2/4 bytes, then store values, ie the esp always point to old value.
-For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %esp` is the pointer of it.
+1. push -- first minus 2/4 bytes, then store values, ie the esp always point to old value. If it is `push %esp`, it will save the old value before minus which means push original esp value.  
+For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %esp` pushed the pointer of it.
+
+
+-------------------------
+
+## user process interrupt stack
+[user process stack state](docs/pic/user_process_stack.jpg)
+
+
 
 

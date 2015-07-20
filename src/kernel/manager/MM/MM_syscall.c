@@ -31,20 +31,27 @@ void page_copy(Msg *m) {
 
             s_pt = (PTE*)(s_p[pdir_i].page_frame << 12);
             for (ptable_idx = 0; ptable_idx < NR_PTE; ptable_idx++) {
-                if (s_pt[ptable_idx].present == 1) {
-                    page = alloc_page();
-                    assert((((int)page & 0xfff) == 0) && page != NULL);
-                    // make page table entry using the address of new page,
-                    // and the flags of father
-                    make_specific_pte(
-                        &ptable[ptable_idx], page,
-                        s_pt[ptable_idx].user_supervisor, s_pt[ptable_idx].read_write);
-                    // copy the content in page
-                    memcpy(page, (void *)(s_pt[ptable_idx].page_frame << 12), PAGE_SIZE);
+                if (s_pt[ptable_idx].present == 1) { // present
+                    if (s_pt[ptable_idx].read_write == PAGE_W) {// read and write
+                        page = alloc_page();
+                        assert((((int)page & 0xfff) == 0) && page != NULL);
+                        // make page table entry using the address of new page,
+                        // and the flags of father
+                        make_specific_pte(
+                            &ptable[ptable_idx], page,
+                            s_pt[ptable_idx].user_supervisor, s_pt[ptable_idx].read_write);
+                        // copy the content in page
+                        memcpy(page, (void *)(s_pt[ptable_idx].page_frame << 12), PAGE_SIZE);
+                    } else {
+                        assert(s_pt[ptable_idx].read_write == PAGE_R);
+                        // TODO if s_pt[ptable_idx].read_write == PAGE_R, ie
+                        // it is read only, just point to it.
+                        make_specific_pte(
+                            &ptable[ptable_idx], (void *)(s_pt[ptable_idx].page_frame << 12),
+                            s_pt[ptable_idx].user_supervisor, s_pt[ptable_idx].read_write);
+                    }
                 }
-
             }
-
         }
     }
 

@@ -31,12 +31,15 @@ void kfork(Msg* m) {
         (int)father, (int)child, NULL, INVALID_ID, INVALID_ID);
     send(MM, m);
     receive(MM, m);
-    // special handle tf
-    TrapFrame *frame = (TrapFrame*)((char *)(child->kstack) + KSTACK_SIZE - sizeof(TrapFrame)); // allocate frame at the end of stack
+    // special handle kernel stack and tf
+    // @checked size: [tf, (char *)father->kstack + KSTACK_SIZE)
+    uint32_t copy_size = (char *)father->kstack + KSTACK_SIZE - (char *)father->tf;
+    // allocate trapframe, and function invoke stack to the end of stack
+    void *second_frame = (void *)((char *)(child->kstack) + KSTACK_SIZE - copy_size);
     // @see user_process_fork.jpg: father's tf is now point to the second TrapFrame
-    memcpy(frame, father->tf, sizeof(TrapFrame));
-    child->tf = frame;
-    // handle the content on the kernel stack
+    memcpy(second_frame, father->tf, copy_size);
+    child->tf = second_frame;
+    // handle the content on the kernel stack, ebp, esp
     /*
       至于内核栈上由于函数调用而保存的ebp值, 我们观察到函数调用保存的ebp值会形成一条函数调用链:
       tf->ebp 指向异常现场所在函数的栈帧, *(tf->ebp)指向上一层函数的栈帧,
@@ -49,8 +52,10 @@ void kfork(Msg* m) {
      */
     //int32_t gap = father->kstack - child->kstack;
     uint32_t ebp = ((TrapFrame*)father->tf)->ebp;
-    while (ebp != 0) {
+    while (ebp >= KERNEL_VA_START) {
     }
+    // handle content on the user stack which must use physical address
+    // for current thread is PM which has different page directory with user process
 
     //reply message
     m->ret = child->pid;
