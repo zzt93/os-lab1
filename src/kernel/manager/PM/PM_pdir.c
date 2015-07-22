@@ -8,6 +8,7 @@ static int f_pointer = 0;
 
 /**
    TODO may change to bitmap to store usage info
+   return: the physical address of page directory
  */
 PDE* pdir_alloc() {
     assert(f_pointer < PDIR_NUM);
@@ -21,7 +22,7 @@ PDE* pdir_alloc() {
     for (i = 0; i < NR_PDE; i++) {
         make_invalid_pde(&pdir[i]);
     }
-    return pdir;
+    return (PDE*)va_to_pa(pdir);
 }
 
 void init_kernel_image(PDE* pdir) {

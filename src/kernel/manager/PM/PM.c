@@ -20,15 +20,18 @@ int PM;
    m->type
        @type:PM_CREATE
        m->i[0] -- the program/file name
-
-       @return The message send from PM specify:
+       @return: The message send from PM specify:
        m->ret -- whether successfully create a user process
 
        @type:PM_fork
        m->buf -- the father's PCB's address
-
        @return:
        m->ret -- the child pid
+
+       @type:PM_exec
+       m->i[0] -- the program/file name
+       m->buf -- address of string
+       @return: 
 */
 static void PM_job() {
     static Msg m;
@@ -87,7 +90,7 @@ void create_process(Msg* m) {
 
     // create page directory for new process
     // must using physical address for cr3 should only store pa
-    PDE* pdir = (PDE*)va_to_pa(pdir_alloc());
+    PDE* pdir = pdir_alloc();
     assert( ((int)pdir&0xfff) == 0);
     /* read 512 bytes starting from offset 0 from file "0" into buf */
 	/* it contains the ELF header and program header table */

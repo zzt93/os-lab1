@@ -5,3 +5,7 @@
 int fork() {
     return syscall(SYS_fork);
 }
+
+int exec(int filename, char *args) {
+    return syscall(SYS_exec, filename, args);
+}

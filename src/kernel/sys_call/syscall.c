@@ -35,6 +35,13 @@ void do_syscall(TrapFrame *tf) {
             int pid = m.ret;
             tf->eax = pid;
 			break;
+        case SYS_exec:
+            m.i[0] = tf->ebx;
+            m.buf = tf->ecx;
+            send(PM, &m);
+            receive(PM, &m);
+            tf->eax = m.ret;
+            break;
 		case 111:
             printk(RED"user process test "RESET);
             break;

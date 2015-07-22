@@ -12,7 +12,7 @@ void page_copy(Msg *m) {
     PCB* dest = (PCB*)m->i[1];
     pid_t aim = m->src;
     // allocate page directory
-    PDE *pdir = (PDE*)va_to_pa(pdir_alloc());
+    PDE *pdir = pdir_alloc();
     set_pdir(dest, (uint32_t)pdir);
     PDE *s_p = (PDE*)(src->pdir.page_directory_base << 12);
     assert( ((int)s_p&0xfff) == 0);
@@ -69,7 +69,7 @@ void copy_page_by_vir(Msg* m) {
     PCB* dest = (PCB*)m->i[1];
     pid_t aim = m->src;
     // allocate page directory
-    PDE *pdir = (PDE*)va_to_pa(pdir_alloc());
+    PDE *pdir = pdir_alloc();
     set_pdir(dest, (uint32_t)pdir);
     PDE *s_p = (PDE*)(src->pdir.page_directory_base << 12);
     assert( ((int)s_p&0xfff) == 0);

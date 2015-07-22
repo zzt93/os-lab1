@@ -17,5 +17,6 @@ extern int MM;
 
 #include "MM_alloc.h"
 #include "MM_syscall.h"
+#include "MM_util.h"
 
 #endif /* __MM_H__ */
