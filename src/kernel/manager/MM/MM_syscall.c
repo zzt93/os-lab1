@@ -7,10 +7,9 @@
 
 #include "lib/string.h"
 
-void page_copy(Msg *m) {
+int page_copy(Msg *m) {
     PCB* src = (PCB*)m->i[0];
     PCB* dest = (PCB*)m->i[1];
-    pid_t aim = m->src;
     // allocate page directory
     PDE *pdir = pdir_alloc();
     set_pdir(dest, (uint32_t)pdir);
@@ -56,9 +55,7 @@ void page_copy(Msg *m) {
     }
 
     // reply message
-    m->ret = 1;
-    m->src = current->pid;
-    send(aim, m);
+    return 1;
 }
 
 /**
@@ -67,7 +64,6 @@ void page_copy(Msg *m) {
 void copy_page_by_vir(Msg* m) {
     PCB* src = (PCB*)m->i[0];
     PCB* dest = (PCB*)m->i[1];
-    pid_t aim = m->src;
     // allocate page directory
     PDE *pdir = pdir_alloc();
     set_pdir(dest, (uint32_t)pdir);
@@ -81,8 +77,11 @@ void copy_page_by_vir(Msg* m) {
     //for each vir_mem, allocate page directory, page table, page
 
     // reply message
-    m->ret = 1;
-    m->src = current->pid;
-    send(aim, m);
+    return 1;
 }
 */
+
+
+int page_free(Msg *m) {
+    return 1;
+}

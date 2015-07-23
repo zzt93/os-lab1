@@ -16,7 +16,11 @@
    '='
 
    Value might as well be a pointer, for the behaviour of
-   copy of v
+   copying of v is shallow copy
+
+   Duplicate value:
+   put duplicate key( which is decided by the function when initialize
+   it) will replace the old value
 */
 
 /**
@@ -79,7 +83,14 @@
     void name##_put(K k, V v) {                             \
         Entry* e = kmalloc(sizeof(Entry));                  \
         name##_init_entry(e, k, v);                         \
-        name##_add(e);                                      \
+        if (name##_has(e)) {                                \
+            TNode_##name* t = name##_get_node(e);           \
+            assert(t != NULL);                              \
+            assert((t->t)->k = k);                          \
+            t->t = e;                                       \
+        } else {                                            \
+            name##_add(e);                                  \
+        }                                                   \
     }                                                       \
                                                             \
 

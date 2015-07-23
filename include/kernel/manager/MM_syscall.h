@@ -3,6 +3,7 @@
 
 #include "kernel/message.h"
 
-void page_copy(Msg *m);
+int page_copy(Msg *m);
+int page_free(Msg *m);
 
 #endif /* __MM_SYSCALL_H__ */

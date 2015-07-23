@@ -25,18 +25,25 @@ static void MM_job() {
 
     while (true) {
         receive(ANY, &m);
+
+        pid_t dest = m.src;
         switch(m.type) {
             //case NEW_PDIR:
             case NEW_PAGE:
-                init_va(&m);
+                m.ret = init_va(&m);
                 break;
             case COPY_page:
-                page_copy(&m);
+                m.ret = page_copy(&m);
+                break;
+            case FREE_page:
+                m.ret = page_free(&m);
                 break;
             default:
                 assert(false);
                 break;
         }
+        m.src = current->pid;
+        send(dest, &m);
     }
 }
 

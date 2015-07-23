@@ -3,14 +3,17 @@
 
 #include "common.h"
 #include "kernel/message.h"
+#include "kernel/process.h"
 
 enum {
     PM_CREATE,
     PM_fork,
+    PM_exec,
+    PM_exit,
 };
 
 void init_PM();
-void create_process(Msg*);
+PCB *create_process(Msg*);
 
 extern int PM;
 

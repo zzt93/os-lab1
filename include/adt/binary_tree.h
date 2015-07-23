@@ -5,7 +5,7 @@
 #include "tree.h"
 #include "lib/malloc.h"
 
-/*
+/**
   T: the type parameter
   f: the comparing funciton, bool f(T, T);
   name: the name of tree
@@ -180,14 +180,16 @@
                                                                         \
     static void find_replace(TNode_##name*, int);                       \
                                                                         \
-static void exchange_root(TNode_##name* node,                           \
-                                  TNode_##name *(*get)(TNode_##name*)) { \
+    static void                                                         \
+    exchange_root(TNode_##name* node,                                   \
+        TNode_##name *(*get)(TNode_##name*)) {                          \
                                                                         \
         TNode_##name * son = get(node);                                 \
         assert(son != NULL);                                            \
         TNode_##name * l_big = find_leaf_by(son, node->t);              \
         assert(l_big != NULL);                                          \
-        /*printk("*l_big->t %d, *node->t  %d\n", *l_big->t, *node->t);*/ \
+        /*printk("*l_big->t %d, *node->t %d\n",                         \
+         *l_big->t, *node->t);*/                                        \
         TNode_##name * fa = find_fa(l_big->t);                          \
         assert(fa != NULL);                                             \
         /* exchange root with a min/max node*/                          \
@@ -274,12 +276,22 @@ static void exchange_root(TNode_##name* node,                           \
         NOINTR;                                                         \
     }                                                                   \
                                                                         \
-    
-    /*get a node using the funciton when init as criteria             \
-    TNode_##name* get(T fake) {\
-    \
-    }\
-    */
+                                                                        \
+    /**
+        get a node using the funciton that used as criteria
+    */                                                                  \
+    TNode_##name* name##_get_node(T t) {                                \
+        TNode_##name* fa = find_fa(t);                                  \
+        assert(fa != NULL);                                             \
+        TNode_##name *le =  left(fa);                                   \
+        TNode_##name *ri = right(fa);                                   \
+        if (le != NULL && f(le->t, t) == 0) {                           \
+            return le;                                                  \
+        } else {                                                        \
+            assert(ri != NULL && f(ri->t, t) == 0);                     \
+            return ri;                                                  \
+        }                                                               \
+    }                                                                   \
 /*\
   bool empty_subtree(TNode_##name* root) {                     \
   assert(root != NULL);                                           \

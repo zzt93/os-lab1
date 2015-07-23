@@ -65,8 +65,7 @@ void copy_user_stack(PCB *father, PCB *child) {
    @see init_proc.c; process.h
  */
 // return the pid of child process
-void kfork(Msg* m) {
-    pid_t fa = m->src;
+int kfork(Msg* m) {
     PCB *father = m->buf;
     PCB *child = kmalloc(PCB_SIZE);
     // shallow copy: privilege, sign, pid
@@ -96,14 +95,30 @@ void kfork(Msg* m) {
     list_init(&(child->vir_mem));
     list_add_after(&(child->vir_mem), father->vir_mem.next);
 
-    //reply message
-    m->ret = child->pid;
-    m->src = current->pid;
-    assert(current->pid == PM);
-    send(fa, m);
-    // reply to child
-    m->ret = 0;
-    m->src = current->pid;
-    assert(current->pid == PM);
-    send(child, m);
+    return child->pid;
+}
+
+void free_process(PCB *pcb) {
+    // free page, then page table, then page directory
+    init_msg(
+        m,
+        current->pid,
+        FREE_page,
+        INVALID_ID, INVALID_ID, aim, INVALID_ID, INVALID_ID);
+
+}
+
+int kexec(Msg *m) {
+    //int filename = m->i[0];
+    //char *args = m->buf;
+    PCB *aim = (PCB *)m->i[1];
+    free_process(aim);
+    PCB *new = create_process(m);
+    // prepare args on the stack
+    return 1;
+}
+
+int kexit(Msg *m) {
+    PCB *aim = (PCB *)m->buf;
+    free_process(aim);
 }

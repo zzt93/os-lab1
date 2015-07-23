@@ -17,7 +17,7 @@ extern PCB* current;
    填写页目录项和页表项分别使用make_pde()函数和make_pte()函数, 它们都在src/kernel/memory/util.c中定义, 你可以在src/kernel/memory/kvm.c中参考内核启动分页机制的过程.
    内核映像占用0xc0000000及以上的虚拟地址, 我们只需要让相应的页目录项指向相应的内核页表就可以了, 无须为内核映像重新分配页表.
  */
-void init_va(Msg* m) {
+int init_va(Msg* m) {
     unsigned int off = (unsigned int)m->offset;
     //assert(m->i[1] == m->dev_id);
     assert(off >= 0 && off < KERNEL_VA_START);
@@ -58,7 +58,5 @@ void init_va(Msg* m) {
 
     // send back with the starting physical address
     // which is set in the upper loop
-    pid_t dest = m->src;
-    m->src = current->pid;
-    send(dest, m);
+    return 1;
 }

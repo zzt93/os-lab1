@@ -3,7 +3,9 @@
 
 #include "kernel/message.h"
 
-void kfork(Msg*);
+int kfork(Msg *);
+int kexec(Msg *);
+int kexit(Msg *);
 
 
 #endif /* __PM_SYSCALL_H__ */

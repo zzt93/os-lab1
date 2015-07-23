@@ -8,10 +8,11 @@ enum {
     NEW_PAGE,
     NEW_PDIR,
     COPY_page,
+    FREE_page,
 };
 
 void init_MM();
-void init_va(Msg*);
+int init_va(Msg*);
 
 extern int MM;
 

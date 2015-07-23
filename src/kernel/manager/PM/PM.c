@@ -31,24 +31,47 @@ int PM;
        @type:PM_exec
        m->i[0] -- the program/file name
        m->buf -- address of string
-       @return: 
+       @return: Returns success unless COMMAND is not found or a redirection error occurs.
+       m->ret -- the status of execution
 */
 static void PM_job() {
     static Msg m;
 
     while (true) {
         receive(ANY, &m);
+        pid_t dest = m.src;
         switch(m.type) {
             case PM_CREATE:
-                create_process(&m);
+                if (create_process(&m) == NULL) {
+                    m.ret = 0;
+                } else {
+                    m.ret = 1;
+                }
                 break;
             case PM_fork:
-                kfork(&m);
+            {
+                pid_t child = kfork(&m);
+                // reply to child
+                m.ret = 0;
+                m.src = current->pid;
+                assert(current->pid == PM);
+                send(child, &m);
+                // reply to father
+                m.ret = child;
+                break;
+            }
+            case PM_exec:
+                m.ret = kexec(&m);
+                break;
+            case PM_exit:
+                m.ret = kexit(&m);
                 break;
             default:
                 assert(false);
                 break;
         }
+        m.src = current->pid;
+        send(dest, &m);
     }
 }
 
@@ -82,9 +105,8 @@ void create_va_stack(PDE* pdir, uint32_t *ss, uint32_t *esp) {
 /**
    whether to use this message to send
  */
-void create_process(Msg* m) {
+PCB *create_process(Msg* m) {
     int name = m->i[0];
-    int dest = m->src;
     assert(name >= 0);
     char buf[B_SIZE];
 
@@ -189,8 +211,5 @@ void create_process(Msg* m) {
     //set_user_tf(p, ss, esp);
     PCB* p = create_user_thread(f, (uint32_t)pdir, ss, esp, &vir_range);
     add2wake(p);
-    // send back
-    m->ret = 1;
-    m->src = current->pid;
-    send(dest, m);
+    return p;
 }
