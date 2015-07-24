@@ -48,5 +48,7 @@ void set_tss_esp0(uint32_t);
 #define PAGE_W 1
 #define PAGE_R 0
 
+#include "lib/malloc.h"
+#define ALIG_PAGE_SZ(size) _ALIGN_((size), (PAGE_SIZE - 1))
 
 #endif

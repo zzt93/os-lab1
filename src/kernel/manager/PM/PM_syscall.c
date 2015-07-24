@@ -98,27 +98,38 @@ int kfork(Msg* m) {
     return child->pid;
 }
 
-void free_process(PCB *pcb) {
+int free_process(PCB *aim) {
+    Msg m;
     // free page, then page table, then page directory
     init_msg(
-        m,
+        &m,
         current->pid,
         FREE_page,
         INVALID_ID, INVALID_ID, aim, INVALID_ID, INVALID_ID);
+    pdir_free(get_pdir_addr(aim));
+    return 1;
 
 }
 
 int kexec(Msg *m) {
-    //int filename = m->i[0];
     //char *args = m->buf;
     PCB *aim = (PCB *)m->i[1];
+    // save the resources to inherit: pid, file descriptor
+    pid_t p = aim->pid;
+    // file descriptor
+    // free process
     free_process(aim);
+    // create a new one
     PCB *new = create_process(m);
+    new->pid = p;
+    pid_count_des();
+    // put in queue
+    add2wake(new);
     // prepare args on the stack
     return 1;
 }
 
 int kexit(Msg *m) {
     PCB *aim = (PCB *)m->buf;
-    free_process(aim);
+    return free_process(aim);
 }

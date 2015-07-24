@@ -12,3 +12,4 @@ PCB* fetch_pcb(pid_t id) {
     //printk("fetch id %d", id);
     return all_get(id);
 }
+

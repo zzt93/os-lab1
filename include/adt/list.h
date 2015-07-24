@@ -8,7 +8,7 @@ struct ListHead {
 };
 typedef struct ListHead ListHead;
 
-/*
+/**
   return the pointer to the container struct, ie type*
   eg PCB *pcb = list_entry(ptr, PCB, link)
  */

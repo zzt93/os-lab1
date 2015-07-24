@@ -14,10 +14,10 @@ PCB* create_user_thread(
     void *f,
     uint32_t pdir,
     uint32_t ss, uint32_t esp,
-    ListHead *vir
-                        );
+    ListHead *vir);
 
 int new_id();
+void pid_count_des();
 
 static inline void set_pdir(PCB* p, uint32_t addr) {
     assert((addr&0xfff) == 0);

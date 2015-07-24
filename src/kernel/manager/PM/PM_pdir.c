@@ -3,18 +3,24 @@
 #include "kernel/semaphore.h"
 #include "kernel/manager/PM_pdir.h"
 
+#include "adt/bit_map.h"
+
 static Pdir all_pdirs[PDIR_NUM] align_to_page;
-static int f_pointer = 0;
+static uint32_t availabe = PDIR_NUM;
+
+
+BIT_MAP(PDIR_NUM)
 
 /**
-   TODO may change to bitmap to store usage info
    return: the physical address of page directory
  */
 PDE* pdir_alloc() {
-    assert(f_pointer < PDIR_NUM);
+    assert(availabe > 0);
+    int j = first_val(FREE);
+    assert(j != INVALID);
     lock();
-    Pdir* free = &all_pdirs[f_pointer];
-    f_pointer++;
+    Pdir* free = &all_pdirs[j];
+    availabe --;
     unlock();
     // make it invalid at first
     PDE* pdir = (PDE*)free;
@@ -23,6 +29,16 @@ PDE* pdir_alloc() {
         make_invalid_pde(&pdir[i]);
     }
     return (PDE*)va_to_pa(pdir);
+}
+
+void pdir_free(uint32_t address) {
+    assert((address & 0xfff) == 0);
+    Pdir *pdir = (Pdir *)address;
+    int i = pdir - all_pdirs;
+    lock();
+    set_val(i, FREE);
+    availabe ++;
+    unlock();
 }
 
 void init_kernel_image(PDE* pdir) {

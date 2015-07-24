@@ -42,12 +42,16 @@ static void PM_job() {
         pid_t dest = m.src;
         switch(m.type) {
             case PM_CREATE:
-                if (create_process(&m) == NULL) {
+            {
+                PCB *p = create_process(&m);
+                if (p == NULL) {
                     m.ret = 0;
                 } else {
+                    add2wake(p);
                     m.ret = 1;
                 }
                 break;
+            }
             case PM_fork:
             {
                 pid_t child = kfork(&m);
@@ -103,7 +107,10 @@ void create_va_stack(PDE* pdir, uint32_t *ss, uint32_t *esp) {
 }
 
 /**
-   whether to use this message to send
+   single responsibility:
+   just create process,
+   not add it to wake queue
+   not send message back
  */
 PCB *create_process(Msg* m) {
     int name = m->i[0];
@@ -210,6 +217,5 @@ PCB *create_process(Msg* m) {
     //set_pdir(p, (uint32_t)pdir);
     //set_user_tf(p, ss, esp);
     PCB* p = create_user_thread(f, (uint32_t)pdir, ss, esp, &vir_range);
-    add2wake(p);
     return p;
 }

@@ -83,5 +83,12 @@ void copy_page_by_vir(Msg* m) {
 
 
 int page_free(Msg *m) {
+    PCB *aim = (PCB *)m->buf;
+    ListHead *p = NULL;
+    Vir_mem *v = NULL;
+    list_foreach(p, &(aim->vir_mem)) {
+        v = list_entry(p, Vir_mem, link);
+        
+    }
     return 1;
 }

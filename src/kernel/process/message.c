@@ -5,6 +5,21 @@
 #include "lib/malloc.h"
 
 
+/**
+   Intenal:
+   send() message to A will copy to A's list
+   A receive() will copy to it's parameter
+
+   Message sender:
+   If this method can be invoked by different thread
+   simultaneously, the message it used to send is either
+   a `local variable` or `method parameter` -- for the
+   implementation, they are always right.
+   If this method is single-threaded, so use `static` is fine
+   Message receiver:
+   single-threaded -- can use static
+   multi-threaded -- must local variable or parameter to reply
+ */
 
 void add_message(PCB* p, Msg* msg) {
     NOINTR;

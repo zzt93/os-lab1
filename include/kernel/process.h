@@ -74,6 +74,11 @@ void wake_up(PCB*);
 PCB* fetch_pcb(int);
 void add_process(PCB*);
 
+static inline uint32_t get_pdir_addr(PCB *) {
+    return p->pdir.page_frame << 12;
+}
+
+
 #define IDLE_ID 0
 #define START_ID (IDLE_ID+1)
 

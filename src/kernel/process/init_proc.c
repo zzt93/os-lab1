@@ -8,6 +8,12 @@
 
 static int pid_count = START_ID;
 
+void pid_count_des() {
+    lock();
+    pid_count--;
+    unlock();
+}
+
 static void init_kernel_tf(TrapFrame* frame, void* fun) {
     // using xxx to represent the second pushed esp
     frame->xxx = (uint32_t)(&(frame->xxx) + 5);// see pushal
