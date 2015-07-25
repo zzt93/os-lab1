@@ -16,4 +16,6 @@
 #define INTR assert(read_eflags() & IF_MASK)
 #define NOINTR assert(~read_eflags() & IF_MASK)
 
+#define _ALIGN_(x, a) (((x) + (a)) & ~(a))
+
 #endif /* __MACRO_H__ */

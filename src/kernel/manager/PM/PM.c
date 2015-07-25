@@ -150,7 +150,7 @@ PCB *create_process(Msg* m) {
         /*
           store the information about virtual address
          */
-        Vir_mem *tmp = kmalloc(sizeof(Vir_mem));
+        Seg_info *tmp = kmalloc(sizeof(Seg_info));
         vir_init(tmp,
             (uint32_t)va, (uint32_t)va + ph_table->memsz, ph_table->flags);
         list_add_after(&vir_range, &(tmp->link));

@@ -81,14 +81,37 @@ void copy_page_by_vir(Msg* m) {
 }
 */
 
+/**
+   In the perspective of program segment
+ */
+int seg_free(Seg_info *v) {
+    uint32_t low_b = ALIGN_PAGE_SZ(v.start) - PAGE_SIZE;
+    assert((low_b & 0xfff) == 0);// ALIGN check
+    assert((low_b & ~0xfff) == (v.start & ~0xfff));
+    // free page
+    // TODO check cornel case
+    while (low_b < v.end) {
+        free_page(get_pa(aim->pdir, low_b));
+        low_b += PAGE_SIZE;
+    }
+    // free page table
+    uint32_t pt_low = ALIGN_PTABLE_SZ(v.start) - PT_SIZE;
+    assert((pt_low & 0x3fffff));
+    return 1;
+}
 
+/**
+   In the perspective of memory management
+   free page, page table using stored virtual space information
+ */
 int page_free(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     ListHead *p = NULL;
-    Vir_mem *v = NULL;
+    Seg_info *v = NULL;
+    int state = 1;
     list_foreach(p, &(aim->vir_mem)) {
-        v = list_entry(p, Vir_mem, link);
-        
+        v = list_entry(p, Seg_info, link);
+        state &= seg_free(v);
     }
-    return 1;
+    return state;
 }

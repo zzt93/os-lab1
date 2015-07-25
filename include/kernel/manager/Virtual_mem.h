@@ -10,10 +10,10 @@ typedef struct {
     uint32_t start;
     uint32_t end;
     int flags;
-} Vir_mem;
+} Seg_info;
 
-void vir_init(Vir_mem *self, uint32_t start, uint32_t end, int flags);
-void add_bef(ListHead *, Vir_mem *);
-void add_after(ListHead *, Vir_mem *);
+void vir_init(Seg_info *self, uint32_t start, uint32_t end, int flags);
+void add_bef(ListHead *, Seg_info *);
+void add_after(ListHead *, Seg_info *);
 
 #endif /* __VIRTUAL_MEM_H__ */

@@ -11,7 +11,7 @@
      kernel space -- they share all spaces, so no need to store it.
  */
 
-void vir_init(Vir_mem *self, uint32_t start, uint32_t end, int flags) {
+void vir_init(Seg_info *self, uint32_t start, uint32_t end, int flags) {
     self->start = start;
     self->end = end;
     self->flags = flags;

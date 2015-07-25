@@ -30,8 +30,10 @@
 #define NR_PDE						1024
 // 2**10 pages/page table == NR_PTE
 #define NR_PTE						1024
-// the size one page directory can access -- 2**22
+// the size one page directory entry can access -- 2**22
 #define PD_SIZE						((NR_PTE) * (PAGE_SIZE))
+// the size one page table contains
+#define PT_SIZE PD_SIZE
 
 /* force the data to be aligned with page boundary.
    statically defined page tables uses this feature. */

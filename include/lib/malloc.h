@@ -12,8 +12,9 @@ void init_kmalloc();
 #define ALIGNMENT 4 // the bytes to alignment
 #define HEAD_SIZE 1 // use one word to store head info
 
+#include "macro.h"
+
 #define ALIG(size) _ALIGN_((size), (ALIGNMENT - 1))
-#define _ALIGN_(x, a) (((x) + (a)) & ~(a))
 /*
 typedef struct {
     listhead link;
