@@ -11,6 +11,8 @@ typedef struct ListHead ListHead;
 /**
   return the pointer to the container struct, ie type*
   eg PCB *pcb = list_entry(ptr, PCB, link)
+  @NOTICE: never surround type and member with () or
+  will be `macro expected expression before ‘)’ token`
  */
 #define list_entry(ptr, type, member) \
 	((type*)( (char*)(ptr) - (int)(& ((type*)0)->member ) ))
@@ -73,6 +75,25 @@ static inline int list_size(ListHead* list) {
     }
     return count;
 }
+
+/**
+   p: the *name* of a ListHead pointer
+   head: the *value* of a ListHead pointer
+   T: the type name
+   name: the name of a variable of T
+   member: the member in the T
+ */
+#define list_free(p, head, T, name, member)     \
+    ListHead *p = NULL;                         \
+    (p) = (head)->next;                         \
+    T *name = NULL;                                \
+    while ((p) != (head)) {                     \
+        name = list_entry((p), T, member);         \
+        (p) = (p)->next;                        \
+        kfree(name);                               \
+    }                                           \
+                                                \
+
 
 #endif
 

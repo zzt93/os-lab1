@@ -3,14 +3,17 @@
 #include "adt/queue.h"
 #include "adt/binary_tree.h"
 
+#include "kernel/syscall.h"
+
 Sem wake_lock, sleeped_lock;
 /**
    NOTICE:
    In my implementation, when a process is running,
    it will only recorded in the current pointer, not
    in any other queue.
-   Only when this process stop running:
-   1. schedule(ie, choose another process), I
+   This process stop running when:
+   1. time slot is run out so go to
+   schedule(ie, choose another process), I
    will enqueue the running process in wake queue.
    2. sleep, I will add it to sleeped tree
 
@@ -173,7 +176,7 @@ void sleep() {
     // no need to wait_intr(); for int $0x80
     //wait_intr();
     // programmed exceptions INT N is unmaskable
-    asm volatile("int $0x80");
+    asm volatile("int $0x80": : "a"(SLEEP));
     //vecsys(); -- use this is wrong!!!!
     //for no eip, cs, eflags is pushed
 }

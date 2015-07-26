@@ -38,16 +38,21 @@ void do_syscall(TrapFrame *tf) {
         switch (id) {
             case SYS_fork:
                 m.type = PM_fork;
+                // current PCB*
                 m.buf = current;
                 break;
             case SYS_exec:
                 m.type = PM_exec;
+                // file name -- int
                 m.i[0] = tf->ebx;
+                // current PCB*
                 m.i[1] = (int)current;
+                // args address
                 m.buf = (void *)tf->ecx;
                 break;
             case SYS_exit:
                 m.type = PM_exit;
+                // current PCB*
                 m.buf = current;
                 break;
             default:
@@ -64,6 +69,8 @@ void do_syscall(TrapFrame *tf) {
                 break;
             case SYS_print_serial:
                 printk("%s ", tf->ebx);
+                break;
+            case SLEEP:
                 break;
             default:
                 printk(RED"no such system call %d "RESET, id);

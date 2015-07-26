@@ -65,7 +65,7 @@ void copy_user_stack(PCB *father, PCB *child) {
    @see init_proc.c; process.h
  */
 // return the pid of child process
-int kfork(Msg* m) {
+PCB * kfork(Msg* m) {
     PCB *father = m->buf;
     PCB *child = kmalloc(PCB_SIZE);
     // shallow copy: privilege, sign, pid
@@ -93,9 +93,10 @@ int kfork(Msg* m) {
 
     // share virtual address storage
     list_init(&(child->vir_mem));
+    // TODO can share???
     list_add_after(&(child->vir_mem), father->vir_mem.next);
 
-    return child->pid;
+    return child;
 }
 
 int free_process(PCB *aim) {
@@ -107,13 +108,39 @@ int free_process(PCB *aim) {
         FREE_page,
         INVALID_ID, INVALID_ID, aim, INVALID_ID, INVALID_ID);
     pdir_free(get_pdir_addr(aim));
+    // free message queue
+    list_free(p1, &aim->mes, Msg, msg, list);
+    list_free(p2, &(aim->vir_mem), Seg_info, s, link);
+    // free pcb
+    kfree(aim);
     return 1;
 
 }
 
-int kexec(Msg *m) {
-    //char *args = m->buf;
+int save_args(Msg *m, char *buf) {
+    switch(m->type) {
+        case PM_exec:
+        {
+            char *src = get_pa(&((PCB *)m->i[1])->pdir, (uint32_t)m->buf);
+            *(uint32_t *)buf = (uint32_t)src;
+            size_t len = strlen(src) + 1;
+            memcpy(buf + sizeof src, src, len);
+            return len + sizeof src;
+        }
+        default:
+            printk(RED"not implemented now"RESET);
+            assert(0);
+            break;
+    }
+}
+
+#define BUF_SZ 512
+
+PCB * kexec(Msg *m) {
+    char args[BUF_SZ];
     PCB *aim = (PCB *)m->i[1];
+    // save arguments
+    size_t len = save_args(m, args);
     // save the resources to inherit: pid, file descriptor
     pid_t p = aim->pid;
     // file descriptor
@@ -123,10 +150,12 @@ int kexec(Msg *m) {
     PCB *new = create_process(m);
     new->pid = p;
     pid_count_des();
-    // put in queue
-    add2wake(new);
     // prepare args on the stack
-    return 1;
+    // push args *
+    memcpy(user_stack(new) - len, args, len);
+    // TODO `- sizeof(int)` for saved eip
+    set_esp(new, USER_STACK_BASE - len - sizeof(int));
+    return new;
 }
 
 int kexit(Msg *m) {

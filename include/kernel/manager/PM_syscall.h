@@ -2,9 +2,10 @@
 #define __PM_SYSCALL_H__
 
 #include "kernel/message.h"
+#include "kernel/process.h"
 
-int kfork(Msg *);
-int kexec(Msg *);
+PCB * kfork(Msg *);
+PCB * kexec(Msg *);
 int kexit(Msg *);
 
 

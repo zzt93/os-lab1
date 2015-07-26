@@ -17,6 +17,7 @@ PCB* create_user_thread(
     ListHead *vir);
 
 int new_id();
+void set_esp(PCB *p, uint32_t esp);
 void pid_count_des();
 
 static inline void set_pdir(PCB* p, uint32_t addr) {

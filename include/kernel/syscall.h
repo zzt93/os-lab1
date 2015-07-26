@@ -21,6 +21,7 @@ enum {
     MIS,
     // user test
     SYS_print_serial,
+    SLEEP,
 };
 
 

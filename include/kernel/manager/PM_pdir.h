@@ -8,6 +8,7 @@ typedef struct {
 } Pdir;
 
 PDE* pdir_alloc();
+void pdir_free(void *);
 void init_kernel_image(PDE*);
 
 #define PDIR_MEM PAGE_SIZE

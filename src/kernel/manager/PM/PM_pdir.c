@@ -31,8 +31,8 @@ PDE* pdir_alloc() {
     return (PDE*)va_to_pa(pdir);
 }
 
-void pdir_free(uint32_t address) {
-    assert((address & 0xfff) == 0);
+void pdir_free(void *address) {
+    assert(((uint32_t)address & 0xfff) == 0);
     Pdir *pdir = (Pdir *)address;
     int i = pdir - all_pdirs;
     lock();

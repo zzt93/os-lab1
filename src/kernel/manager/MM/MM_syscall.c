@@ -13,7 +13,7 @@ int page_copy(Msg *m) {
     // allocate page directory
     PDE *pdir = pdir_alloc();
     set_pdir(dest, (uint32_t)pdir);
-    PDE *s_p = (PDE*)(src->pdir.page_directory_base << 12);
+    PDE *s_p = (PDE*)get_pdir_addr(src);
     assert( ((int)s_p&0xfff) == 0);
     // copy page table and page
     PTE *ptable = NULL, *s_pt = NULL;
@@ -67,7 +67,7 @@ void copy_page_by_vir(Msg* m) {
     // allocate page directory
     PDE *pdir = pdir_alloc();
     set_pdir(dest, (uint32_t)pdir);
-    PDE *s_p = (PDE*)(src->pdir.page_directory_base << 12);
+    PDE *s_p = (PDE*)get_pdir_addr(src);
     assert( ((int)s_p&0xfff) == 0);
     // copy page table and page
     PTE *ptable = NULL, *s_pt = NULL;
@@ -84,19 +84,23 @@ void copy_page_by_vir(Msg* m) {
 /**
    In the perspective of program segment
  */
-int seg_free(Seg_info *v) {
-    uint32_t low_b = ALIGN_PAGE_SZ(v.start) - PAGE_SIZE;
+int seg_free(PCB *aim, Seg_info *v) {
+    uint32_t low_b = ALIGN_PAGE_SZ(v->start) - PAGE_SIZE;
     assert((low_b & 0xfff) == 0);// ALIGN check
-    assert((low_b & ~0xfff) == (v.start & ~0xfff));
+    assert((low_b & ~0xfff) == (v->start & ~0xfff));
     // free page
-    // TODO check cornel case
-    while (low_b < v.end) {
-        free_page(get_pa(aim->pdir, low_b));
+    // @checked corner case
+    while (low_b < v->end) {
+        free_page(get_pa(&aim->pdir, low_b));
         low_b += PAGE_SIZE;
     }
     // free page table
-    uint32_t pt_low = ALIGN_PTABLE_SZ(v.start) - PT_SIZE;
+    uint32_t pt_low = ALIGN_PTABLE_SZ(v->start) - PT_SIZE;
     assert((pt_low & 0x3fffff));
+    while (pt_low < v->end) {
+        free_page(get_ptable(&aim->pdir, pt_low));
+        pt_low += PT_SIZE;
+    }
     return 1;
 }
 
@@ -111,7 +115,7 @@ int page_free(Msg *m) {
     int state = 1;
     list_foreach(p, &(aim->vir_mem)) {
         v = list_entry(p, Seg_info, link);
-        state &= seg_free(v);
+        state &= seg_free(aim, v);
     }
     return state;
 }

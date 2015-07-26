@@ -54,7 +54,9 @@ static void PM_job() {
             }
             case PM_fork:
             {
-                pid_t child = kfork(&m);
+                PCB * new = kfork(&m);
+                add2wake(new);
+                pid_t child = new->pid;
                 // reply to child
                 m.ret = 0;
                 m.src = current->pid;
@@ -65,8 +67,13 @@ static void PM_job() {
                 break;
             }
             case PM_exec:
-                m.ret = kexec(&m);
+            {
+                PCB *new = kexec(&m);
+                m.ret = (new != NULL);
+                // put in queue
+                add2wake(new);
                 break;
+            }
             case PM_exit:
                 m.ret = kexit(&m);
                 break;
@@ -106,6 +113,9 @@ void create_va_stack(PDE* pdir, uint32_t *ss, uint32_t *esp) {
     assert(*esp == KOFFSET);
 }
 
+void * user_stack(PCB *p) {
+    return get_pa(&p->pdir, USER_STACK_BASE);
+}
 /**
    single responsibility:
    just create process,

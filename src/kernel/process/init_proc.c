@@ -137,3 +137,7 @@ int new_id() {
     unlock();
     return pid;
 }
+
+void set_esp(PCB *p, uint32_t esp) {
+    ((TrapFrame *)p->tf)->esp = esp;
+}

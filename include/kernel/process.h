@@ -47,6 +47,7 @@ typedef struct {
     // pid
     int pid;
     PROCESS_STATE state;
+    // to be linked in process list
     ListHead link;
     ListHead mes;
     //Sem mes_lock;
@@ -74,8 +75,8 @@ void wake_up(PCB*);
 PCB* fetch_pcb(int);
 void add_process(PCB*);
 
-static inline uint32_t get_pdir_addr(PCB *) {
-    return p->pdir.page_frame << 12;
+static inline void * get_pdir_addr(PCB *p) {
+    return (void *)(p->pdir.page_directory_base << 12);
 }
 
 
