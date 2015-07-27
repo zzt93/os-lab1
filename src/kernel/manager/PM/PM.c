@@ -77,6 +77,9 @@ static void PM_job() {
             case PM_exit:
                 m.ret = kexit(&m);
                 break;
+            case PM_waitpid:
+                kwaitpid(&m);
+                return;
             default:
                 assert(false);
                 break;

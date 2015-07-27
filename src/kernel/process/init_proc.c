@@ -60,6 +60,8 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type) {
     pcb->type = type;
     // process virtual memory range
     list_init(&(pcb->vir_mem));
+    // initialize wait pid list
+    list_init(&pcb->waitpid);
 }
 
 PCB*

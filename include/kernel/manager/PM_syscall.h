@@ -7,6 +7,7 @@
 PCB * kfork(Msg *);
 PCB * kexec(Msg *);
 int kexit(Msg *);
+void kwaitpid(Msg *);
 
 
 #endif /* __PM_SYSCALL_H__ */

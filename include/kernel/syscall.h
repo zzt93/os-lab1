@@ -16,6 +16,8 @@ enum {
     SYS_exit,
     SYS_fork,
     SYS_exec,
+    SYS_getpid,
+    SYS_waitpid,
     SYS_sleep,
     // Miscellaneous
     MIS,
@@ -24,6 +26,10 @@ enum {
     SLEEP,
 };
 
-
+int fork();
+int exec(int filename, char *args);
+int exit();
+int getpid();
+int waitpid(int wait);
 
 #endif /* __SYSCALL_H__ */

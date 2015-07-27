@@ -55,6 +55,15 @@ void do_syscall(TrapFrame *tf) {
                 // current PCB*
                 m.buf = current;
                 break;
+            case SYS_getpid:
+                tf->eax = current->pid;
+                return;
+            case SYS_waitpid:
+                m.type = PM_waitpid;
+                // which process current process wait for
+                m.i[0] = tf->ebx;
+                m.buf = current;
+                break;
             default:
                 printk(RED"no such system call %d "RESET, id);
                 assert(0);

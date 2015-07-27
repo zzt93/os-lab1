@@ -56,13 +56,15 @@ typedef struct {
     CR3 pdir;
 
     Thread_t type;
-
+    // link to Seg_info
     ListHead vir_mem;
+    // link to waiting process by link
+    ListHead waitpid;
 } PCB;
 
 extern PCB *current;
 
-// implement in schedule.c
+// implemented in schedule.c
 void add2wake(PCB*);
 void add2sleeped(PCB*);
 void sleep();

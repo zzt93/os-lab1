@@ -89,12 +89,14 @@ PCB * kfork(Msg* m) {
 
     // clear message queue
     list_init(&(child->mes));
+    // initialize link
     list_init(&(child->link));
+    // initialize waiting list
+    list_init(&child->waitpid);
 
     // share virtual address storage
     list_init(&(child->vir_mem));
-    // TODO can share???
-    list_add_after(&(child->vir_mem), father->vir_mem.next);
+    list_copy(p, &(father->vir_mem), Seg_info, s, link);
 
     return child;
 }
@@ -110,7 +112,10 @@ int free_process(PCB *aim) {
     pdir_free(get_pdir_addr(aim));
     // free message queue
     list_free(p1, &aim->mes, Msg, msg, list);
+    // free virtual address space
     list_free(p2, &(aim->vir_mem), Seg_info, s, link);
+    // free waitpid
+    list_free(p3, &aim->waitpid, PCB, p, link);
     // free pcb
     kfree(aim);
     return 1;
@@ -120,6 +125,45 @@ int free_process(PCB *aim) {
 int save_args(Msg *m, char *buf) {
     switch(m->type) {
         case PM_exec:
+            /**
+               user stack starting state of:
+               int main(char *args)
+
+               ______________KERNEL_VA_START -- 0xc0000000
+               |          |
+               |   ....   |
+               |  *args   |
+               |__________|
+               |___args___|
+               |___eip ___|
+               |___ebp ___|
+
+               int main(int argc, char *argv[]) -- not implemented now
+
+               ______________KERNEL_VA_START -- 0xc0000000
+               |          |
+               |   ....   |
+               | *argv[n] |
+               |__________|
+               |   ....   |
+               |__________|
+               |          |
+               |   ....   |
+               | *argv[1] |
+               |__________|
+               |          |
+               |   ....   |
+               | *argv[0] |
+               |__________|
+               |_argv[n]__|
+               |   ....   |
+               |_argv[1]__|
+               |_argv[0]__|
+               |___argc___|
+               |___eip ___|
+               |___ebp ___|
+
+            */
         {
             char *src = get_pa(&((PCB *)m->i[1])->pdir, (uint32_t)m->buf);
             *(uint32_t *)buf = (uint32_t)src;
@@ -158,7 +202,30 @@ PCB * kexec(Msg *m) {
     return new;
 }
 
+void notify_wait(PCB *aim) {
+    ListHead *p = NULL;
+    ListHead *head = &aim->waitpid;
+    PCB *t = NULL;
+    Msg m;
+    m.src = current->pid;
+    // set return value for waitpid
+    m.ret = 1;
+    list_foreach(p, head) {
+        t = list_entry(p, PCB, link);
+        send(t->pid, &m);
+    }
+}
+
 int kexit(Msg *m) {
     PCB *aim = (PCB *)m->buf;
+    notify_wait(aim);
     return free_process(aim);
+}
+
+/**
+   Store the wait to target process
+ */
+void kwaitpid(Msg *m) {
+    PCB *aim = fetch_pcb(m->i[0]);
+    list_add_after(&aim->waitpid, m->buf);
 }

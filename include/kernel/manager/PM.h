@@ -10,6 +10,7 @@ enum {
     PM_fork,
     PM_exec,
     PM_exit,
+    PM_waitpid,
 };
 
 void init_PM();

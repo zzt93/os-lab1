@@ -84,15 +84,24 @@ static inline int list_size(ListHead* list) {
    member: the member in the T
  */
 #define list_free(p, head, T, name, member)     \
-    ListHead *p = NULL;                         \
-    (p) = (head)->next;                         \
-    T *name = NULL;                                \
+    ListHead *p = (head)->next;                 \
+    T *name = NULL;                             \
     while ((p) != (head)) {                     \
-        name = list_entry((p), T, member);         \
+        name = list_entry((p), T, member);      \
         (p) = (p)->next;                        \
-        kfree(name);                               \
+        kfree(name);                            \
     }                                           \
                                                 \
+
+#define list_copy(p, head, T, name, member)         \
+    ListHead *p = (head) ->next;                    \
+    T *name##_src = NULL;                           \
+    T *name##_dest = NULL;                          \
+    list_foreach((p), head) {                       \
+        name##_src = list_entry((p), T, member);    \
+        name##_dest = kmalloc(sizeof(T));           \
+        memcpy(name##_dest, name##_src, sizeof(T)); \
+    }                                               \
 
 
 #endif
