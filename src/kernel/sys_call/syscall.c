@@ -79,6 +79,12 @@ void do_syscall(TrapFrame *tf) {
             case SYS_print_serial:
                 printk("%s ", tf->ebx);
                 break;
+            case SYS_sleep:
+                m.type = NEW_TIMER;
+                m.i[0] = tf->ebx;
+                send(TIMER, &m);
+                receive(TIMER, &m);
+                break;
             case SLEEP:
                 break;
             default:

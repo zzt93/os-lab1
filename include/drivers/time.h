@@ -7,6 +7,11 @@ typedef struct Time {
 	int year, month, day;
 	int hour, minute, second;
 } Time;
+
+typedef enum {
+    NEW_TIMER,
+};
+
 inline long get_jiffy();
 
 void get_time(Time *tm);

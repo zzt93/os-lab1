@@ -25,7 +25,7 @@
 
 /**
    Why call left in get then interrupt then cause page fault
-   -- for the lock() in asm_do_irq change the value of
+   -- for the `call lock()` in asm_do_irq change the value of
    $eax, $edx
  */
 #define MAP(K, V, name)                                     \

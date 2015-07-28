@@ -18,11 +18,13 @@ enum {
     SYS_exec,
     SYS_getpid,
     SYS_waitpid,
-    SYS_sleep,
     // Miscellaneous
     MIS,
     // user test
     SYS_print_serial,
+    SYS_sleep,
+    // for int 0x80 in sleep method
+    // @see ./src/kernel/process/schedule.c
     SLEEP,
 };
 
@@ -31,5 +33,6 @@ int exec(int filename, char *args);
 int exit();
 int getpid();
 int waitpid(int wait);
+int sleep(int time);
 
 #endif /* __SYSCALL_H__ */

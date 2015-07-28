@@ -44,6 +44,8 @@ timer_driver_thread(void) {
 	while (true) {
 		receive(ANY, &m);
 		switch (m.type) {
+            case NEW_TIMER:
+                break;
 			default: assert(0);
 		}
 	}
@@ -91,7 +93,8 @@ init_rt(void) {
 }
 
 /**
-   get time by times of timer interrupt
+   get time by counting times of timer interrupt
+   100Hz, ie 1s = 10 interrupts
  */
 void
 get_time(Time *tm) {
