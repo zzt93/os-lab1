@@ -2,6 +2,14 @@
 #define __HEAP_H__
 
 /**
+   Usage:
+   HEAP(T, capacity, f)
+   T -- type
+   capacity -- the largest size of this heap
+   f -- function to compare elements, can be used to
+   adjust max-heap or min-heap
+   
+   Internal:
    Using array to implement heap, ie priority queue
    
    array start from 0,
@@ -31,7 +39,7 @@
     /*return next index for this function*/     \
     /*for percolate down is left/right child*/  \
     static int cmp_swap(int i1) {               \
-        unsigned int i2 = l_child(i1);            \
+        unsigned int i2 = l_child(i1);          \
         if (i2+1 < size) {                      \
             if(f(heap[i2+1], heap[i2]) > 0){    \
                 ++i2;                           \
@@ -47,7 +55,7 @@
                                                 \
     static void percolate_up(int i) {           \
         int tei = 0;                            \
-        for (; i != 0 && i/2 >= 0; i/=2) {      \
+        for (; i != 0 && i/2 >= 0; i = tei) {    \
             tei = i/2;                          \
             if (i%2 == 0 && tei-1 >= 0) {       \
                 tei -= 1;                       \
@@ -57,7 +65,7 @@
     }                                           \
                                                 \
     static void percolate_down(int i) {         \
-        for (; 2*i+1 < size; ) {                \
+        while (2*i+1 < size) {                  \
             i = cmp_swap(i);                    \
         }                                       \
     }                                           \
@@ -67,14 +75,18 @@
     }                                           \
                                                 \
     static T pop_max() {                        \
+        lock();                                 \
         T t = heap[0];                          \
         heap[0] = heap[--size];                 \
+        unlock();                               \
         percolate_down(0);                      \
         return t;                               \
     }                                           \
                                                 \
     static void add(T t) {                      \
+        lock();                                 \
         heap[size++] = t;                       \
+        unlock();                               \
         percolate_up(size - 1);                 \
     }                                           \
 
