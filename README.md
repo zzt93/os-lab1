@@ -32,6 +32,8 @@ circular queue
 [BST](docs/ADT/BST.md)  
 [map](docs/ADT/map.md)  
 linked-list  
+bit map  
+[heap](docs/ADT/heap.md)
 
 -----------------------------
 

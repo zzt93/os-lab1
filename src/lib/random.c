@@ -19,20 +19,33 @@
    @see Random.java
  */
 
-static long int rseed;
-static const long int a = 0x5DEECE66D;
+static long long int rseed;
+static const long long int a = 0x5DEECE66D;
 static const long int c = 0xb;
-static const long mask = (1L << 48) - 1;
-static const double DOUBLE_UNIT = 1.0 / (1L << 53);
+static const long long int mask = (1ll << 48) - 1;
+static const double DOUBLE_UNIT = 1.0 / (1ll << 53);
+
+static int next(int bits) {
+    long old, next;
+    do {
+        old = rseed;
+        next = (a * old + c) & mask;
+    } while (old != next);
+    /*
+      对于x86平台的gcc编译器，最高位移入1，也就是仍保持负数的符号位，
+      这种处理方式对负数仍然保持了“右移1位相当于除以2”的性质。
+     */
+    return (int)(next >> (48 - bits));
+}
 
 double next_double() {
     return (((long)(next(26)) << 27) + next(27)) * DOUBLE_UNIT;
 }
 
 /**
-   return random int between [0, range)
+   return random int between [0, round)
  */
-int next_int(int range) {
+int next_int(int bound) {
     if (bound <= 0) {
         assert(0);
     }
@@ -50,19 +63,6 @@ int next_int(int range) {
         val = bits % bound;
     } while (bits - val + (bound-1) < 0);
     return val;
-}
-
-static int next(int bits) {
-    long old, next;
-    do {
-        old = rseed;
-        next = (a * old + c) & mask;
-    } while (old != next);
-    /*
-      对于x86平台的gcc编译器，最高位移入1，也就是仍保持负数的符号位，
-      这种处理方式对负数仍然保持了“右移1位相当于除以2”的性质。
-     */
-    return (int)(next >> (48 - bits));
 }
 
 void srand(unsigned int seed) {

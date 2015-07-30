@@ -96,7 +96,7 @@ PCB * kfork(Msg* m) {
 
     // share virtual address storage
     list_init(&(child->vir_mem));
-    list_copy(p, &(father->vir_mem), Seg_info, s, link);
+    list_copy(&(father->vir_mem), Seg_info, link);
 
     return child;
 }
@@ -111,11 +111,11 @@ int free_process(PCB *aim) {
         INVALID_ID, INVALID_ID, aim, INVALID_ID, INVALID_ID);
     pdir_free(get_pdir_addr(aim));
     // free message queue
-    list_free(p1, &aim->mes, Msg, msg, list);
+    list_free(&aim->mes, Msg, list);
     // free virtual address space
-    list_free(p2, &(aim->vir_mem), Seg_info, s, link);
+    list_free(&(aim->vir_mem), Seg_info, link);
     // free waitpid
-    list_free(p3, &aim->waitpid, PCB, p, link);
+    list_free(&aim->waitpid, PCB, link);
     // free pcb
     kfree(aim);
     return 1;

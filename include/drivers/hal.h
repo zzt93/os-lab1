@@ -35,4 +35,6 @@ extern const char* tty4;// pid -- TTY main thread
 extern const char* timer;
 extern const char* ram;
 
+#include "time.h"
+
 #endif

@@ -77,32 +77,30 @@ static inline int list_size(ListHead* list) {
 }
 
 /**
-   p: the *name* of a ListHead pointer
    head: the *value* of a ListHead pointer
    T: the type name
-   name: the name of a variable of T
    member: the member in the T
  */
-#define list_free(p, head, T, name, member)     \
-    ListHead *p = (head)->next;                 \
-    T *name = NULL;                             \
-    while ((p) != (head)) {                     \
-        name = list_entry((p), T, member);      \
-        (p) = (p)->next;                        \
-        kfree(name);                            \
+#define list_free(head, T, member) {            \
+        ListHead *p = (head)->next;             \
+        T *t = NULL;                            \
+        while ((p) != (head)) {                 \
+            t = list_entry((p), T, member);     \
+            (p) = (p)->next;                    \
+            kfree(t);                           \
+        }                                       \
     }                                           \
-                                                \
 
-#define list_copy(p, head, T, name, member)         \
-    ListHead *p = (head) ->next;                    \
-    T *name##_src = NULL;                           \
-    T *name##_dest = NULL;                          \
-    list_foreach((p), head) {                       \
-        name##_src = list_entry((p), T, member);    \
-        name##_dest = kmalloc(sizeof(T));           \
-        memcpy(name##_dest, name##_src, sizeof(T)); \
-    }                                               \
-
+#define list_copy(head, T, member) {                \
+        ListHead *p = (head) ->next;                \
+        T *t_src = NULL;                            \
+        T *t_dest = NULL;                           \
+        list_foreach((p), head) {                   \
+            t_src = list_entry((p), T, member);     \
+            t_dest = kmalloc(sizeof(T));            \
+            memcpy(t_dest, t_src, sizeof(T));       \
+        }                                           \
+    }
 
 #endif
 

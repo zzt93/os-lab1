@@ -37,17 +37,25 @@ void init_timer(void) {
 	hal_register(timer, TIMER, 0);
 }
 
+int wait(int time) {
+    return 0;
+}
+
 static void
 timer_driver_thread(void) {
 	static Msg m;
-
+    static int dest = -1;
 	while (true) {
 		receive(ANY, &m);
+        dest = m.src;
+        m.src = current->pid;
 		switch (m.type) {
             case NEW_TIMER:
+                m.ret = wait(m.i[0]);
                 break;
 			default: assert(0);
 		}
+        send(dest, &m);
 	}
 }
 

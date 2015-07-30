@@ -33,6 +33,6 @@ int exec(int filename, char *args);
 int exit();
 int getpid();
 int waitpid(int wait);
-int sleep(int time);
+int wait(int time);
 
 #endif /* __SYSCALL_H__ */

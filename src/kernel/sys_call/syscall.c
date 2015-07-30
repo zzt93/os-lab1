@@ -3,6 +3,8 @@
 #include "kernel/message.h"
 #include "kernel/process.h"
 
+#include "drivers/hal.h"
+
 /*
 int __attribute__((__noinline__))
 syscall(int id, ...) {

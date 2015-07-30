@@ -8,12 +8,14 @@ typedef struct Time {
 	int hour, minute, second;
 } Time;
 
-typedef enum {
+enum {
     NEW_TIMER,
 };
 
 inline long get_jiffy();
 
 void get_time(Time *tm);
+
+extern int TIMER;
 
 #endif
