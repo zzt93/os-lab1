@@ -21,3 +21,7 @@ int getpid() {
 int waitpid(int wait) {
     return syscall(SYS_waitpid, wait);
 }
+
+int wait(int time) {
+    return syscall(SYS_wait, time);
+}

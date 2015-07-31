@@ -17,4 +17,6 @@ void test_page_alloc();
 // implemented in util.c
 void init_test_proc();
 
+void test_random();
+
 #endif /* __TEST_H__ */

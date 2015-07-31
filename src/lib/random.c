@@ -26,11 +26,14 @@ static const long long int mask = (1ll << 48) - 1;
 static const double DOUBLE_UNIT = 1.0 / (1ll << 53);
 
 static int next(int bits) {
-    long old, next;
+    long long int old, next;
+    lock();
     do {
         old = rseed;
         next = (a * old + c) & mask;
-    } while (old != next);
+    } while (old == next);
+    rseed = next;
+    unlock();
     /*
       对于x86平台的gcc编译器，最高位移入1，也就是仍保持负数的符号位，
       这种处理方式对负数仍然保持了“右移1位相当于除以2”的性质。
@@ -39,7 +42,7 @@ static int next(int bits) {
 }
 
 double next_double() {
-    return (((long)(next(26)) << 27) + next(27)) * DOUBLE_UNIT;
+    return (((long long int)next(26) << 27) + next(27)) * DOUBLE_UNIT;
 }
 
 /**
@@ -49,8 +52,8 @@ int next_int(int bound) {
     if (bound <= 0) {
         assert(0);
     }
-    if ((bound & (bound - 1))) {  // i.e., bound is a power of 2
-        return (int)((bound * (long)next(31)) >> 31);
+    if (!(bound & (bound - 1))) {  // i.e., bound is a power of 2
+        return (int)((bound * (long long int)next(31)) >> 31);
     }
     /*'
       if bound is not the power of 2, just using modulus may
@@ -66,7 +69,7 @@ int next_int(int bound) {
 }
 
 void srand(unsigned int seed) {
-    assert(sizeof(long int) > sizeof(int));
+    assert(sizeof(long long int) == 8);
     lock();
     rseed = seed;
     unlock();

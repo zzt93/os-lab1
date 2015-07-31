@@ -9,7 +9,7 @@
    HEAP(T, capacity, f)
    T -- type
    capacity -- the largest size of this heap
-   f -- function to compare elements, can be used to
+   f(T*, T*) -- function to compare elements, can be used to
    adjust max-heap or min-heap
 
     - Invariant:
@@ -29,12 +29,12 @@
     static T heap[capacity];                    \
     static int size = 0;                        \
                                                 \
-    static int father(int i) {                  \
+    static inline int father(int i) {           \
         int left = i % 2;                       \
         return left ? i / 2 : i / 2 - 1;        \
     }                                           \
                                                 \
-    static int l_child(int i) {                 \
+    static inline int l_child(int i) {          \
         return i * 2 + 1;                       \
     }                                           \
                                                 \
@@ -44,11 +44,11 @@
     static int cmp_swap(int i1) {               \
         unsigned int i2 = l_child(i1);          \
         if (i2+1 < size) {                      \
-            if(f(heap[i2+1], heap[i2]) > 0){    \
+            if(f(heap + i2+1, heap + i2) > 0){  \
                 ++i2;                           \
             }                                   \
         }                                       \
-        if (f(heap[i1], heap[i2]) < 0){         \
+        if (f(heap + i1, heap + i2) < 0){       \
             T temp = heap[i1];                  \
             heap[i1] = heap[i2];                \
             heap[i2] = temp;                    \
@@ -70,11 +70,21 @@
         }                                       \
     }                                           \
                                                 \
+    static inline int empty() {                 \
+        return size == 0;                       \
+    }                                           \
+                                                \
     static T max() {                            \
+        if (empty()) {                          \
+            assert(0);                          \
+        }                                       \
         return heap[0];                         \
     }                                           \
                                                 \
     static T pop_max() {                        \
+        if (empty()) {                          \
+            assert(0);                          \
+        }                                       \
         lock();                                 \
         T t = heap[0];                          \
         heap[0] = heap[--size];                 \
@@ -89,6 +99,9 @@
         unlock();                               \
         percolate_up(size - 1);                 \
     }                                           \
+
+#define heap_each(i, t)                                     \
+    for (i = 0, t = heap + i; i < size; i++, t = heap + i)
 
 /*
                                                   \

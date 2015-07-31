@@ -65,7 +65,7 @@ void hal_list(void) {
 	list_foreach(it, &devices) {
 		Dev *dev = list_entry(it, Dev, list);
 		assert(dev);
-		printk("%s #%d, #%d\n", dev->name, dev->pid, dev->dev_id);
+		printk("%s pid: #%d, device id: #%d\n", dev->name, dev->pid, dev->dev_id);
 	}
 	unlock();
 }

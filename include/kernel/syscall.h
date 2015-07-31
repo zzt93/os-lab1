@@ -22,7 +22,7 @@ enum {
     MIS,
     // user test
     SYS_print_serial,
-    SYS_sleep,
+    SYS_wait,
     // for int 0x80 in sleep method
     // @see ./src/kernel/process/schedule.c
     SLEEP,

@@ -79,11 +79,12 @@ void do_syscall(TrapFrame *tf) {
                 printk(RED"user process test "RESET);
                 break;
             case SYS_print_serial:
-                printk("%s ", tf->ebx);
+                printk(RED"%s "RESET, tf->ebx);
                 break;
-            case SYS_sleep:
+            case SYS_wait:
                 m.type = NEW_TIMER;
                 m.i[0] = tf->ebx;
+                m.i[1] = current->pid;
                 send(TIMER, &m);
                 receive(TIMER, &m);
                 break;

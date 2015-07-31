@@ -18,4 +18,16 @@ void get_time(Time *tm);
 
 extern int TIMER;
 
+typedef struct {
+    int time;
+    int pid;
+} Timer;
+
+void set_timer(Timer *t, int time, int pid);
+// implemented in timer_sys.c
+
+#include "kernel/message.h"
+
+int kwait(Msg *m);
+void update_timer();
 #endif

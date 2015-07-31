@@ -79,7 +79,7 @@ static void PM_job() {
                 break;
             case PM_waitpid:
                 kwaitpid(&m);
-                return;
+                continue;
             default:
                 assert(false);
                 break;
