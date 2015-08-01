@@ -138,7 +138,7 @@ welcome(void) {
     test_map();
     test_page_alloc();
     test_bit_map();
-    */
     test_heap();
     test_random();
+    */
 }

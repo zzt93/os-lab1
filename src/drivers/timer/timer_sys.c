@@ -36,7 +36,7 @@ void update_timer() {
     Timer t;
     Msg m;
     m.src = current->pid;
-    while ((t = max()).time == 1) {
+    while (!empty() && (t = max()).time == 1) {
         pop_max();
         send(t.pid, &m);
     }

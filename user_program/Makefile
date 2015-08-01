@@ -4,7 +4,7 @@ CC      = gcc
 LD      = ld
 CFLAGS  = -m32 -static -ggdb -MD -Wall -Werror -I../include -O0 \
 		 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer -fno-align-functions -Wno-main
-LDFLAGS = -melf_i386 -e main
+LDFLAGS = -melf_i386 -e entry
 
 CFILES  = $(shell find ./ -maxdepth 1 -name "*.c")
 SFILES  = $(shell find ./ -maxdepth 1 -name "*.S")

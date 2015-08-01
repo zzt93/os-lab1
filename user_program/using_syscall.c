@@ -1,7 +1,7 @@
 #include "kernel/syscall.h"
 
 
-int main() {
+int entry() {
     while(1) {
         int filename = 2;
         char *cmd = "gcc -o2 test.c";
