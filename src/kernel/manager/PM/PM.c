@@ -166,7 +166,7 @@ PCB *create_process(Msg* m) {
         Seg_info *tmp = kmalloc(sizeof(Seg_info));
         vir_init(tmp,
             (uint32_t)va, (uint32_t)va + ph_table->memsz, ph_table->flags);
-        list_add_after(&vir_range, &(tmp->link));
+        list_add_before(&vir_range, &(tmp->link));
 		/* allocate pages starting from va, with memory size no less than ph->memsz */
         /*
           flags: RWE is the lowest three bits

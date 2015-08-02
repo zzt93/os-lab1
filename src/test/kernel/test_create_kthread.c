@@ -94,7 +94,7 @@ void user_process() {
     init_msg(&m,
         current->pid,
         PM_CREATE,
-        2, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
+        0, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
     send(PM, &m);
     receive(PM, &m);
     while (true) {

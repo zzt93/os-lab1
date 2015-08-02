@@ -16,6 +16,12 @@ static void s_copy(PCB* src, PCB* dest) {
 void copy_kstack(PCB *father, PCB *child) {
     // @checked size: [tf, (char *)father->kstack + KSTACK_SIZE)
     uint32_t copy_size = (char *)father->kstack + KSTACK_SIZE - (char *)father->tf;
+    // this assert is not so accurate for
+    // 1. I ignore the function backtrace
+    // 2. The second TrapFrame hasn't push `ss` and `esp`
+    assert(copy_size > 2 * sizeof(TrapFrame));
+    assert((uint32_t)father->tf < (uint32_t)father->kstack + KSTACK_SIZE
+        && (uint32_t)father->tf > (uint32_t)father->kstack);
     // allocate trapframe, and function invoke stack to the end of stack
     void *second_frame = (void *)((char *)(child->kstack) + KSTACK_SIZE - copy_size);
     // @see user_process_fork.jpg: father's tf is now point to the second TrapFrame
@@ -33,7 +39,7 @@ void copy_kstack(PCB *father, PCB *child) {
       子进程将来就可以正确地从异常和函数中返回了.
      */
     int32_t gap = father->kstack - child->kstack;
-    // handle epb, esp in the TrapFrame
+    // handle epb, esp in the later TrapFrame
     TrapFrame * s_frame = ((TrapFrame *)second_frame);
     // first change it to point to right place, store the pointer to next ebp
     s_frame->ebp += gap;
@@ -94,7 +100,7 @@ PCB * kfork(Msg* m) {
     // initialize waiting list
     list_init(&child->waitpid);
 
-    // share virtual address storage
+    // copy virtual address storage
     list_init(&(child->vir_mem));
     list_copy(&(father->vir_mem), Seg_info, link);
 
@@ -114,8 +120,8 @@ int free_process(PCB *aim) {
     list_free(&aim->mes, Msg, list);
     // free virtual address space
     list_free(&(aim->vir_mem), Seg_info, link);
-    // free waitpid
-    list_free(&aim->waitpid, PCB, link);
+    // free waiting list
+    list_free(&(aim->waitpid), Waiting, link);
     // free pcb
     kfree(aim);
     return 1;
@@ -205,14 +211,14 @@ PCB * kexec(Msg *m) {
 void notify_wait(PCB *aim) {
     ListHead *p = NULL;
     ListHead *head = &aim->waitpid;
-    PCB *t = NULL;
+    Waiting *t = NULL;
     Msg m;
     m.src = current->pid;
     // set return value for waitpid
     m.ret = 1;
     list_foreach(p, head) {
-        t = list_entry(p, PCB, link);
-        send(t->pid, &m);
+        t = list_entry(p, Waiting, link);
+        send(t->wait->pid, &m);
     }
 }
 
@@ -223,9 +229,11 @@ int kexit(Msg *m) {
 }
 
 /**
-   Store the wait to target process
+   Store the waiting process to target process
  */
 void kwaitpid(Msg *m) {
     PCB *aim = fetch_pcb(m->i[0]);
-    list_add_after(&aim->waitpid, m->buf);
+    Waiting *w = kmalloc(sizeof(Waiting));
+    init_wait(w, aim);
+    list_add_after(&aim->waitpid, &w->link);
 }

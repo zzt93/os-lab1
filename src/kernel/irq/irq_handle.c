@@ -55,6 +55,7 @@ void irq_handle(TrapFrame *tf) {
     if (irq == 0x80) {
         do_syscall(tf);
     } else if (irq < 1000) {
+        printk("Stack :%x %x %x %x ", tf->eip, tf->ebp, tf->xxx, tf->esp);
         printk("error code: %x ;cr2: %x ", tf->error_code, read_cr2());
 		extern uint8_t logo[];
 		panic("Unexpected exception #%d\n\33[1;31mHint: The machine is always right! For more details about exception #%d, see\n%s\n\33[0m", irq, irq, logo);
@@ -73,7 +74,6 @@ void irq_handle(TrapFrame *tf) {
 	}
     // save the trap frame pointer for the old process
 	current->tf = tf;
-    printk("Stack :%x %x %x %x ", tf->eip, tf->ebp, tf->xxx, tf->esp);
 	schedule();
 }
 

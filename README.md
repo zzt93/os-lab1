@@ -5,7 +5,7 @@ Try to learn os by lab
 
 ------------------------------
 
-Wed Jul 8 2015 update:
+Aug 2 2015 update:
 
 ## The functionalities that I have already implemented:
 
@@ -25,6 +25,8 @@ user process
 using page allocation  -- using bit-map algorithm  
 add page protection  
 put user in ring3  
+wait(int second) -- system call  
+
 
 
 Implement some ADT:  
@@ -37,7 +39,7 @@ bit map
 
 -----------------------------
 
-Wed Jul 8 2015 update:
+Jul 8 2015 update:
 
 ## Thread and it's pid:  
 ANY -- -1 used by server like FM, MM, PM  
@@ -52,6 +54,16 @@ PM -- 10
 MM -- 11  
 user process invoker -- 12  
 first user process -- 13  
+
+-----------------
+
+Aug 2 2015 update:
+
+## State of a process
+- running -- store in `current`
+- ready -- store in `wake queue`
+- sleeped -- `sleeped tree`, eg `receive()`, `sleep()`, all system call
+- blocked on a semaphore -- linked by `pcb->link`, eg `P() & V()`
 
 
 ----------------------

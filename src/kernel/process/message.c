@@ -118,7 +118,8 @@ void receive(pid_t src, Msg *m) {
     NOINTR;
     get_message(current, src, m);
     unlock();
-    INTR;
+    // following is wrong for system call using send&receive
+    //INTR;
     //V(s);
     //printk("%d:-------end receive------\n", current->pid);
 }

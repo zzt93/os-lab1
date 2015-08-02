@@ -47,7 +47,8 @@ typedef struct {
     // pid
     int pid;
     PROCESS_STATE state;
-    // to be linked in process list
+    // to be linked on a semaphore list
+    // if it is running, link must be empty
     ListHead link;
     ListHead mes;
     //Sem mes_lock;
