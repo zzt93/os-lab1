@@ -55,6 +55,7 @@ static void PM_job() {
             case PM_fork:
             {
                 PCB * new = kfork(&m);
+                assert(new != NULL);
                 add2wake(new);
                 pid_t child = new->pid;
                 // reply to child
@@ -116,8 +117,12 @@ void create_va_stack(PDE* pdir, uint32_t *ss, uint32_t *esp) {
     assert(*esp == KOFFSET);
 }
 
-void * user_stack(PCB *p) {
-    return get_pa(&p->pdir, USER_STACK_BASE);
+/**
+   user stack initial page end position
+   user stack initial page starting position
+ */
+void * user_stack_pa(PCB *p, uint32_t val) {
+    return get_pa(&p->pdir, val);
 }
 /**
    single responsibility:

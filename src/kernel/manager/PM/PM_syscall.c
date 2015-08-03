@@ -38,17 +38,17 @@ void copy_kstack(PCB *father, PCB *child) {
       我们只需要从tf->ebp开始, 把函数调用链上的每一个ebp 加上父子进程内核栈的相对偏移量,
       子进程将来就可以正确地从异常和函数中返回了.
      */
-    int32_t gap = father->kstack - child->kstack;
+    int32_t gap = child->kstack - father->kstack ;
     // handle epb, esp in the later TrapFrame
     TrapFrame * s_frame = ((TrapFrame *)second_frame);
     // first change it to point to right place, store the pointer to next ebp
     s_frame->ebp += gap;
     s_frame->xxx += gap;
     uint32_t* ebp = (uint32_t *)s_frame->ebp;
-    while ((uint32_t)ebp >= KERNEL_VA_START) {
+    while (*ebp >= KERNEL_VA_START) {
         *ebp += gap; // TODO check addition of uint32_t and int32_t
-        ebp = (uint32_t *)*ebp;
         assert(*ebp > (uint32_t)ebp);
+        ebp = (uint32_t *)*ebp;
     }
     // 4 bytes for ebp, 4 bytes for `call` pushed eip, 4 bytes for `push %esp` esp
     /* The pointer in first TrapFrame point to the
@@ -58,13 +58,19 @@ void copy_kstack(PCB *father, PCB *child) {
     f_frame->ebp += gap;
     f_frame->esp += gap;
     */
+    //TODO change address of message
 }
 
+/*
+  This function is somewhat wrong, for if the user stack
+  is larger than a page, it may be not consecutive region
+  in physical address, so just copy from start is wrong.
 void copy_user_stack(PCB *father, PCB *child) {
-    void *fa_start = (void *)get_pa(&father->pdir, USER_STACK_POINTER);
-    void *child_start = (void *)get_pa(&child->pdir, USER_STACK_POINTER);
+    void *fa_start = user_stack_pa(father, USER_STACK_POINTER);
+    void *child_start = user_stack_pa(child, USER_STACK_POINTER);
     memcpy(child_start, fa_start, USER_STACK_SIZE);
 }
+*/
 
 /**
    TODO check whether every field in pcb is correctly copied
@@ -77,21 +83,22 @@ PCB * kfork(Msg* m) {
     // shallow copy: privilege, sign, pid
     s_copy(father, child);
     // deep copy ptable, page, set page directory
+    // except kernel image, including user stack
+    // handle content on the user stack which must use physical address to **copy**
+    // for current thread is PM which has different page directory with user process
+    // The pointer field on the user stack is the same, so no need to change pointer field.
+    //
     init_msg(m,
         current->pid,
         COPY_page,
         (int)father, (int)child, NULL, INVALID_ID, INVALID_ID);
     send(MM, m);
     receive(MM, m);
-    // special handle kernel stack and tf
+
+    init_kernel_image(get_pdir_addr(child));
+    // special handler for kernel stack and tf
     copy_kstack(father, child);
 
-    // handle content on the user stack which must use physical address to **copy**
-    // for current thread is PM which has different page directory with user process
-    // The pointer field on the user stack is the same, so no need to change pointer field.
-    if (father->type == USER) {
-        copy_user_stack(father, child);
-    }
 
     // clear message queue
     list_init(&(child->mes));
@@ -202,7 +209,7 @@ PCB * kexec(Msg *m) {
     pid_count_des();
     // prepare args on the stack
     // push args *
-    memcpy(user_stack(new) - len, args, len);
+    memcpy(user_stack_pa(new, USER_STACK_BASE) - len, args, len);
     // TODO `- sizeof(int)` for saved eip
     set_esp(new, USER_STACK_BASE - len - sizeof(int));
     return new;

@@ -26,6 +26,7 @@ using page allocation  -- using bit-map algorithm
 add page protection  
 put user in ring3  
 wait(int second) -- system call  
+random number  
 
 
 

@@ -20,7 +20,8 @@ int page_copy(Msg *m) {
     Page *page = NULL;
 
     uint32_t pdir_i, ptable_idx;
-    for (pdir_i = 0; pdir_i < NR_PDE; pdir_i++) {
+    // except kernel image, including user stack
+    for (pdir_i = 0; pdir_i < (KERNEL_VA_START >> 22); pdir_i++) {
         // if source process has a page directory entry,
         //ie a page table
         if (s_p[pdir_i].present == 1) {
@@ -61,6 +62,7 @@ int page_copy(Msg *m) {
 /**
    Copy `page directory, page table, page` from source process
    to destination process by the information stored in the vir_mem
+   and user stack
 void copy_page_by_vir(Msg* m) {
     PCB* src = (PCB*)m->i[0];
     PCB* dest = (PCB*)m->i[1];
@@ -76,6 +78,7 @@ void copy_page_by_vir(Msg* m) {
     uint32_t pdir_i, ptable_idx;
     //for each vir_mem, allocate page directory, page table, page
 
+    // for user stack
     // reply message
     return 1;
 }

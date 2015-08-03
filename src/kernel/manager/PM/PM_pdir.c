@@ -21,6 +21,7 @@ PDE* pdir_alloc() {
     lock();
     Pdir* free = &all_pdirs[j];
     availabe --;
+    set_val(j, USED);
     unlock();
     // make it invalid at first
     PDE* pdir = (PDE*)free;
