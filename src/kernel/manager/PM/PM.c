@@ -58,11 +58,6 @@ static void PM_job() {
                 assert(new != NULL);
                 add2wake(new);
                 pid_t child = new->pid;
-                // reply to child
-                m.ret = 0;
-                m.src = current->pid;
-                assert(current->pid == PM);
-                send(child, &m);
                 // reply to father
                 m.ret = child;
                 break;
@@ -118,7 +113,8 @@ void create_va_stack(PDE* pdir, uint32_t *ss, uint32_t *esp) {
 }
 
 /**
-   user stack initial page end position
+   user stack initial page end position -- must minus some number
+   for it is out of range
    user stack initial page starting position
  */
 void * user_stack_pa(PCB *p, uint32_t val) {

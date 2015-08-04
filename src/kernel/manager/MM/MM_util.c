@@ -4,9 +4,9 @@
 void * get_ptable(CR3 *pdir, uint32_t va) {
     uint32_t pdir_idx = va >> 22;
     uint32_t ptable_idx = (va >> 12) & 0x3ff;
-    PDE *pde = (PDE *)((pdir->page_directory_base << 12) + pdir_idx);
+    PDE *pde = (PDE *)(pdir->page_directory_base << 12) + pdir_idx;
     assert(pde->present == 1);
-    PTE *pte = (PTE *)(page_frame_to_address(pde) + ptable_idx);
+    PTE *pte = (PTE *)page_frame_to_address(pde) + ptable_idx;
     assert(pte->present == 1);
     return pte;
 }

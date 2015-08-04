@@ -91,14 +91,15 @@ static inline int list_size(ListHead* list) {
         }                                       \
     }                                           \
 
-#define list_copy(head, T, member) {                \
-        ListHead *p = (head) ->next;                \
+#define list_copy(head, T, member, dest) {          \
+        ListHead *p = NULL;                         \
         T *t_src = NULL;                            \
         T *t_dest = NULL;                           \
         list_foreach((p), head) {                   \
             t_src = list_entry((p), T, member);     \
             t_dest = kmalloc(sizeof(T));            \
             memcpy(t_dest, t_src, sizeof(T));       \
+            list_add_after(dest, &t_dest->member);  \
         }                                           \
     }
 

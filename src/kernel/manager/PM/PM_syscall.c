@@ -13,7 +13,44 @@ static void s_copy(PCB* src, PCB* dest) {
     assert(dest->pid > src->pid);
 }
 
+/**
+   I. copy full kernel stack, include two TrapFrame:
+     In this choice, I have to change all the pointer field which
+     point to kernel stack, including function stack trace(ebp,
+     local variables's address) and xxx, ebp in TrapFrame
+
+   II. copy just the first TrapFrame:
+     In this occasion, only change xxx, ebp is fine
+ */
 void copy_kstack(PCB *father, PCB *child) {
+    // handle the content in the first TrapFrame, ebp, xxx
+    TrapFrame * s_frame = ((TrapFrame *)father->tf);
+    uint32_t* ebp = (uint32_t *)s_frame->ebp;
+    while (*ebp >= KERNEL_VA_START) {
+        assert(*ebp > (uint32_t)ebp);
+        ebp = (uint32_t *)*ebp;
+    }
+    // 4 bytes for ebp, 4 bytes for `call` pushed eip, 4 bytes for `push %esp` esp
+    /* The ebp in first TrapFrame point to the
+       user stack, and that are same for all user process, so
+       no need to change it
+    f_frame->ebp += gap;
+    */
+    int32_t gap = child->kstack - father->kstack;
+    TrapFrame *child_frame = (TrapFrame *)((char *)ebp + 4 + 4 + 4 + gap);
+    assert((char *)child_frame - gap == (char *)father->kstack + KSTACK_SIZE - sizeof(TrapFrame));
+    uint32_t copy_size = sizeof(TrapFrame);
+    memcpy(child_frame, (char *)child_frame - gap, copy_size);
+    child_frame->xxx += gap;
+    // set return value of fork
+    child_frame->eax = 0;
+    child->tf = child_frame;
+    // for it is occasion two, count_of_lock should be change
+    child->count_of_lock --;
+}
+
+// TODO only work for user thread to fork
+void copy_kstack_full(PCB *father, PCB *child) {
     // @checked size: [tf, (char *)father->kstack + KSTACK_SIZE)
     uint32_t copy_size = (char *)father->kstack + KSTACK_SIZE - (char *)father->tf;
     // this assert is not so accurate for
@@ -51,12 +88,12 @@ void copy_kstack(PCB *father, PCB *child) {
         ebp = (uint32_t *)*ebp;
     }
     // 4 bytes for ebp, 4 bytes for `call` pushed eip, 4 bytes for `push %esp` esp
-    /* The pointer in first TrapFrame point to the
+    /* The ebp in first TrapFrame point to the
        user stack, and that are same for all user process, so
        no need to change it
-    TrapFrame *f_frame = ((TrapFrame *)(char *)&ebp - 4 - 4 - 4);
+    TrapFrame *f_frame = ((TrapFrame *)(char *)&ebp + 4 + 4 + 4);
     f_frame->ebp += gap;
-    f_frame->esp += gap;
+    f_frame->xxx += gap;
     */
     //TODO change address of message
 }
@@ -109,7 +146,7 @@ PCB * kfork(Msg* m) {
 
     // copy virtual address storage
     list_init(&(child->vir_mem));
-    list_copy(&(father->vir_mem), Seg_info, link);
+    list_copy(&(father->vir_mem), Seg_info, link, &child->vir_mem);
 
     return child;
 }
@@ -179,10 +216,14 @@ int save_args(Msg *m, char *buf) {
             */
         {
             char *src = get_pa(&((PCB *)m->i[1])->pdir, (uint32_t)m->buf);
-            *(uint32_t *)buf = (uint32_t)src;
+            // just take a place of address, not real address
+            *(uint32_t *)buf = 0;
             size_t len = strlen(src) + 1;
             memcpy(buf + sizeof src, src, len);
-            return len + sizeof src;
+            size_t all = ALIG(len + sizeof src);
+            // set real address
+            *(uint32_t *)buf = USER_STACK_BASE - all + sizeof src;
+            return all;
         }
         default:
             printk(RED"not implemented now"RESET);
@@ -194,7 +235,7 @@ int save_args(Msg *m, char *buf) {
 #define BUF_SZ 512
 
 PCB * kexec(Msg *m) {
-    char args[BUF_SZ];
+    char args[BUF_SZ] = {0};
     PCB *aim = (PCB *)m->i[1];
     // save arguments
     size_t len = save_args(m, args);
@@ -209,7 +250,7 @@ PCB * kexec(Msg *m) {
     pid_count_des();
     // prepare args on the stack
     // push args *
-    memcpy(user_stack_pa(new, USER_STACK_BASE) - len, args, len);
+    memcpy(user_stack_pa(new, USER_STACK_BASE - len), args, len);
     // TODO `- sizeof(int)` for saved eip
     set_esp(new, USER_STACK_BASE - len - sizeof(int));
     return new;
