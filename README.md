@@ -91,5 +91,10 @@ For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %es
 [user process stack state](docs/pic/user_process_stack.jpg)
 
 
+---------------------
+
+## NOTICE in the future:
+- the adt itself not must to be synchronized, the user choose whether to synchronize.  
+- can add NOINTR to make sure user add synchronizatino
 
 

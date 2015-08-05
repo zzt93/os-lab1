@@ -166,6 +166,10 @@ int free_process(PCB *aim) {
     list_free(&(aim->vir_mem), Seg_info, link);
     // free waiting list
     list_free(&(aim->waitpid), Waiting, link);
+    // before invalidate the reference of PCB, release the reference
+    // in the sleeped_tree -- for process call `exit` and `exec` are
+    // are sleeping on waiting PM's message
+    delete_ref(aim);
     // free pcb
     kfree(aim);
     return 1;
@@ -282,6 +286,7 @@ int kexit(Msg *m) {
 void kwaitpid(Msg *m) {
     PCB *aim = fetch_pcb(m->i[0]);
     Waiting *w = kmalloc(sizeof(Waiting));
-    init_wait(w, aim);
+    init_wait(w, m->buf);
+    // let m->buf waiting on the aim
     list_add_after(&aim->waitpid, &w->link);
 }

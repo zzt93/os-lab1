@@ -83,6 +83,10 @@ printk(const char *ctl, ...) {
     //unlock();
 }
 
+void kprintf(const char *format, void **args) {
+    vfprintf(serial_printc, format, args);
+}
+
 void printHexadecimal(void (*printer)(char), int c) {
     int and = 0xf;
     printer('0');

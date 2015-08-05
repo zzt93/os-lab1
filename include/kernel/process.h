@@ -73,10 +73,12 @@ void sleep_to(ListHead*, void (*)(ListHead*, PCB*));
 void wake_up_from(ListHead*, PCB* (*)(ListHead*));
 void wake_up_lock(PCB*, int);
 void wake_up(PCB*);
+void delete_ref(PCB*);
 
 // implement in process.c
 PCB* fetch_pcb(int);
 void add_process(PCB*);
+int remove_process(PCB *pcb);
 
 static inline void * get_pdir_addr(PCB *p) {
     return (void *)(p->pdir.page_directory_base << 12);

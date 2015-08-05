@@ -218,3 +218,12 @@ void wake_up(PCB* p) {
     }
     unlock();
 }
+
+void delete_ref(PCB *p) {
+    lock();
+    int res = sleeped_delete(p);
+    assert(res != 0);
+    res = remove_process(p);
+    unlock();
+    assert(res != 0);
+}

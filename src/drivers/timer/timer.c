@@ -72,6 +72,7 @@ static void
 update_jiffy(void) {
 	jiffy ++;
 	if (jiffy % HZ == 0) {
+        // TODO change it to more accurate
         update_timer();
 		rt.second ++;
 		if (rt.second >= 60) { rt.second = 0; rt.minute ++; }

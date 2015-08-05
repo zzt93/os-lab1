@@ -55,7 +55,7 @@
                                                             \
     /*get a node using the funciton when init as criteria*/ \
     V name##_get(K k) {                                     \
-        /*lock();*/                                         \
+        lock();                                             \
         aim.k = k;                                          \
         TNode_##name* e = find_fa(&aim);                    \
         if (e == NULL) {                                    \
@@ -70,7 +70,7 @@
         if (right(e)) {                                     \
             ri = right(e)->t;                               \
         }                                                   \
-        /*unlock();                                    */   \
+        unlock();                                           \
         if (le != NULL && le->k == k) {                     \
             return le->v;                                   \
         } else if ((ri != NULL && ri->k == k)){             \
@@ -83,6 +83,7 @@
     void name##_put(K k, V v) {                             \
         Entry* e = kmalloc(sizeof(Entry));                  \
         name##_init_entry(e, k, v);                         \
+        lock();                                             \
         if (name##_has(e)) {                                \
             TNode_##name* t = name##_get_node(e);           \
             assert(t != NULL);                              \
@@ -91,6 +92,15 @@
         } else {                                            \
             name##_add(e);                                  \
         }                                                   \
+        unlock();                                           \
+    }                                                       \
+                                                            \
+    int name##_remove(K k) {                                \
+        lock();                                             \
+        aim.k = k;                                          \
+        int res = name##_delete(&aim);                      \
+        unlock();                                           \
+        return res;                                         \
     }                                                       \
                                                             \
 

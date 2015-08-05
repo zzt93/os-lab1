@@ -68,11 +68,15 @@ static void PM_job() {
                 m.ret = (new != NULL);
                 // put in queue
                 add2wake(new);
-                break;
+                // for the thread apply exec is now not exist,
+                // so no need to send back
+                continue;
             }
             case PM_exit:
                 m.ret = kexit(&m);
-                break;
+                // for the thread apply exec is now not exist,
+                // so no need to send back
+                continue;
             case PM_waitpid:
                 kwaitpid(&m);
                 continue;

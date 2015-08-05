@@ -81,6 +81,9 @@ void do_syscall(TrapFrame *tf) {
             case SYS_print_serial:
                 printk(RED"%s "RESET, tf->ebx);
                 break;
+            case SYS_printf:
+                kprintf((const char *)tf->ebx, (void **)tf->ecx);
+                break;
             case SYS_wait:
                 m.type = NEW_TIMER;
                 m.i[0] = tf->ebx;

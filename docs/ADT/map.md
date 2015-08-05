@@ -5,6 +5,8 @@ K -- key type
 V -- value type  
 name -- map name  
 
+- the container is thread safe by `lock()&unlock()`
+
 ### Internal
 ```
 

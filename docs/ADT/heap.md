@@ -10,7 +10,7 @@
 	- Invariant:  
 		f(father, left_child) >= 0 && f(father, right_child) >= 0
 
-
+	- This container is thread safe by `lock()&unlock()`
 ### Internal:
    - Using array to implement heap, ie priority queue  
 

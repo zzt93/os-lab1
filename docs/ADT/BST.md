@@ -7,6 +7,9 @@
   cmp -- the comparing funciton, bool f(T, T);  
   name -- the name of tree
   
+
+- This container is not thread safe
+
 ### Internal
 ```
 

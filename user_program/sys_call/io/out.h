@@ -4,5 +4,6 @@
 //#include "kernel/syscall.h"
 
 int puts(const char *ctl);
+int printf(const char *format, ...);
 
 #endif /* __OUT_H__ */
