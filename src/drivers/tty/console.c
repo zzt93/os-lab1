@@ -13,6 +13,7 @@ Console *current_consl;
 static const char *ttynames[NR_TTY] = {"tty1", "tty2", "tty3", "tty4"};
 
 // real memory of screen
+// memory-mapped screen
 static uint16_t *vmem = (void*)pa_to_va(0xb8000);
 
 static uint16_t vbuf[NR_TTY][SCR_W * SCR_H * 2];

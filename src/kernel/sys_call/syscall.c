@@ -84,6 +84,9 @@ void do_syscall(TrapFrame *tf) {
             case SYS_printf:
                 kprintf((const char *)tf->ebx, (void **)tf->ecx);
                 break;
+            case SYS_read_line:
+                assert(0);
+                break;
             case SYS_wait:
                 m.type = NEW_TIMER;
                 m.i[0] = tf->ebx;

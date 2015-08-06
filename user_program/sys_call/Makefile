@@ -21,4 +21,4 @@ compile: $(OBJS)
 #	xxd -c 4 -s 0 -i $@ > $(subst out,ar,$@)
 
 clean:
-	rm -f $(OBJS) $(OBJS:.o=.d)
+	rm -f $(OBJS)

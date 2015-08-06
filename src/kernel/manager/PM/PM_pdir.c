@@ -32,9 +32,13 @@ PDE* pdir_alloc() {
     return (PDE*)va_to_pa(pdir);
 }
 
+/**
+   address -- is the physical address
+ */
 void pdir_free(void *address) {
     assert(((uint32_t)address & 0xfff) == 0);
-    Pdir *pdir = (Pdir *)address;
+    // for all_pdirs is a 'virtual address'
+    Pdir *pdir = (Pdir *)pa_to_va(address);
     int i = pdir - all_pdirs;
     lock();
     set_val(i, FREE);

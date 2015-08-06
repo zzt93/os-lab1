@@ -170,6 +170,8 @@ int free_process(PCB *aim) {
     // in the sleeped_tree -- for process call `exit` and `exec` are
     // are sleeping on waiting PM's message
     delete_ref(aim);
+    // return pid
+    pid_free(aim->pid);
     // free pcb
     kfree(aim);
     return 1;
@@ -238,20 +240,21 @@ int save_args(Msg *m, char *buf) {
 
 #define BUF_SZ 512
 
+/**
+   In my current implementation, pid is not necessarily the
+   same
+ */
 PCB * kexec(Msg *m) {
     char args[BUF_SZ] = {0};
     PCB *aim = (PCB *)m->i[1];
     // save arguments
     size_t len = save_args(m, args);
     // save the resources to inherit: pid, file descriptor
-    pid_t p = aim->pid;
     // file descriptor
     // free process
     free_process(aim);
     // create a new one
     PCB *new = create_process(m);
-    new->pid = p;
-    pid_count_des();
     // prepare args on the stack
     // push args *
     memcpy(user_stack_pa(new, USER_STACK_BASE - len), args, len);

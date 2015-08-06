@@ -35,6 +35,9 @@ void* alloc_page() {
     return page;
 }
 
+/**
+   p -- is the physical address
+ */
 void free_page(void *p) {
     assert(((uint32_t)p & 0xfff) == 0);
     Page* page = (Page*)p;

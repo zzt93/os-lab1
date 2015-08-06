@@ -12,7 +12,7 @@ Aug 2 2015 update:
 printk -- printf in kernel  
 kmalloc -- malloc in kernel -- using next-fit algorithm  
 the key press interrupt handler  
-a simple maze game  
+a simple maze game running without os  
 the context switch between threads  
 the creation of thread  
 the schedule of thread -- now using Round-Robin algorithm  
@@ -27,6 +27,10 @@ add page protection
 put user in ring3  
 wait(int second) -- system call  
 random number  
+fork a process  
+exec a command  
+exit a user process  
+
 
 
 

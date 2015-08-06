@@ -87,6 +87,7 @@ static inline void * get_pdir_addr(PCB *p) {
 
 #define IDLE_ID 0
 #define START_ID (IDLE_ID+1)
+#define PID_LIMIT 4096
 
 // for message
 #define ANY -1

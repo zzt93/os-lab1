@@ -23,6 +23,7 @@ enum {
     // user test
     SYS_print_serial,
     SYS_printf,
+    SYS_read_line,
     SYS_wait,
     // for int 0x80 in sleep method
     // @see ./src/kernel/process/schedule.c
@@ -35,5 +36,7 @@ int exit();
 int getpid();
 int waitpid(int wait);
 int wait(int time);
+
+void read_line(char *s);
 
 #endif /* __SYSCALL_H__ */

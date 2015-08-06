@@ -9,6 +9,9 @@
    set_val(i, val) -- set position `i` to be `val`
    is_val(i, val) -- test whether `i` is `val`
    first_val(val) -- return the first position where value if `val`
+
+
+   This container is not thread safe
  */
 
 #include "kernel/semaphore.h"
@@ -39,9 +42,7 @@
         assert(i >= 0);                             \
         int index = i / BITS;                       \
         int j = i % BITS;                           \
-        lock();                                     \
         int res = free[index] >> j;                 \
-        unlock();                                   \
         return (res & 1) == val;                    \
     }                                               \
                                                     \
