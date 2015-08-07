@@ -83,8 +83,12 @@ printk(const char *ctl, ...) {
     //unlock();
 }
 
+void tty4_printc(char);
+
 void kprintf(const char *format, void **args) {
-    vfprintf(serial_printc, format, args);
+    lock();
+    vfprintf(tty4_printc, format, args);
+    unlock();
 }
 
 void printHexadecimal(void (*printer)(char), int c) {

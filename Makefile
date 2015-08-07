@@ -38,5 +38,5 @@ user_pro: lib_comp
 	@cd user_program; make
 
 lib_comp:
-	@cd user_program; make lib_comp
+	@cd user_program; make syscall
 

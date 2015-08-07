@@ -36,7 +36,7 @@ readkey(void) {
 	uint32_t code = in_byte(0x60);
 	in_byte(0x61);
     unlock();
-	if (code >= 128) {
+	if (code >= 128) {// the key is released
 		code -= 128;
 		switch (code) {
 			case K_LSHFT: shft --; break;
@@ -45,14 +45,14 @@ readkey(void) {
 			case K_ALT: alt --; break;
 			case K_CAPS: caps &= 1; break;
 		}
-	} else {
+	} else {// the key is pressed
 		int c = keychar[0][code];
-		if (c >= 'a' && c <= 'z') {
+		if (c >= 'a' && c <= 'z') {// is lower case character
 			c = keychar[(shft & 1) ^ (caps & 1)][code];
 		} else {
 			c = keychar[shft & 1][code];
 		}
-		if (c != 0) {
+		if (c != 0) {// not the following cases
 			consl_accept(current_consl, c);
 		}
 		switch (code) {

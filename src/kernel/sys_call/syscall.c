@@ -15,6 +15,10 @@ syscall(int id, ...) {
 }
 */
 
+/**
+   NOTICE:
+   if the parameters contains address, may be you need physical address
+ */
 void do_syscall(TrapFrame *tf) {
 	int id = tf->eax; // system call id
     Msg m;
@@ -85,6 +89,10 @@ void do_syscall(TrapFrame *tf) {
                 kprintf((const char *)tf->ebx, (void **)tf->ecx);
                 break;
             case SYS_read_line:
+                dev_read("tty4",
+                    current->pid,
+                    get_pa(&current->pdir, tf->ebx),
+                    0, tf->ecx);
                 assert(0);
                 break;
             case SYS_wait:

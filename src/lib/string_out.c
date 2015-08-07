@@ -1,4 +1,5 @@
 
+
 /**
    - This function is thread-safe
    - no invalid character check
@@ -19,12 +20,22 @@ int to_int(char *str) {
    - Usage: @see strtok();
  */
 void split(char *str, char delimiter, char **saveptr) {
-    char c = 0;
+    // skip heading delimiter
+    while (*str != '\0' && *str == delimiter) {
+        str++;
+    }
+    if (*str == '\0') {
+        return;
+    }
+
+    // save the first part
+    *saveptr ++ = str;
+    char last_c = 0;
     while(*str != '\0') {
-        if (*str == delimiter && c != delimiter) {
-            *saveptr = str;
+        if (*str != delimiter && last_c == delimiter) {
+            *saveptr ++ = str;
         }
-        c = *str;
+        last_c = *str;
         str++;
     }
 }

@@ -48,15 +48,15 @@ Jul 8 2015 update:
 
 ## Thread and it's pid:  
 ANY -- -1 used by server like FM, MM, PM  
-idle -- 0  
-Timer -- 1  
-TTY -- 2  
-getty -- 3-6  
-IDE -- 7  
-RAMDISK -- 8  
-FM -- 9  
-PM -- 10  
-MM -- 11  
+idle -- 0  -- running when no other thread ready  
+Timer -- 1  -- deal with time-related system call and interrupt  
+TTY -- 2  -- deal with keyboard input and screen  
+getty -- 3-6  -- change input to upper case  
+IDE -- 7  -- about hard disk  
+RAMDISK -- 8  -- disk in RAM  
+FM -- 9  -- deal with file related system call  
+PM -- 10  -- deal with process related system call  
+MM -- 11  -- deal with memory management  
 user process invoker -- 12  
 first user process -- 13  
 

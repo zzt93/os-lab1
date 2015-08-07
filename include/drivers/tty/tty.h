@@ -46,4 +46,6 @@ void readkey(void);
 void update_banner(void);
 void read_request(Msg *m);
 
+extern char * const user_name;
+
 #endif

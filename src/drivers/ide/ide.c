@@ -5,7 +5,7 @@
 #include "drivers/hal.h"
 #include "ide.h"
 #include "drivers/time.h"
-#include "lib/kcpy.h"
+#include "lib/string.h"
 
 #define WRITEBACK_TIME  1  /* writeback cache for every 1 second */
 
@@ -56,7 +56,8 @@ ide_driver_thread(void) {
 			uint8_t data;
 			for (i = 0; i < m.len; i ++) {
 				data = read_byte(m.offset + i);
-				copy_from_kernel(fetch_pcb(m.req_pid), m.buf + i, &data, 1);
+				//copy_from_kernel(fetch_pcb(m.req_pid), m.buf + i, &data, 1);
+                memcpy(m.buf + i, &data, 1);
 			}
 			m.ret = i;
 			m.dest = m.src;
@@ -66,7 +67,8 @@ ide_driver_thread(void) {
 			uint32_t i;
 			uint8_t data;
 			for (i = 0; i < m.len; i ++) {
-				copy_to_kernel(fetch_pcb(m.req_pid), &data, m.buf + i, 1);
+                memcpy(&data, m.buf + i, 1);
+				//copy_to_kernel(fetch_pcb(m.req_pid), &data, m.buf + i, 1);
 				write_byte(m.offset + i, data);
 			}
 			m.ret = i;

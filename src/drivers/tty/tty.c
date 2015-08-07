@@ -39,6 +39,8 @@ ttyd(void) {
         //printk("position1\n");
         INTR;
 		if (m.src == MSG_HARD_INTR) {
+            // means it is hardware interrupt
+            // keyboard input or timer
 			switch (m.type) {
 				case MSG_TTY_GETKEY:
                     INTR;
@@ -60,12 +62,12 @@ ttyd(void) {
 					break;
 				case DEV_WRITE:
 					if (m.dev_id >= 0 && m.dev_id < NR_TTY) {
-						char c;
+						//char c;
 						int i;
                         // copy from the message buffer one by one
 						for (i = 0; i < m.len; i ++) {
-							copy_to_kernel(fetch_pcb(m.req_pid), &c, (char*)m.buf + i, 1);
-							consl_writec(&ttys[m.dev_id], c);
+							//copy_to_kernel(fetch_pcb(m.req_pid), &c, (char*)m.buf + i, 1);
+							consl_writec(&ttys[m.dev_id], *((char *)m.buf + i));
 						}
 						consl_sync(&ttys[m.dev_id]);
 					}

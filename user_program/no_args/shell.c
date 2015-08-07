@@ -1,8 +1,9 @@
 #include "kernel/syscall.h"
 #include "sys_call/io/io.h"
-#include "libu/string.h"
+#include "lib/string.h"
 
-#define BUF_SZ 512
+
+#define BUF_SZ 256
 
 
 int entry() {
@@ -11,7 +12,8 @@ int entry() {
     int filename = -1;
     int pid;
     while(1) {
-        read_line(cmd);
+        memset(cmd, 0, BUF_SZ);
+        read_line(cmd, BUF_SZ);
         split(cmd, ' ', save);
         filename = to_int(save[0]);
         if((pid = fork()) == 0) {
@@ -20,6 +22,6 @@ int entry() {
         else {
             waitpid(pid);
         }
-        return 0;
     }
+    return 0;
 }

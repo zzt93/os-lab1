@@ -8,26 +8,25 @@ static int tty_idx = 1;
 
 static void
 getty(void) {
-	char name[] = "tty0", buf[256];
+    int capacity = 256;
+	char name[] = "tty0", buf[capacity];
 	lock();
 	name[3] += (tty_idx ++);
 	unlock();
 
-    int gap = 1;
-    int offset = 0;
+    int len = 0;
 	while(1) {
 		/* Insert code here to do these:
 		 * 1. read key input from ttyd to buf (use dev_read())
 		 * 2. convert all small letters in buf into capitcal letters
 		 * 3. write the result on screen (use dev_write())
         */
-        dev_read(name, current->pid, buf, offset, gap);
+        len = dev_read(name, current->pid, buf, 0, capacity);
         int i;
-        for (i = 0; i < gap; i++) {
+        for (i = 0; i < len; i++) {
             buf[i] = to_upper(buf[i]);
         }
-        dev_write(name, current->pid, buf, offset, gap);
-        offset += gap;
+        dev_write(name, current->pid, buf, 0, len);
 	}
 }
 

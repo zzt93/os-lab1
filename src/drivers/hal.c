@@ -86,7 +86,7 @@ dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset,
        want to read or write at the same time, they may influence
        others' message.
        Using a local variable is safe here for the stack won't
-       disappear util we receive a message back.
+       disappear until we receive a message back.
      */
 	Msg m;
 	m.src = current->pid;
@@ -104,11 +104,21 @@ dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset,
 	return m.ret;
 }
 
+/**
+   `reqst_pid` read from device called `aim`,
+   `offset` place into `buf`(which has `len` bytes )
+   offset -- here is the position in a line for getty
+ */
 size_t
-dev_read(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
-	return dev_rw(aim, DEV_READ, reqst_pid, buf, offset, len);
+dev_read(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t capacity) {
+	return dev_rw(aim, DEV_READ, reqst_pid, buf, offset, capacity);
 }
 
+/**
+   `reqst_pid` write `len` bytes to device called `aim` from `buf`
+   offset -- meanless for getty/TTY, for console itself know where
+   to write
+ */
 size_t
 dev_write(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
 	return dev_rw(aim, DEV_WRITE, reqst_pid, buf, offset, len);

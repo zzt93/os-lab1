@@ -2,7 +2,7 @@
 
 int entry();
 
-void __start() {
+void _start2() {
     entry();
     exit();
 }

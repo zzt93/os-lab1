@@ -37,6 +37,5 @@ int getpid();
 int waitpid(int wait);
 int wait(int time);
 
-void read_line(char *s);
 
 #endif /* __SYSCALL_H__ */

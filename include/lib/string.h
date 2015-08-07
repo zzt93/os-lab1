@@ -15,4 +15,8 @@ char to_upper(char);
 
 void print_str(void (*printer)(char), char *);
 
+int to_int(char *);
+void split(char *s, char delimiter, char **save);
+
+
 #endif
