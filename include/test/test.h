@@ -12,6 +12,8 @@ void test_map();
 void test_bit_map();
 void test_heap();
 
+void test_string();
+
 void test_page_alloc();
 
 // implemented in util.c

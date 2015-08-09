@@ -33,7 +33,9 @@ char *itoa(int a) {
 	return p;
 }
 
-//TODO test
+/**
+   return: the width of this int
+ */
 int itoa_s(int a, char *s, int limit) {
     int wid = 0;
     if (a < 0) {
@@ -56,13 +58,6 @@ int itoh_s(int a, char *s, int limit) {
     return -1;
 }
 
-void memcpy(void *dest, const void *src, size_t size) {
-	asm volatile ("cld; rep movsb" : : "c"(size), "S"(src), "D"(dest));
-}
-
-void memset(void *dest, uint8_t data, size_t size) {
-	asm volatile ("cld; rep stosb" : : "c"(size), "a"(data), "D"(dest));
-}
 
 /**
    @NOTICE: Not include null character '\0'

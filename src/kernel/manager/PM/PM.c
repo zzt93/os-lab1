@@ -45,10 +45,10 @@ static void PM_job() {
             {
                 PCB *p = create_process(&m);
                 if (p == NULL) {
-                    m.ret = 0;
+                    m.ret = FAIL;
                 } else {
                     add2wake(p);
-                    m.ret = 1;
+                    m.ret = SUCC;
                 }
                 break;
             }
@@ -139,7 +139,7 @@ PCB *create_process(Msg* m) {
     // must using physical address for cr3 should only store pa
     PDE* pdir = pdir_alloc();
     assert( ((int)pdir&0xfff) == 0);
-    /* read 512 bytes starting from offset 0 from file "0" into buf */
+    /* read 512 bytes starting from offset 0 from file "name" into buf */
 	/* it contains the ELF header and program header table */
     init_msg(m,
         current->pid,
@@ -147,6 +147,9 @@ PCB *create_process(Msg* m) {
         INVALID_ID, name, buf, 0, B_SIZE);
 	send(FM, m);
     receive(FM, m);
+    if (m->ret == FAIL) {
+        return NULL;
+    }
 
     struct ELFHeader *elf = (struct ELFHeader*)buf;
     struct ProgramHeader *ph_table, *end_ph;

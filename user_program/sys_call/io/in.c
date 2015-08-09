@@ -1,5 +1,5 @@
 #include "kernel/syscall.h"
 
-void read_line(char *str, int capacity) {
-    syscall(SYS_read_line, str, capacity);
+int read_line(char *str, int capacity) {
+    return syscall(SYS_read_line, str, capacity);
 }

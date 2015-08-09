@@ -34,5 +34,7 @@ void init_msg(
     pid_t r, int d, void *b, off_t o, size_t l);
 
 #define INVALID_ID -1
+#define FAIL 0
+#define SUCC 1
 
 #endif /* __MESSAGE_H__ */

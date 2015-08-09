@@ -2,7 +2,6 @@
 #include "drivers/tty/tty.h"
 #include "drivers/tty/tty4_p.h"
 
-#include "kernel/semaphore.h"
 #include "kernel/process.h"
 
 static char name[] = "tty4";

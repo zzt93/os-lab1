@@ -255,6 +255,9 @@ PCB * kexec(Msg *m) {
     free_process(aim);
     // create a new one
     PCB *new = create_process(m);
+    if (new == NULL) {
+        return NULL;
+    }
     // prepare args on the stack
     // push args *
     memcpy(user_stack_pa(new, USER_STACK_BASE - len), args, len);

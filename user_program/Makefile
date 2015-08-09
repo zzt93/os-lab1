@@ -1,6 +1,6 @@
 # **** GNU make manual: http://www.gnu.org/software/make/manual/make.html ****
 
-CFLAGS  = -m32 -static -ggdb -MD -Wall -Werror -I../../include -I../ -O0 \
+CFLAGS  = -m32 -static -ggdb -MD -Wall -Werror -I../include -O0 \
 		 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer -fno-align-functions -Wno-main
 
 CFILES  = $(shell find ./ -maxdepth 1 -name "*.c")
@@ -8,12 +8,13 @@ SFILES  = $(shell find ./ -maxdepth 1 -name "*.S")
 OBJS    = $(CFILES:.c=.o) $(SFILES:.S=.o)
 
 
-user: syscall, start
+
+user: systemcall start
 	@cd args; make
 	@cd no_args; make
 
 
-syscall:
+systemcall:
 	@cd sys_call; make
 
 start:$(OBJS)

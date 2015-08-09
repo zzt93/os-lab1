@@ -5,7 +5,8 @@
 #include "drivers/tty/term.h"
 #include "drivers/time.h"
 #include "drivers/hal.h"
-#include "lib/kcpy.h"
+
+#include "kernel/manager/MM_util.h"
 
 Console ttys[NR_TTY];
 Console *current_consl;
@@ -169,13 +170,14 @@ backsp(Console *c) {
 static size_t
 get_cooked(Console *c, pid_t pid, char *buf, int count) {
     assert(c->f != c->r);
+    char *aim = get_pa(&fetch_pcb(pid)->pdir, (uint32_t)buf);
     int nread = 0;
     while (count --) {
         if (c->cbuf[c->f] == 0) {// out of range of cooked buffer
             //c->f = (c->f + 1) % CBUF_SZ;
             break;
         }
-        copy_from_kernel(fetch_pcb(pid), buf ++, c->cbuf + c->f, 1);
+        memcpy(aim ++, c->cbuf + c->f, 1);
         nread ++;
         c->f = (c->f + 1) % CBUF_SZ;
     }
@@ -211,6 +213,13 @@ static void put_user_name(Console *c) {
         str++;
     }
 }
+
+int put_prompt() {
+    put_user_name(ttys + NR_TTY - 1);
+    return 1;
+}
+
+
 /**
    to emulate the behavior of pressing [enter]
    :update the index of to be handled character in
@@ -237,7 +246,7 @@ cook(Console *c) {
         c->rtop --;
         read_request(&c->rstk[c->rtop]);
     }
-    put_user_name(c);
+    //put_user_name(c);
 }
 
 void
@@ -329,7 +338,7 @@ init_consl(int tty_index) {
     }
     c->i = c->r = c->f = 0;
     c->rtop = 0;
-    put_user_name(c);
+    //put_user_name(c);
     consl_sync(c);
 }
 

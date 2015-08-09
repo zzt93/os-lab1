@@ -4,12 +4,12 @@ CC      = gcc
 LD      = ld
 CFLAGS  = -m32 -static -ggdb -MD -Wall -Werror -I../../include -I../ -O0 \
 		 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer -fno-align-functions -Wno-main
-LDFLAGS = -melf_i386 -e _start
+LDFLAGS = -melf_i386 -e main
 
 CFILES  = $(shell find ./ -maxdepth 1 -name "*.c")
 SFILES  = $(shell find ./ -maxdepth 1 -name "*.S")
-SYS		= $(shell find ../sys_call/ -name "*.o")
-LIB     = ../../src/lib/string_out.o ../start.o
+SYS		= #$(shell find ../sys_call/ -name "*.o")
+LIB     = #../../src/lib/string_out.o ../start.o
 OBJS    = $(CFILES:.c=.out) $(SFILES:.S=.out)
 ARRAYS  = $(OBJS:.out=.ar)
 

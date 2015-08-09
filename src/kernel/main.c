@@ -141,4 +141,5 @@ welcome(void) {
     test_heap();
     test_random();
     */
+    test_string();
 }

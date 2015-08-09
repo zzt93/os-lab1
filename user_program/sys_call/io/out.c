@@ -8,3 +8,7 @@ int printf(const char *format, ...) {
     void **args = (void **)&format + 1;
     return syscall(SYS_printf, format, args);
 }
+
+int prompt() {
+    return syscall(SYS_prompt);
+}

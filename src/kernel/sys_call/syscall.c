@@ -5,6 +5,8 @@
 
 #include "drivers/hal.h"
 
+int put_prompt();// in console.c
+
 /*
 int __attribute__((__noinline__))
 syscall(int id, ...) {
@@ -17,7 +19,7 @@ syscall(int id, ...) {
 
 /**
    NOTICE:
-   if the parameters contains address, may be you need physical address
+   if the parameters contains address, may be you need physical address -- but not  convert it now, convert it after read message
  */
 void do_syscall(TrapFrame *tf) {
 	int id = tf->eax; // system call id
@@ -89,11 +91,11 @@ void do_syscall(TrapFrame *tf) {
                 kprintf((const char *)tf->ebx, (void **)tf->ecx);
                 break;
             case SYS_read_line:
-                dev_read("tty4",
+                // TODO using variable to replace "tty4"
+                tf->eax = dev_read("tty4",
                     current->pid,
-                    get_pa(&current->pdir, tf->ebx),
+                    (void *)tf->ebx,
                     0, tf->ecx);
-                assert(0);
                 break;
             case SYS_wait:
                 m.type = NEW_TIMER;
@@ -101,6 +103,9 @@ void do_syscall(TrapFrame *tf) {
                 m.i[1] = current->pid;
                 send(TIMER, &m);
                 receive(TIMER, &m);
+                break;
+            case SYS_prompt:
+                tf->eax = put_prompt();
                 break;
             case SLEEP:
                 break;

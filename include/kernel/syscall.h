@@ -20,11 +20,16 @@ enum {
     SYS_waitpid,
     // Miscellaneous
     MIS,
-    // user test
+    // print in serial terminal
     SYS_print_serial,
+    // printf in the screen
     SYS_printf,
+    // read line from tty4 -- last tty
     SYS_read_line,
+    // wait in seconds now
     SYS_wait,
+    // put prompt -- user name/ prompt
+    SYS_prompt,
     // for int 0x80 in sleep method
     // @see ./src/kernel/process/schedule.c
     SLEEP,
@@ -37,5 +42,6 @@ int getpid();
 int waitpid(int wait);
 int wait(int time);
 
+int prompt();
 
 #endif /* __SYSCALL_H__ */

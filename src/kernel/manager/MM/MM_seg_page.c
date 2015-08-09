@@ -35,6 +35,7 @@ int init_va(Msg* m) {
 	uint32_t pdir_idx, ptable_idx;
     //pdir_idx = off >> 22;
     //ptable_idx = (off >> 12) & 0x3ff;
+    // TODO @see seg_free to simplify this loop
     for (; off < m->offset + m->len; off++) {
         pdir_idx = off >> 22;
         ptable_idx = (off >> 12) & 0x3ff;
