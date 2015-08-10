@@ -83,11 +83,12 @@ printk(const char *ctl, ...) {
     //unlock();
 }
 
-void tty4_printc(char);
+#include "drivers/tty/tty4.h"
 
 void kprintf(const char *format, void **args) {
     lock();
     vfprintf(tty4_printc, format, args);
+    flush();
     unlock();
 }
 

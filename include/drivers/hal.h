@@ -4,8 +4,11 @@
 #include "common.h"
 #include "adt/list.h"
 
-#define DEV_READ 1
-#define DEV_WRITE 2
+enum {
+    DEV_READ,
+    DEV_WRITE,
+    PROMPT,
+};
 
 #define MSG_HARD_INTR -2
 
@@ -31,7 +34,6 @@ extern const char* hda ;// pid
 extern const char* tty1;// pid -- TTY main thread
 extern const char* tty2;// pid -- TTY main thread
 extern const char* tty3;// pid -- TTY main thread
-extern const char* tty4;// pid -- TTY main thread
 extern const char* timer;
 extern const char* ram;
 

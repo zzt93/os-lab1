@@ -2,6 +2,7 @@
 #include "kernel/message.h"
 #include "drivers/hal.h"
 #include "drivers/tty/tty.h"
+#include "drivers/tty/tty4.h"
 #include "lib/kcpy.h"
 
 pid_t TTY;
@@ -56,6 +57,7 @@ ttyd(void) {
 			}
 		} else {
             INTR;
+            pid_t dest = m.src;
 			switch(m.type) {
 				case DEV_READ:
 					read_request(&m);
@@ -75,11 +77,15 @@ ttyd(void) {
 						assert(0);
 					}
 					m.ret = m.len;
-					pid_t dest = m.src;
 					m.src = current->pid;
                     // make the sender know it's done
 					send(dest, &m);
 					break;
+                case PROMPT:
+					m.src = current->pid;
+                    m.ret = put_prompt(terminal);
+                    send(dest, &m);
+                    break;
 				default:
                     printk("type %d", m.type);
                     assert(0);

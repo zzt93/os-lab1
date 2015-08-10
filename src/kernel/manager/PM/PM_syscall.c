@@ -11,6 +11,8 @@ static void s_copy(PCB* src, PCB* dest) {
     assert(src->type == USER);
     dest->pid = new_id();
     assert(dest->pid > src->pid);
+    memcpy(dest->fd_table, src->fd_table, sizeof(FDE * PROCESS_MAX_FD));
+    // TODO update system file table
 }
 
 /**
@@ -242,7 +244,7 @@ int save_args(Msg *m, char *buf) {
 
 /**
    In my current implementation, pid is not necessarily the
-   same
+   same -- TODO add lock if necessary
  */
 PCB * kexec(Msg *m) {
     char args[BUF_SZ] = {0};
@@ -250,7 +252,8 @@ PCB * kexec(Msg *m) {
     // save arguments
     size_t len = save_args(m, args);
     // save the resources to inherit: pid, file descriptor
-    // file descriptor
+    FDE tmp[PROCESS_MAX_FD];
+    memcpy(tmp, aim->fd_table, sizeof(FDE * PROCESS_MAX_FD));
     // free process
     free_process(aim);
     // create a new one
@@ -258,6 +261,7 @@ PCB * kexec(Msg *m) {
     if (new == NULL) {
         return NULL;
     }
+    memcpy(new->fd_table, tmp, sizeof(FDE * PROCESS_MAX_FD));
     // prepare args on the stack
     // push args *
     memcpy(user_stack_pa(new, USER_STACK_BASE - len), args, len);
@@ -291,8 +295,14 @@ int kexit(Msg *m) {
  */
 void kwaitpid(Msg *m) {
     PCB *aim = fetch_pcb(m->i[0]);
+    if (aim == NULL) {
+        m->src = current->pid;
+        m->ret = FAIL;
+        send(((PCB *)m->buf)->pid, m);
+        return;
+    }
     Waiting *w = kmalloc(sizeof(Waiting));
     init_wait(w, m->buf);
-    // let m->buf waiting on the aim
+    // let m->buf, ie user process waiting on the aim
     list_add_after(&aim->waitpid, &w->link);
 }

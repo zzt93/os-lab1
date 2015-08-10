@@ -78,6 +78,8 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type) {
     list_init(&(pcb->vir_mem));
     // initialize wait pid list
     list_init(&pcb->waitpid);
+    // initialize fd table
+    memset(pcb->fd_table, 0, sizeof(FDE * PROCESS_MAX_FD));
 }
 
 PCB*

@@ -11,7 +11,12 @@
 Console ttys[NR_TTY];
 Console *current_consl;
 
-static const char *ttynames[NR_TTY] = {"tty1", "tty2", "tty3", "tty4"};
+
+static const char *ttynames[NR_TTY] = {"tty1", "tty2", "tty3", TTY4};
+
+// for tty4
+Console *terminal = ttys + NR_TTY - 1;
+extern char * user_name;
 
 // real memory of screen
 // memory-mapped screen
@@ -21,7 +26,6 @@ static uint16_t vbuf[NR_TTY][SCR_W * SCR_H * 2];
 
 char banner[SCR_W + 1];
 
-char * const user_name = "zzt@os_lab: ";
 
 const char*
 get_current_tty(void) {
@@ -206,17 +210,13 @@ read_request(Msg *m) {
     }
 }
 
-static void put_user_name(Console *c) {
+int put_prompt(Console *c) {
     char *str = user_name;
     while(*str != '\0') {
         consl_writec(c, *str);
         str++;
     }
-}
-
-int put_prompt() {
-    put_user_name(ttys + NR_TTY - 1);
-    return 1;
+    return str - user_name;
 }
 
 

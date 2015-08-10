@@ -17,6 +17,10 @@ typedef enum {
     KERNEL, USER,
 } Thread_t;
 
+#include "manager/fd.h"
+
+#define PROCESS_MAX_FD 8
+
 /*
   for the stack is grow to small address,
   the first item on the stack, should be the
@@ -25,6 +29,12 @@ typedef enum {
   在asm_do_irq中, 代码将会把A的通用寄存器保存到A的堆栈上,
   这些寄存器的内容连同之前保存的#irq和
   硬件保存的EFLAGS, CS, EIP形成了"陷阱帧"(trap frame)的数据结构
+ */
+/**
+   Every time you add a new field in PCB, you have to check the following method:
+   - init_pcb_content
+   - kfork
+   - free_process
  */
 typedef struct {
     /**
@@ -61,6 +71,8 @@ typedef struct {
     ListHead vir_mem;
     // link to waiting process by link
     ListHead waitpid;
+    // file descriptor table
+    FDE fd_table[PROCESS_MAX_FD];
 } PCB;
 
 extern PCB *current;

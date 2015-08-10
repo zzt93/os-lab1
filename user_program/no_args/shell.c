@@ -12,26 +12,29 @@ int entry() {
     int filename = -1;
     int pid, count, res;
     while(1) {
-		prompt();
+        prompt();
         memset(cmd, 0, BUF_SZ);
         read_line(cmd, BUF_SZ);
-		memcpy(copy, cmd, BUF_SZ);
+        memcpy(copy, cmd, BUF_SZ);
         count = split(copy, ' ', save);
-		if (count <= 1) {
-			printf("Unknown command: %s", cmd);
-			continue;
-		}
+        if (count <= 1) {
+            printf("Unknown command: %s\n", cmd);
+            continue;
+        }
         filename = to_int(save[0]);
-		// TODO check file existence and whether it is executable -- many be checked by exec
+        // TODO check file existence and whether it is executable -- many be checked by exec
         if((pid = fork()) == 0) {
-            res = exec(filename, save[1] - copy + cmd);
-			if (res == 0) {
-				printf("Unknown command or wrong args: %s", cmd);
-				continue;
-			}	
+			// no thread will receive the response of exec, so it failure should be known by waitpid
+            exec(filename, save[1] - copy + cmd);
         }
         else {
-            waitpid(pid);
+			// if exec fail, waitpid will fail
+            res = waitpid(pid);
+            if (res == 0) {
+                printf("Unknown command or wrong args: %s\n", cmd);
+                continue;
+            }
+
         }
     }
     return 0;

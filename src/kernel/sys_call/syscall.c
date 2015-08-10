@@ -4,8 +4,8 @@
 #include "kernel/process.h"
 
 #include "drivers/hal.h"
+#include "drivers/tty/tty4.h"
 
-int put_prompt();// in console.c
 
 /*
 int __attribute__((__noinline__))
@@ -19,7 +19,7 @@ syscall(int id, ...) {
 
 /**
    NOTICE:
-   if the parameters contains address, may be you need physical address -- but not  convert it now, convert it after read message
+   if the parameters contains address, may be you need physical address -- but not  convert it now, convert it after receiving message
  */
 void do_syscall(TrapFrame *tf) {
 	int id = tf->eax; // system call id
@@ -29,19 +29,50 @@ void do_syscall(TrapFrame *tf) {
 
     if (id < FM_PM) {
         switch (id) {
+            case SYS_open:
+                m.type = FM_open;
+                // file name
+                m.dev_id = tf->ebx;
+                m.buf = current;
+                break;
             case SYS_read:
-                //send(FM, m);
-                //receive(FM, m);
-                //int nread = m.ret;
-                //tf->eax = nread;   // return value is stored in eax
+                // TODO tf->ebx now is fd, but
+                // read_ram() treat it as file name
+                // tf->ebx -- fd
+                // tf->ecx -- buffer
+                // tf->edx -- len
+                init_msg(&m,
+                    current->pid,
+                    FM_read,
+                    INVALID_ID, tf->ebx, tf->ecx, 0, tf->edx);
                 break;
             case SYS_write:
-                //tf->eax = nwrite;
+                // tf->ebx -- fd
+                // tf->ecx -- buffer
+                // tf->edx -- len
+                init_msg(&m,
+                    current->pid,
+                    FM_write,
+                    INVALID_ID, tf->ebx, tf->ecx, 0, tf->edx);
+                break;
+            case SYS_close:
+                m.type = FM_close;
+                m.buf = current;
+                m.dev_id = tf->ebx;
+                break;
+            case SYS_lseek:
+                break;
+            case SYS_dup:
+                break;
+            case SYS_dup2:
                 break;
             default:
                 printk(RED"no such system call %d "RESET, id);
                 assert(0);
         }
+        send(FM, m);
+        receive(FM, m);
+        tf->eax = m.ret;
     } else if (id < MIS) {
         switch (id) {
             case SYS_fork:
@@ -91,8 +122,7 @@ void do_syscall(TrapFrame *tf) {
                 kprintf((const char *)tf->ebx, (void **)tf->ecx);
                 break;
             case SYS_read_line:
-                // TODO using variable to replace "tty4"
-                tf->eax = dev_read("tty4",
+                tf->eax = dev_read(TTY4,
                     current->pid,
                     (void *)tf->ebx,
                     0, tf->ecx);
@@ -105,7 +135,10 @@ void do_syscall(TrapFrame *tf) {
                 receive(TIMER, &m);
                 break;
             case SYS_prompt:
-                tf->eax = put_prompt();
+                m.type = PROMPT;
+                send(TTY, &m);
+                receive(TTY, &m);
+                tf->eax = m.ret;
                 break;
             case SLEEP:
                 break;

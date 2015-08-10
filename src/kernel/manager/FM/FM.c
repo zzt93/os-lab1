@@ -6,7 +6,7 @@ int FM;
 
 /**
    The message sent to FM should specify:
-   m->type -- FM_READ
+   m->type -- FM_read
         m->buf
         m->dev_id -- file name
         m->offset
@@ -19,14 +19,23 @@ static void FM_job() {
 
     while (true) {
         receive(ANY, &m);
+        pid_t dest = m->src;
         switch(m.type) {
-            case FM_READ:
-                read_file(&m);
+            case FM_read:
+                m.ret = read_file(&m);
+                break;
+            case FM_write:
+                assert(false);
+                break;
+            case FM_open:
+                m.ret = open_file(&m);
                 break;
             default:
                 assert(false);
                 break;
         }
+        m->src = RAM_DISK;
+        send(dest, m);
     }
 }
 

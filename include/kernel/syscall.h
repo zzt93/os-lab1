@@ -8,8 +8,13 @@ int syscall(int, ...);
 void do_syscall(TrapFrame*);
 
 enum {
+    SYS_open,
     SYS_read,
     SYS_write,
+    SYS_lseek,
+    SYS_dup,
+    SYS_dup2,
+    SYS_close,
     // FM and PM delimiter
     FM_PM,
     // process related system call
@@ -35,6 +40,7 @@ enum {
     SLEEP,
 };
 
+// PM related system call
 int fork();
 int exec(int filename, char *args);
 int exit();
@@ -43,5 +49,14 @@ int waitpid(int wait);
 int wait(int time);
 
 int prompt();
+
+// FM related system call
+int open(int filename); // return file descriptor
+int read(int fd, uint8_t *buf, int len);
+int write(int fd, uint8_t *buf, int len);
+int close(int fd);
+int lseek(int fd, int offset, int whence);
+int dup(int oldfd);
+int dup2(int oldfd, int newfd);
 
 #endif /* __SYSCALL_H__ */

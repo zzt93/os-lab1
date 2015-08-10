@@ -5,11 +5,20 @@
 #include "kernel/message.h"
 
 enum {
-    FM_READ,
+    FM_read,
+    FM_write,
+    FM_open,
+    FM_close,
+    FM_dup,
+    FM_dup2,
+    FM_lseek,
 };
 
 void init_FM();
 void read_file(Msg*);
 
 extern int FM;
+
+#include "fd.h"
+
 #endif /* __FM_H__ */

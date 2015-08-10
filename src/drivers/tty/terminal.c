@@ -4,13 +4,14 @@
 
 #include "kernel/process.h"
 
-static char name[] = "tty4";
+char * user_name = "zzt@os_lab: ";
+
 
 static char buf[BUF_SIZE];
 static int len = 0;
 
 
-void terminal() {
+void terminal_job() {
 
     while(1) {
     }
@@ -29,6 +30,6 @@ void flush() {
         return;
     }
     NOINTR;
-    dev_write(name, current->pid, buf, 0, len);
+    dev_write(TTY4, current->pid, buf, 0, len);
     len = 0;
 }
