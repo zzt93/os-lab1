@@ -2,6 +2,8 @@
 #include "kernel/manager/FM.h"
 #include "kernel/message.h"
 
+#include "kernel/manager/fd.h"
+
 int FM;
 
 /**
@@ -19,10 +21,10 @@ static void FM_job() {
 
     while (true) {
         receive(ANY, &m);
-        pid_t dest = m->src;
+        pid_t dest = m.src;
         switch(m.type) {
             case FM_read:
-                m.ret = read_file(&m);
+                read_file(&m);
                 break;
             case FM_write:
                 assert(false);
@@ -30,12 +32,24 @@ static void FM_job() {
             case FM_open:
                 m.ret = open_file(&m);
                 break;
+            case FM_close:
+                m.ret = close_file(&m);
+                break;
+            case FM_dup:
+                m.ret = dup_file(&m);
+                break;
+            case FM_dup2:
+                m.ret = dup2_file(&m);
+                break;
+            case FM_lseek:
+                m.ret = lseek_file(&m);
+                break;
             default:
                 assert(false);
                 break;
         }
-        m->src = RAM_DISK;
-        send(dest, m);
+        m.src = FM;
+        send(dest, &m);
     }
 }
 

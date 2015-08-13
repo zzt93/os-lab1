@@ -44,13 +44,13 @@ bit map
 
 -----------------------------
 
-Jul 8 2015 update:
+Aug 8 2015 update:
 
 ## Thread and it's pid:  
 ANY -- -1 used by server like FM, MM, PM  
 idle -- 0  -- running when no other thread ready  
 Timer -- 1  -- deal with time-related system call and interrupt  
-TTY -- 2  -- deal with keyboard input and screen  
+TTY -- 2  -- deal with keyboard input and screen update  
 getty -- 3-5  -- change input to upper case  
 IDE -- 6  -- about hard disk  
 RAMDISK -- 7  -- disk in RAM  
@@ -59,6 +59,13 @@ PM -- 9  -- deal with process related system call
 MM -- 10  -- deal with memory management  
 user process invoker -- 11  
 first user process -- 12  -- shell program -- bound to tty4, ie read from/write to it  
+
+
+## Drivers and devices:
+- For a single process may take care different devices(eg, TTY -- keyboard and screen)  
+so pid is not able to identify a devices.  
+- In my implementation, devices is uniquely identified by its **name**(or `pid & dev_id`),  
+that is why `dev_read() & dev_write()` using `name` as first argument.  
 
 -----------------
 
@@ -99,6 +106,6 @@ For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %es
 
 ## NOTICE in the future:
 - the adt itself not must to be synchronized, the user choose whether to synchronize.  
-- can add NOINTR to make sure user add synchronizatino
+- can add NOINTR to make sure user add synchronization if necessary  
 
 

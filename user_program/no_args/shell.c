@@ -23,6 +23,7 @@ int entry() {
         }
         filename = to_int(save[0]);
         // TODO check file existence and whether it is executable -- many be checked by exec
+		// TODO add redirect
         if((pid = fork()) == 0) {
 			// no thread will receive the response of exec, so it failure should be known by waitpid
             exec(filename, save[1] - copy + cmd);

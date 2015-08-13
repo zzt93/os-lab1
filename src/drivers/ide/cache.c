@@ -51,6 +51,10 @@ cache_fetch(uint32_t sector) {
 	return ptr;
 }
 
+/**
+   offset is the `address` of content on disk
+   for offset is `uint32_t`, so addressing space is 4GB
+ */
 uint8_t
 read_byte(uint32_t offset) {
 	uint32_t sector = offset >> 9;

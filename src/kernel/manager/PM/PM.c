@@ -74,7 +74,7 @@ static void PM_job() {
                 continue;
             }
             case PM_exit:
-                m.ret = kexit(&m);
+                kexit(&m);
                 // for the thread apply exec is now not exist,
                 // so no need to send back
                 continue;

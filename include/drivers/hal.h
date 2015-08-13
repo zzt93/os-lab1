@@ -31,11 +31,10 @@ void hal_list(void);
 
 // devices' name
 extern const char* hda ;// pid
-extern const char* tty1;// pid -- TTY main thread
-extern const char* tty2;// pid -- TTY main thread
-extern const char* tty3;// pid -- TTY main thread
 extern const char* timer;
 extern const char* ram;
+
+extern int d_tty4;
 
 #include "time.h"
 

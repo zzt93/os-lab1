@@ -12,7 +12,7 @@ typedef          char  int8_t;
 typedef unsigned char  bool;
 
 typedef          int   pid_t;
-typedef          int   size_t;
+typedef          uint32_t   size_t;
 typedef          int   off_t;
 
 #endif

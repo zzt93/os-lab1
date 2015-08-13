@@ -6,4 +6,10 @@
 
 #define NULL         ((void*)0)
 
+typedef enum {
+    SEEK_SET,
+    SEEK_CUR,
+    SEEK_END,
+} File_seek;
+
 #endif

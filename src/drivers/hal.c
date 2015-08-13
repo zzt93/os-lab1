@@ -106,8 +106,9 @@ dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset,
 
 /**
    `reqst_pid` read from device called `aim`,
-   `offset` place into `buf`(which has `len` bytes )
-   offset -- here is the position in a line for getty
+   `offset` place into `buf`(which has `capacity` bytes )
+   offset -- meanless for tty_, for console itself know where
+   to read
  */
 size_t
 dev_read(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t capacity) {
@@ -116,7 +117,7 @@ dev_read(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t capac
 
 /**
    `reqst_pid` write `len` bytes to device called `aim` from `buf`
-   offset -- meanless for getty/TTY, for console itself know where
+   offset -- meanless for tty_, for console itself know where
    to write
  */
 size_t

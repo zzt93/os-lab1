@@ -17,7 +17,7 @@ typedef enum {
     KERNEL, USER,
 } Thread_t;
 
-#include "manager/fd.h"
+#include "kernel/manager/fd.h"
 
 #define PROCESS_MAX_FD 8
 
@@ -72,7 +72,7 @@ typedef struct {
     // link to waiting process by link
     ListHead waitpid;
     // file descriptor table
-    FDE fd_table[PROCESS_MAX_FD];
+    struct file_descriptor_entry fd_table[PROCESS_MAX_FD];
 } PCB;
 
 extern PCB *current;

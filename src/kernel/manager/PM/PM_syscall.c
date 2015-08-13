@@ -4,6 +4,8 @@
 #include "lib/string.h"
 #include "lib/malloc.h"
 
+#include "kernel/manager/fd.h"
+
 static void s_copy(PCB* src, PCB* dest) {
     dest->state = src->state;
     dest->count_of_lock = src->count_of_lock;
@@ -11,8 +13,10 @@ static void s_copy(PCB* src, PCB* dest) {
     assert(src->type == USER);
     dest->pid = new_id();
     assert(dest->pid > src->pid);
-    memcpy(dest->fd_table, src->fd_table, sizeof(FDE * PROCESS_MAX_FD));
-    // TODO update system file table
+    int i;
+    for (i = 0; i < PROCESS_MAX_FD; i++) {
+        assign_fd(dest->fd_table + i, src->fd_table + i);
+    }
 }
 
 /**
@@ -253,7 +257,7 @@ PCB * kexec(Msg *m) {
     size_t len = save_args(m, args);
     // save the resources to inherit: pid, file descriptor
     FDE tmp[PROCESS_MAX_FD];
-    memcpy(tmp, aim->fd_table, sizeof(FDE * PROCESS_MAX_FD));
+    memcpy(tmp, aim->fd_table, sizeof(FDE) * PROCESS_MAX_FD);
     // free process
     free_process(aim);
     // create a new one
@@ -261,7 +265,7 @@ PCB * kexec(Msg *m) {
     if (new == NULL) {
         return NULL;
     }
-    memcpy(new->fd_table, tmp, sizeof(FDE * PROCESS_MAX_FD));
+    memcpy(new->fd_table, tmp, sizeof(FDE) * PROCESS_MAX_FD);
     // prepare args on the stack
     // push args *
     memcpy(user_stack_pa(new, USER_STACK_BASE - len), args, len);
@@ -287,6 +291,11 @@ void notify_wait(PCB *aim) {
 int kexit(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     notify_wait(aim);
+    int i;
+    for (i = 0; i < PROCESS_MAX_FD; i++) {
+        m->dev_id = i;
+        close_file(m);
+    }
     return free_process(aim);
 }
 

@@ -58,13 +58,31 @@ void do_syscall(TrapFrame *tf) {
             case SYS_close:
                 m.type = FM_close;
                 m.buf = current;
+                // dev_id is fd
                 m.dev_id = tf->ebx;
                 break;
             case SYS_lseek:
+                m.type = FM_lseek;
+                // dev_id is fd
+                m.dev_id = tf->ebx;
+                m.offset = tf->ecx;
+                m.buf = current;
+                // len represent whence
+                m.len = tf->edx;
                 break;
             case SYS_dup:
+                m.type = FM_dup;
+                m.buf = current;
+                // here dev_id represent file descriptor
+                m.dev_id = tf->ebx;
                 break;
             case SYS_dup2:
+                m.type = FM_dup2;
+                m.buf = current;
+                // old_fd
+                m.i[0] = tf->ebx;
+                // new_fd in dev_id
+                m.i[1] = tf->ecx;
                 break;
             default:
                 printk(RED"no such system call %d "RESET, id);

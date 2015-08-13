@@ -1,9 +1,11 @@
 #include "kernel/kernel.h"
 #include "lib/malloc.h"
+#include "lib/string.h"
 #include "adt/list.h"
 #include "kernel/semaphore.h"
 
 #include "adt/bit_map.h"
+#include "kernel/manager/fd_ft.h"
 
 #define KER_INIT_LOCK 1
 #define USER_INIT_LOCK 0
@@ -79,7 +81,10 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type) {
     // initialize wait pid list
     list_init(&pcb->waitpid);
     // initialize fd table
-    memset(pcb->fd_table, 0, sizeof(FDE * PROCESS_MAX_FD));
+    memset(pcb->fd_table, 0, sizeof(FDE) * PROCESS_MAX_FD);
+    assign_fte(pcb->fd_table[STDIN_FILENO], stdin);
+    assign_fte(pcb->fd_table[STDOUT_FILENO], stdout);
+    assign_fte(pcb->fd_table[STDERR_FILENO], stderr);
 }
 
 PCB*
