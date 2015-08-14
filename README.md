@@ -64,8 +64,9 @@ first user process -- 12  -- shell program -- bound to tty4, ie read from/write 
 ## Drivers and devices:
 - For a single process may take care different devices(eg, TTY -- keyboard and screen)  
 so pid is not able to identify a devices.  
-- In my implementation, devices is uniquely identified by its **name**(or `pid & dev_id`),  
+- @deprecated In my implementation, devices is uniquely identified by its **name**(or `pid & dev_id`),  
 that is why `dev_read() & dev_write()` using `name` as first argument.  
+- Now, devices can be uniquely identified by its **dev_id**, and avoid using old version of **name**.
 
 -----------------
 

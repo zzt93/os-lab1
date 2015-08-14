@@ -10,7 +10,7 @@ static int do_read(uint8_t *buf, off_t offset, size_t len) {
     assert(buf > 0);
     assert(offset >= 0);
     assert(len >= 0);
-    return dev_read(ram, current->pid, buf, offset, len);
+    return n_dev_read(d_ramdisk, current->pid, buf, offset, len);
     //printk("buf is: %s", buf);
 }
 
@@ -30,8 +30,5 @@ void read_file(Msg* m) {
     } else {
         m->ret = FAIL;
     }
-    pid_t dest = m->src;
-    m->src = current->pid;
-    send(dest, m);
 }
 

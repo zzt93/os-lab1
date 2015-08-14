@@ -15,7 +15,7 @@ void read_MBR() {
      */
     int offset = 0;
     while (true) {
-        dev_read(hda, current->pid, buf, offset, NUM_MBR - offset);
+        n_dev_read(d_ide, current->pid, buf, offset, NUM_MBR - offset);
         int i;
         for (i = 0; i < NUM_MBR - offset; i++) {
             printk("%x ", buf[i]);

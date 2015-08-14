@@ -5,6 +5,10 @@
 #include "kernel/process.h"
 #include "drivers/hal.h"
 
+FTE *stdin;
+FTE *stdout;
+FTE *stderr;
+
 BIT_MAP(MAX_FILE)
 
 static FTE file_table[MAX_FILE];
@@ -49,12 +53,13 @@ FTE * get_fte(PCB *aim, int fd) {
 }
 
 /**
+   TODO init inode bit map; init block bit map
    initialize STD*** in file table
  */
 void init_file_table() {
     iNode node;
     node.size = -1;
-    node.dev_id = d_tty4;
+    node.dev_id = d_ttyi[NOW_TERMINAL];
     memset(node.index, 0, sizeof(uint32_t) * FILE_LINK_NUM);
     node.link_count = 0;
     node.type = NOT_NODE;

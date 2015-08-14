@@ -44,7 +44,7 @@ void do_syscall(TrapFrame *tf) {
                 init_msg(&m,
                     current->pid,
                     FM_read,
-                    INVALID_ID, tf->ebx, tf->ecx, 0, tf->edx);
+                    INVALID_ID, tf->ebx, (void *)tf->ecx, 0, tf->edx);
                 break;
             case SYS_write:
                 // tf->ebx -- fd
@@ -53,7 +53,7 @@ void do_syscall(TrapFrame *tf) {
                 init_msg(&m,
                     current->pid,
                     FM_write,
-                    INVALID_ID, tf->ebx, tf->ecx, 0, tf->edx);
+                    INVALID_ID, tf->ebx, (void *)tf->ecx, 0, tf->edx);
                 break;
             case SYS_close:
                 m.type = FM_close;
@@ -88,8 +88,8 @@ void do_syscall(TrapFrame *tf) {
                 printk(RED"no such system call %d "RESET, id);
                 assert(0);
         }
-        send(FM, m);
-        receive(FM, m);
+        send(FM, &m);
+        receive(FM, &m);
         tf->eax = m.ret;
     } else if (id < MIS) {
         switch (id) {
@@ -140,7 +140,7 @@ void do_syscall(TrapFrame *tf) {
                 kprintf((const char *)tf->ebx, (void **)tf->ecx);
                 break;
             case SYS_read_line:
-                tf->eax = dev_read(TTY4,
+                tf->eax = n_dev_read(d_ttyi[NOW_TERMINAL],
                     current->pid,
                     (void *)tf->ebx,
                     0, tf->ecx);

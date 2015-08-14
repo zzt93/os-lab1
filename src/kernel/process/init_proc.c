@@ -82,9 +82,9 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type) {
     list_init(&pcb->waitpid);
     // initialize fd table
     memset(pcb->fd_table, 0, sizeof(FDE) * PROCESS_MAX_FD);
-    assign_fte(pcb->fd_table[STDIN_FILENO], stdin);
-    assign_fte(pcb->fd_table[STDOUT_FILENO], stdout);
-    assign_fte(pcb->fd_table[STDERR_FILENO], stderr);
+    assign_fte(&pcb->fd_table[STDIN_FILENO], stdin);
+    assign_fte(&pcb->fd_table[STDOUT_FILENO], stdout);
+    assign_fte(&pcb->fd_table[STDERR_FILENO], stderr);
 }
 
 PCB*

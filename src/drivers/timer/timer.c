@@ -11,6 +11,8 @@
 #define FREQ_8253 1193182
 
 pid_t TIMER;
+int d_timer;
+
 static long jiffy = 0;
 static Time rt;
 const char* timer = "timer";
@@ -34,7 +36,7 @@ void init_timer(void) {
 	PCB *p = create_kthread(timer_driver_thread);
 	TIMER = p->pid;
 	add2wake(p);
-	hal_register(timer, TIMER, 0);
+	hal_register(timer, TIMER, &d_timer);
 }
 
 
@@ -45,13 +47,13 @@ timer_driver_thread(void) {
 	while (true) {
 		receive(ANY, &m);
         dest = m.src;
-        m.src = current->pid;
 		switch (m.type) {
             case NEW_TIMER:
                 kwait(&m);
                 continue;
 			default: assert(0);
 		}
+        m.src = current->pid;
         send(dest, &m);
 	}
 }

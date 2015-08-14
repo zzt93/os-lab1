@@ -49,5 +49,11 @@ void read_request(Msg *m);
 int put_prompt(Console *);
 
 #define TTY4 "tty4"
+// the now main output/input terminal index
+// now is last tty
+#define NOW_TERMINAL (NR_TTY-1)
+// device id
+extern int d_ttyi[];
+extern int tty_start;
 
 #endif

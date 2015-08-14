@@ -31,7 +31,9 @@ static inline void make_invalid(FDE *fde) {
 static inline int assign_fd(FDE *f, FDE *s) {
     f->ft_entry = s->ft_entry;
     FTE *aim = (FTE *)s->ft_entry;
-    assert(aim != NULL);
+    if (aim == NULL) {
+        return 0;
+    }
     aim->ref_count ++;
     return 1;
 }

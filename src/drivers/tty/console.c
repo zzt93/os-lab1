@@ -196,15 +196,15 @@ get_cooked(Console *c, pid_t pid, char *buf, int count) {
  */
 void
 read_request(Msg *m) {
-    Console *c = &ttys[m->dev_id];
+    Console *c = &ttys[m->dev_id - tty_start];
     if (c->f == c->r) {
         if (c->rtop == RSTK_SZ) panic("too many read request");
         // just copy the message when no more input in cooked buffer
         memcpy(&c->rstk[c->rtop ++], m, sizeof(Msg));
     } else {// get newly added a line(end with an enter)
+        pid_t dest = m->src;
         int nread = get_cooked(c, m->req_pid, m->buf, m->len);
         m->ret = nread;
-        pid_t dest = m->src;
         m->src = TTY;
         send(dest, m);
     }
@@ -355,6 +355,8 @@ send_updatemsg(void) {
     }
 }
 
+int d_ttyi[NR_TTY];
+int tty_start;
 /**
    init banner on the screen
    init console for each tty_
@@ -368,8 +370,9 @@ void init_console(void) {
         init_consl(i);
         // TTY? it is the device pid, and we send to main TTY thread
         // register the pid of drivers thread
-        hal_register(ttys[i].name, TTY, i);
+        hal_register(ttys[i].name, TTY, d_ttyi + i);
     }
+    tty_start = d_ttyi[0];
     current_consl = ttys;
     // register time change on the screen and cursor of screen handler
     add_irq_handle(0, send_updatemsg);

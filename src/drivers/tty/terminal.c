@@ -30,6 +30,6 @@ void flush() {
         return;
     }
     NOINTR;
-    dev_write(TTY4, current->pid, buf, 0, len);
+    n_dev_write(d_ttyi[NOW_TERMINAL], current->pid, buf, 0, len);
     len = 0;
 }

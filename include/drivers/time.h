@@ -30,4 +30,7 @@ void set_timer(Timer *t, int time, int pid);
 
 int kwait(Msg *m);
 void update_timer();
+
+extern int d_timer;
+
 #endif

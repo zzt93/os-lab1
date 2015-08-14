@@ -19,41 +19,48 @@ void init_hal(void) {
 	list_init(&devices);
 }
 
-static Dev *hal_get(const char *name) {
-	lock();
-	ListHead *it;
-	list_foreach(it, &devices) {
-		Dev *dev = list_entry(it, Dev, list);
-		assert(dev);
-		if (strcmp(dev->name, name) == 0) {
-			unlock();
-			return dev;
-		}
-	}
-	unlock();
-	return NULL;
+static int dev_id_cmp(Dev *d, int id) {
+    return d->dev_id == id;
 }
 
-void hal_get_id(const char *name, pid_t *pid, int *dev_id) {
-	Dev *dev = hal_get(name);
+static Dev *hal_get(int dev_id) {
+    hal_get_(dev_id, dev_id_cmp);
+}
+
+/*
+static int name_cmp(Dev *d, const char *name) {
+    return strcmp(d->name, name) == 0;
+}
+
+static Dev *hal_get_byname(const char *name) {
+    hal_get_(name, name_cmp);
+}
+
+void hal_get_byid(const char *name, pid_t *pid, int dev_id) {
+	Dev *dev = hal_get();
 	assert(dev != NULL);
 	*pid = dev->pid;
 	*dev_id = dev->dev_id;
 }
+*/
 
-void hal_register(const char *name, pid_t driver_pid, int dev_id) {
+static int count_dev = 0;
+void hal_register(const char *name, pid_t driver_pid, int *dev_id) {
 	lock();
 	if (list_empty(&free)) {
 		panic("no room for more device");
 	}
-	if(hal_get(name) != NULL) {
+    /*
+    if(hal_get(name) != NULL) {
 		panic("device \"%s\" is already registered!\n", name);
 	}
+    */
 	Dev *dev = list_entry(free.next, Dev, list);
 	list_del(&dev->list);
 	dev->name = name;
 	dev->pid = driver_pid;
-	dev->dev_id = dev_id;
+    // make sure it is unique
+	dev->dev_id = *dev_id = count_dev ++;
 	list_add_before(&devices, &dev->list);
 	unlock();
 }
@@ -71,11 +78,11 @@ void hal_list(void) {
 }
 
 static size_t
-dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
+dev_rw(Dev *dev, int type, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
     // why need lock it!!! -- for the lock in asm_do_irq will
     // change the value of $eax, $edx
     //lock();
-	Dev *dev = hal_get(dev_name);
+	//Dev *dev = hal_get(dev_id);
     //unlock();
     //printk("%x ", dev);
 	assert(dev != NULL);
@@ -104,23 +111,42 @@ dev_rw(const char *dev_name, int type, pid_t reqst_pid, void *buf, off_t offset,
 	return m.ret;
 }
 
-/**
+/*
    `reqst_pid` read from device called `aim`,
+   `offset` place into `buf`(which has `capacity` bytes )
+   offset -- meanless for tty_, for console itself know where
+   to read
+size_t
+dev_read(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t capacity) {
+	return dev_rw(hal_get_byname(aim), DEV_READ, reqst_pid, buf, offset, capacity);
+}
+
+   `reqst_pid` write `len` bytes to device called `aim` from `buf`
+   offset -- meanless for tty_, for console itself know where
+   to write
+size_t
+dev_write(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
+	return dev_rw(hal_get_byName(aim), DEV_WRITE, reqst_pid, buf, offset, len);
+}
+ */
+
+/**
+   `reqst_pid` read from device dev_id == aim,
    `offset` place into `buf`(which has `capacity` bytes )
    offset -- meanless for tty_, for console itself know where
    to read
  */
 size_t
-dev_read(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t capacity) {
-	return dev_rw(aim, DEV_READ, reqst_pid, buf, offset, capacity);
+n_dev_read(int aim, pid_t reqst_pid, void *buf, off_t offset, size_t capacity) {
+	return dev_rw(hal_get(aim), DEV_READ, reqst_pid, buf, offset, capacity);
 }
 
 /**
-   `reqst_pid` write `len` bytes to device called `aim` from `buf`
+   `reqst_pid` write `len` bytes to device dev_id == `aim` from `buf`
    offset -- meanless for tty_, for console itself know where
    to write
  */
 size_t
-dev_write(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
-	return dev_rw(aim, DEV_WRITE, reqst_pid, buf, offset, len);
+n_dev_write(int aim, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
+	return dev_rw(hal_get(aim), DEV_WRITE, reqst_pid, buf, offset, len);
 }

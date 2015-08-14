@@ -4,14 +4,15 @@
 #include "drivers/tty/tty.h"
 #include "drivers/hal.h"
 
-static int tty_idx = 1;
+static int tty_idx = 0;
 
 static void
 getty(void) {
     int capacity = 256;
-	char name[] = "tty0", buf[capacity];
+	char buf[capacity];
+    int in = 0;
 	lock();
-	name[3] += (tty_idx ++);
+	in = (tty_idx ++);
 	unlock();
 
     int len = 0;
@@ -21,12 +22,12 @@ getty(void) {
 		 * 2. convert all small letters in buf into capitcal letters
 		 * 3. write the result on screen (use dev_write())
         */
-        len = dev_read(name, current->pid, buf, 0, capacity);
+        len = n_dev_read(d_ttyi[in], current->pid, buf, 0, capacity);
         int i;
         for (i = 0; i < len; i++) {
             buf[i] = to_upper(buf[i]);
         }
-        dev_write(name, current->pid, buf, 0, len);
+        n_dev_write(d_ttyi[in], current->pid, buf, 0, len);
 	}
 }
 

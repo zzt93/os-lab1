@@ -5,27 +5,31 @@
 #include "kernel/message.h"
 
 pid_t RAM_DISK;
+int d_ramdisk;
 
 static void ram_disk_job() {
     static Msg m;
 
     while (true) {
         receive(ANY, &m);
+        pid_t dest = m.src;
         switch(m.type) {
             case DEV_READ:
-                read_ram(&m);
+                m.ret = read_ram(&m);
                 break;
             default:
                 assert(false);
                 break;
         }
+        m.src = RAM_DISK;
+        send(dest, &m);
     }
 }
 
 void init_ramdisk() {
     PCB* p = create_kthread(ram_disk_job);
     RAM_DISK = p->pid;
-    hal_register(ram, RAM_DISK, 0);
+    hal_register(ram, RAM_DISK, &d_ramdisk);
     add2wake(p);
     init_ram();
 }
