@@ -11,7 +11,7 @@ typedef enum {
 } Node_e;
 
 typedef struct {
-    // node offset in ramdisk/disk
+    // node offset in ramdisk/disk relative to init_off
     uint32_t node_off;
     // file cursor offset relative to start of file
     int offset;

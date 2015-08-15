@@ -5,6 +5,8 @@
 #include "assert.h"
 
 extern PCB* current;
+// TODO put here temp
+uint32_t init_off;
 
 static int do_read(uint8_t *buf, off_t offset, size_t len) {
     assert(buf > 0);

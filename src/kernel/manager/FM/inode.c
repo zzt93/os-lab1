@@ -1,15 +1,25 @@
 #include "kernel/manager/inode.h"
+#include "drivers/hal.h"
 
-//BIT_MAP()
+#include "adt/bit_map.h"
+
+BIT_MAP(NR_INODE);
 
 /**
    initialize the bit map for inode from ramdisk/disk
+   initialize the inode number from ramdisk/disk
  */
 void init_inode() {
 }
 
 int inode_alloc() {
     // allocate inode
+    int j = first_val(FREE);
+    if (j == INVALID) {
+        return -1;
+    }
+    set_val(j, USED);
+
     // write back to disk
     return 1;
 }

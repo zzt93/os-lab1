@@ -19,6 +19,8 @@ void read_file(Msg*);
 
 extern int FM;
 
+extern uint32_t init_off;
+
 #include "fd.h"
 
 #endif /* __FM_H__ */

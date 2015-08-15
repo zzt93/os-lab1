@@ -92,6 +92,25 @@ The kernel default has **16M** memory
 
 -----------------------
 
+## File system
+- boot and kernel is ahead of file system on the disk, ie file system  
+doesn't take care of kernel which is simplified compared with reality(see following).  
+
+```
+size: sectors
+0        1        A        A+1      A+256+1       A+1+256+1024
+------------------------------------------------------------
+         |        |        |            |           | user 
+   MBR   | kernel | iNode  |   block    |   iNode   | disk
+         |        | bitmap |   bitmap   |           | space
+------------------------------------------------------------
+sizeof(iNode) == 128
+```
+- ie, now inode number is 4096, block number is 2**20
+- operations to file system by `n_dev_read & n_dev_write` will add an offset of that block's start.
+- unit of an offset?
+
+
 ## i386 ISA
 1. push -- first minus 2/4 bytes, then store values, ie the esp always point to old value. If it is `push %esp`, it will save the old value before minus which means push original esp value.  
 For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %esp` pushed the pointer of it.
@@ -108,5 +127,8 @@ For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %es
 ## NOTICE in the future:
 - the adt itself not must to be synchronized, the user choose whether to synchronize.  
 - can add NOINTR to make sure user add synchronization if necessary  
+
+- put the original global variable to parameter can better re-use some data structure.(ListHead)
+- using macro when need different type(Tree<>)
 
 
