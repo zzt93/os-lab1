@@ -5,7 +5,7 @@ Try to learn os by lab
 
 ------------------------------
 
-Aug 2 2015 update:
+Aug 12 2015 update:
 
 ## The functionalities that I have already implemented:
 
@@ -30,6 +30,7 @@ random number
 fork a process  
 exec a command  
 exit a user process  
+waitpid  
 
 
 
@@ -99,16 +100,18 @@ doesn't take care of kernel which is simplified compared with reality(see follow
 ```
 size: sectors
 0        1        A        A+1      A+256+1       A+1+256+1024
-------------------------------------------------------------
-         |        |        |            |           | user 
-   MBR   | kernel | iNode  |   block    |   iNode   | disk
-         |        | bitmap |   bitmap   |           | space
-------------------------------------------------------------
-sizeof(iNode) == 128
+-----------------------------------------------------------------------
+         |        |        |        |            |           | user 
+   MBR   | kernel | super  | iNode  |   block    |   iNode   | disk
+         |        | block  | bitmap |   bitmap   |           | space
+-----------------------------------------------------------------------
+sizeof(iNode) == 128B
 ```
-- ie, now inode number is 4096, block number is 2**20
-- operations to file system by `n_dev_read & n_dev_write` will add an offset of that block's start.
-- unit of an offset?
+- super block contains: inode map start, block map start, inode size, inode start, block size, block start, 
+- ie, now inode number is 2**12, 4096, block number is 2**20
+- operations to file system by `n_dev_read & n_dev_write` will add an offset of that section's start  
+which is invisible for user.
+ 
 
 
 ## i386 ISA
@@ -130,5 +133,6 @@ For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %es
 
 - put the original global variable to parameter can better re-use some data structure.(ListHead)
 - using macro when need different type(Tree<>)
+- using special name convention when implement data structure, eg `_bitmap_array`
 
 

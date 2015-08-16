@@ -54,7 +54,7 @@ FTE * get_fte(PCB *aim, int fd) {
 
 /**
    TODO init inode bit map; init block bit map
-   init by super block(init_off, 1kb/block, start of each region)
+   init by super block(start and size of each region)
    initialize STD*** in file table
  */
 void init_file_table() {

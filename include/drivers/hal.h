@@ -56,4 +56,6 @@ extern int d_ide;
 #include "time.h"
 #include "tty/tty.h"
 
+extern int now_disk;
+
 #endif

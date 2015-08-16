@@ -6,6 +6,7 @@
 
 int FM;
 
+int now_disk = d_ramdisk;
 /**
    The message sent to FM should specify:
    m->type -- FM_read
@@ -57,5 +58,11 @@ void init_FM() {
     PCB* p = create_kthread(FM_job);
     FM = p->pid;
     add2wake(p);
+    init_file_system();
+}
+
+void init_file_system() {
+    init_file_table();
+    load_super_block();
 }
 
