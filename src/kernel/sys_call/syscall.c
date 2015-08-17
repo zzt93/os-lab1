@@ -19,7 +19,10 @@ syscall(int id, ...) {
 
 /**
    NOTICE:
-   if the parameters contains address, may be you need physical address -- but not  convert it now, convert it after receiving message
+   if the parameters contains address, may be you need
+   physical address -- but not convert it now,
+   convert it after receiving message
+   ie, in the target process/server
  */
 void do_syscall(TrapFrame *tf) {
 	int id = tf->eax; // system call id

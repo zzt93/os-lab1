@@ -8,6 +8,11 @@ int syscall(int, ...);
 void do_syscall(TrapFrame*);
 
 enum {
+    SYS_createfile,
+    SYS_makedir,
+    SYS_delfile,
+    SYS_deldir,
+    SYS_listdir,
     SYS_open,
     SYS_read,
     SYS_write,
@@ -58,5 +63,12 @@ int close(int fd);
 int lseek(int fd, int offset, int whence);
 int dup(int oldfd);
 int dup2(int oldfd, int newfd);
+
+// hierachy file system call
+int createfile(const char *name);
+int makedir(const char *name);
+int delfile(const char *name);
+int deldir(const char *name);
+int listdir(const char *name, char *buf);
 
 #endif /* __SYSCALL_H__ */

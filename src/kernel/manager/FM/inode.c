@@ -1,6 +1,7 @@
 #include "kernel/manager/inode.h"
 #include "drivers/hal.h"
 
+#include "kernel/manager/FM.h"
 #include "adt/d_bit_map.h"
 
 D_BIT_MAP();

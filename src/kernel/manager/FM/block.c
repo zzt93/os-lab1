@@ -1,6 +1,7 @@
 #include "kernel/manager/block.h"
-#include "adt/bit_map.h"
+#include "adt/d_bit_map.h"
 #include "drivers/hal.h"
+#include "kernel/manager/FM.h"
 
 D_BIT_MAP()
 
@@ -39,13 +40,15 @@ uint32_t block_alloc() {
     int index = set_val(j, USED);
     // write back to disk
     n_dev_write(now_disk, FM, bits() + index, block_mapi_off(j), 1);
-    return blocki_off(j);
+    return blocki_offset(j);
 }
 
 int block_free(uint32_t offset) {
     int j = offset_blocki(offset);
-    set_val(j, FREE);
+    int index = set_val(j, FREE);
     // write back to disk
     return n_dev_write(now_disk, FM, bits() + index, block_mapi_off(j), 1);
 }
 
+void load_super_block() {
+}

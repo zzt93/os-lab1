@@ -70,6 +70,8 @@ os_init_cont(void) {
 
     NOINTR;
 	welcome();
+    // to initialize shell process, which must later
+    // than init_manager
     init_test_proc();
     /*
     //used to make timer interrupt more frequent

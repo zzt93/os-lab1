@@ -8,5 +8,6 @@
 
 extern const int block_size;
 
+void load_super_block();
 
 #endif /* __BLOCK_H__ */

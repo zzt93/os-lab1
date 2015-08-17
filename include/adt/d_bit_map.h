@@ -24,7 +24,7 @@
 
 #define D_BIT_MAP()                                             \
     static uint32_t *_bitmap_array;                             \
-    static _bitmap_size;                                        \
+    static int _bitmap_size;                                    \
                                                                 \
     static void init_bitmap(int size) {                         \
         assert(size > 0);                                       \

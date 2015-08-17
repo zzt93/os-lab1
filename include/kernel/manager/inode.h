@@ -28,7 +28,7 @@ typedef struct {
     // count of hard link
     int link_count;
     File_e type;
-} iNode __attribute__ ((aligned (128)));
+} iNode __attribute__ ((__aligned__(128)));
 
 
 #endif /* __INODE_H__ */

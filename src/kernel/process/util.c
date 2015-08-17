@@ -4,6 +4,9 @@
 #include "lib/malloc.h"
 #include "kernel/init_proc.h"
 
+#include "kernel/process.h"
+#include "kernel/message.h"
+#include "kernel/manager/PM.h"
 
 /*
   // not correctly implemented now:
@@ -49,6 +52,22 @@ void init_proc() {
 }
 */
 
+/**
+   thread to create first user process -- shell
+ */
+void user_process() {
+    Msg m;
+    init_msg(&m,
+        current->pid,
+        PM_CREATE,
+        0, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
+    send(PM, &m);
+    receive(PM, &m);
+    while (true) {
+        wait_intr();
+    }
+}
+
 void init_driver_test() {
     //add2wake(create_kthread(read_MBR));
     //add2wake(create_kthread(read_FM));
@@ -56,17 +75,6 @@ void init_driver_test() {
 
 void init_test_proc() {
     //init_driver_test();
-    add2wake(create_kthread(user_process));
-}
-
-void init_idle() {
-    current->count_of_lock = 1;
-    current->pdir.val = get_kcr3()->val;
-}
-
-
-void init_proc() {
-    init_idle();
 
     /* test for lock and semaphore
     create_sem(&wake_lock, 1);
@@ -79,6 +87,18 @@ void init_proc() {
     add2wake(create_kthread(D));
     add2wake(create_kthread(E));
     */
+
+    add2wake(create_kthread(user_process));
+}
+
+void init_idle() {
+    current->count_of_lock = 1;
+    current->pdir.val = get_kcr3()->val;
+}
+
+
+void init_proc() {
+    init_idle();
 }
 /*
 */

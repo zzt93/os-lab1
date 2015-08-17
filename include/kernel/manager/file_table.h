@@ -36,4 +36,6 @@ extern FTE *stdin;
 extern FTE *stdout;
 extern FTE *stderr;
 
+void init_file_table();
+
 #endif /* __FILE_TABLE_H__ */

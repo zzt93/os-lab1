@@ -3,10 +3,12 @@
 #include "kernel/message.h"
 
 #include "kernel/manager/fd.h"
+#include "kernel/manager/file_table.h"
+#include "drivers/hal.h"
 
 int FM;
 
-int now_disk = d_ramdisk;
+int now_disk;
 /**
    The message sent to FM should specify:
    m->type -- FM_read
@@ -54,6 +56,16 @@ static void FM_job() {
     }
 }
 
+void load_super_block();
+
+void init_file_system() {
+    now_disk = d_ramdisk;
+    // default system opened file
+    init_file_table();
+    // init each region start and size
+    load_super_block();
+}
+
 void init_FM() {
     PCB* p = create_kthread(FM_job);
     FM = p->pid;
@@ -61,8 +73,4 @@ void init_FM() {
     init_file_system();
 }
 
-void init_file_system() {
-    init_file_table();
-    load_super_block();
-}
 

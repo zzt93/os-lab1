@@ -3,7 +3,7 @@
 
 int entry() {
     while(1) {
-        int filename = 2;
+        int filename = 1;
         char *cmd = "gcc -o2 test.c";
         int pid;
         if( (pid = fork()) == 0) {
