@@ -68,8 +68,12 @@ int next_int(int bound) {
     return val;
 }
 
+/**
+   if it compile failed, random can't be used
+ */
+static test_bits[sizeof 1ll == 8 ? 1 : -1];
+
 void srand(unsigned int seed) {
-    assert(sizeof(long long int) == 8);
     lock();
     rseed = seed;
     unlock();

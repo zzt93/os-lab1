@@ -56,6 +56,7 @@ static void FM_job() {
     }
 }
 
+uint32_t super_start = ;
 void load_super_block();
 
 void init_file_system() {

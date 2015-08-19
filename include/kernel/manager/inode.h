@@ -17,7 +17,7 @@ typedef uint32_t block_t;
 // to allocate an area for bit_map.h
 // #define NR_INODE (1 << 12)
 
-typedef struct {
+struct INODE{
 	//char filename[32];
     // file size
 	size_t size;
@@ -28,7 +28,9 @@ typedef struct {
     // count of hard link
     int link_count;
     File_e type;
-} iNode __attribute__ ((__aligned__(128)));
+} __attribute__ ((__aligned__(128)));
+
+typedef struct INODE iNode;
 
 
 #endif /* __INODE_H__ */

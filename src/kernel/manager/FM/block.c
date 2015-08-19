@@ -18,7 +18,7 @@ static inline uint32_t blocki_offset(int index) {
 
 static inline uint32_t block_mapi_off(int index) {
     return block_map_start +
-        index / BITS;
+        index / sizeof(uint8_t);
 }
 
 static inline int offset_blocki(uint32_t offset) {

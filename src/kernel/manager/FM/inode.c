@@ -10,15 +10,20 @@ const int inode_size = sizeof(iNode);
 uint32_t inode_map_start;
 uint32_t inode_start;
 
+char assert_iNode_size[sizeof(iNode) % 128 == 0 ? 1 : -1];
 
 static inline uint32_t nodei_off(int index) {
     return inode_start +
         index * inode_size;
 }
 
+/**
+   for the offset in harddisk is in unit of
+   bytes, so all the offset have to in bytes
+ */
 static inline uint32_t node_mapi_off(int index) {
     return inode_map_start +
-        index / BITS;
+        index / sizeof(uint8_t);
 }
 
 static inline int off_nodei(uint32_t offset) {
