@@ -61,8 +61,17 @@ static void init_user_tf(TrapFrame* frame, void* fun) {
     frame->eflags = 0x200;// set IF = 1, that is enable interrupt
 }
 
+static void init_fd_table(PCB *pcb, FTE *cwd) {
+    // initialize fd table
+    memset(pcb->fd_table, 0, sizeof(FDE) * PROCESS_MAX_FD);
+    assign_fte(&pcb->fd_table[STDIN_FILENO], stdin);
+    assign_fte(&pcb->fd_table[STDOUT_FILENO], stdout);
+    assign_fte(&pcb->fd_table[STDERR_FILENO], stderr);
+    // set the current working directory
+    set_cwd(pcb, cwd);
+}
 
-static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type) {
+static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
     //NOINTR;
     lock();
     pcb->pid = new_id();
@@ -80,12 +89,9 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type) {
     list_init(&(pcb->vir_mem));
     // initialize wait pid list
     list_init(&pcb->waitpid);
-    // initialize fd table
-    memset(pcb->fd_table, 0, sizeof(FDE) * PROCESS_MAX_FD);
-    assign_fte(&pcb->fd_table[STDIN_FILENO], stdin);
-    assign_fte(&pcb->fd_table[STDOUT_FILENO], stdout);
-    assign_fte(&pcb->fd_table[STDERR_FILENO], stderr);
+    init_fd_table();
 }
+
 
 PCB*
 create_kthread(void *fun) {

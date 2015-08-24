@@ -32,6 +32,7 @@ typedef enum {
  */
 /**
    Every time you add a new field in PCB, you have to check the following method:
+   - init_idle
    - init_pcb_content
    - kfork
    - free_process

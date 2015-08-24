@@ -35,6 +35,7 @@ int free_fte(void *p);
 extern FTE *stdin;
 extern FTE *stdout;
 extern FTE *stderr;
+extern FTE *default_cwd;
 
 void init_file_table();
 

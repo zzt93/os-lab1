@@ -71,7 +71,7 @@ int next_int(int bound) {
 /**
    if it compile failed, random can't be used
  */
-static test_bits[sizeof 1ll == 8 ? 1 : -1];
+char test_randome_bits[sizeof 1ll == 8 ? 1 : -1];
 
 void srand(unsigned int seed) {
     lock();

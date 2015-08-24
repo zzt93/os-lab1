@@ -21,7 +21,8 @@ int new_id();
 void set_esp(PCB *p, uint32_t esp);
 void pid_free();
 
-static inline void set_pdir(PCB* p, uint32_t addr) {
+static inline
+void set_pdir(PCB* p, uint32_t addr) {
     assert((addr&0xfff) == 0);
     p->pdir.val = 0;
     p->pdir.page_directory_base = addr >> 12;
@@ -32,10 +33,16 @@ static inline void set_pdir(PCB* p, uint32_t addr) {
    set the tf store the content of user stack
    for user process running on it
  */
-static inline void set_user_stack(PCB* p, uint32_t ss, uint32_t esp) {
+static inline
+void set_user_stack(PCB* p, uint32_t ss, uint32_t esp) {
     TrapFrame* frame = (TrapFrame*)p->tf;
     frame->ss = ss;
     frame->esp = esp;
+}
+
+static inline
+void set_cwd(PCB *pcb, FDE *fte) {
+    assign_fte(&pcb->fd_table[CWD], fte);
 }
 
 #endif /* __TRAPFRAME_H__ */

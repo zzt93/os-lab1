@@ -4,7 +4,7 @@
 #include "common.h"
 
 typedef enum {
-    NOT_NODE,
+    NO_BLOCK,
     DIR,
     PLAIN,
 } File_e;

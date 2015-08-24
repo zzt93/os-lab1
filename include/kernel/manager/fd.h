@@ -16,6 +16,7 @@ typedef struct file_descriptor_entry {
 #define STDIN_FILENO 0
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
+#define CWD 3
 
 
 static inline int is_invalid_fd(FDE *fde) {

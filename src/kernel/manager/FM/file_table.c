@@ -8,6 +8,7 @@
 FTE *stdin;
 FTE *stdout;
 FTE *stderr;
+FTE *default_cwd;
 
 BIT_MAP(MAX_FILE)
 
@@ -19,7 +20,7 @@ void fill_fte(FTE *fte, iNode *node, uint32_t offset) {
     fte->dev_id = node->dev_id;
     fte->ref_count = 0;
     // TODO pointing an inode means not device?
-    fte->type = node->type == NOT_NODE ? DEV : REG;
+    fte->type = ((node->type == NO_BLOCK) ? DEV : REG);
     fte->filesize = node->size;
 }
 
@@ -63,7 +64,7 @@ void init_file_table() {
     node.dev_id = d_ttyi[NOW_TERMINAL];
     memset(node.index, 0, sizeof(uint32_t) * FILE_LINK_NUM);
     node.link_count = 0;
-    node.type = NOT_NODE;
+    node.type = NO_BLOCK;
     stdin = add_fte(&node, -1);
     stdout = add_fte(&node, -1);
     stderr = add_fte(&node, -1);
