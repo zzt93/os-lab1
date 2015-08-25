@@ -1,5 +1,6 @@
 #include "adt/bit_map.h"
 #include "kernel/manager/fd.h"
+#include "kernel/manager/manager.h"
 
 #include "lib/string.h"
 #include "kernel/process.h"
@@ -68,6 +69,10 @@ void init_file_table() {
     stdin = add_fte(&node, -1);
     stdout = add_fte(&node, -1);
     stderr = add_fte(&node, -1);
+    // set to a directory -- now is root
+    // read it from disk
+    n_dev_read(now_disk, FM, (char *)&node, inode_start, sizeof node);
+    default_cwd = add_fte(&node, inode_start);
 }
 
 int detach_fte(FDE *fd, FTE *fte) {

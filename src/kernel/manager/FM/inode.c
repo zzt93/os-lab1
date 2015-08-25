@@ -9,6 +9,7 @@ D_BIT_MAP();
 const int inode_size = sizeof(iNode);
 uint32_t inode_map_start;
 uint32_t inode_start;
+uint32_t inode_area_size;
 
 char assert_iNode_size[sizeof(iNode) % 128 == 0 ? 1 : -1];
 char assert_enum_size[sizeof(File_e) == 4 ? 1 : -1];
@@ -37,9 +38,13 @@ static inline int off_nodei(uint32_t offset) {
    initialize the bit map for inode from ramdisk/disk
    initialize the inode number from ramdisk/disk
  */
-void init_inode() {
-    uint32_t size = 0;
-    init_bitmap(size);
+void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) {
+    inode_map_start = mstart;
+    init_bitmap(msize);
+    inode_start = start;
+    inode_area_size = size;
+    // copy from harddisk
+    n_dev_read(now_disk, FM, bits(), mstart, msize);
 }
 
 uint32_t inode_alloc() {

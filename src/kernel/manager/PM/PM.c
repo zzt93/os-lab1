@@ -238,6 +238,6 @@ PCB *create_process(Msg* m) {
     //PCB* p = create_kthread(f);
     //set_pdir(p, (uint32_t)pdir);
     //set_user_tf(p, ss, esp);
-    PCB* p = create_user_thread(f, (uint32_t)pdir, ss, esp, &vir_range);
+    PCB* p = create_user_thread(f, (uint32_t)pdir, ss, esp, &vir_range, default_cwd);
     return p;
 }

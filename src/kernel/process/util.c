@@ -94,7 +94,7 @@ void init_test_proc() {
 void init_idle() {
     current->count_of_lock = 1;
     current->pdir.val = get_kcr3()->val;
-    init_fd_table();
+    init_fd_table(current, default_cwd);
 }
 
 

@@ -2,6 +2,7 @@
 #define __TRAPFRAME_H__
 
 #include "kernel/process.h"
+#include "kernel/manager/fd_ft.h"
 
 PCB* create_kthread(void*);
 
@@ -14,8 +15,8 @@ PCB* create_user_thread(
     void *f,
     uint32_t pdir,
     uint32_t ss, uint32_t esp,
-    ListHead *vir
-                        );
+    ListHead *vir,
+    FTE *cwd);
 
 int new_id();
 void set_esp(PCB *p, uint32_t esp);
@@ -41,7 +42,7 @@ void set_user_stack(PCB* p, uint32_t ss, uint32_t esp) {
 }
 
 static inline
-void set_cwd(PCB *pcb, FDE *fte) {
+void set_cwd(PCB *pcb, FTE *fte) {
     assign_fte(&pcb->fd_table[CWD], fte);
 }
 

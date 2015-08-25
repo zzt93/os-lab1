@@ -56,7 +56,6 @@ static void FM_job() {
     }
 }
 
-uint32_t super_start = -1;
 void load_super_block();
 
 void init_file_system() {
@@ -71,7 +70,7 @@ void init_FM() {
     PCB* p = create_kthread(FM_job);
     FM = p->pid;
     add2wake(p);
-    init_file_system();
+    //init_file_system();
 }
 
 

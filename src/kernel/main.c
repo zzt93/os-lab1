@@ -59,19 +59,26 @@ os_init_cont(void) {
     init_kmalloc();
 
     NOINTR;
+    /*
+      init_manager() have to before init_proc()
+      for init_proc() will using the `default_cwd` which is
+      initialized by FM
+     */
+    init_manager();
 	/* Initialize the state of process idle, ie the running
        process for set up right lock num to avoid other
        initialization enable the interrupt and cause problem
     */
+    // TODO init_proc() and init_manager() can replace??
 	init_proc();
 
     init_driver();
-    init_manager();
 
     NOINTR;
 	welcome();
     // to initialize shell process, which must later
-    // than init_manager
+    // than init_manager -- for it will send message to
+    // managers
     init_test_proc();
     /*
     //used to make timer interrupt more frequent

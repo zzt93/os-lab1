@@ -10,4 +10,11 @@ extern const int block_size;
 
 void load_super_block();
 
+#include "common.h"
+
+extern const int block_size;
+extern uint32_t block_map_start;
+extern uint32_t block_start;
+extern uint32_t block_area_size;
+
 #endif /* __BLOCK_H__ */

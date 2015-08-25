@@ -9,6 +9,7 @@ D_BIT_MAP()
 const int block_size = 1 << 10;
 uint32_t block_map_start;
 uint32_t block_start;
+uint32_t block_area_size;
 
 
 static inline uint32_t blocki_offset(int index) {
@@ -27,9 +28,13 @@ static inline int offset_blocki(uint32_t offset) {
     return gap / block_size;
 }
 
-void init_block() {
-    uint32_t size = 0;
-    init_bitmap(size);
+void init_block(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) {
+    block_map_start = mstart;
+    init_bitmap(msize);
+    block_start = start;
+    block_area_size = size;
+    // copy from harddisk
+    n_dev_read(now_disk, FM, bits(), mstart, msize);
 }
 
 uint32_t block_alloc() {
@@ -50,5 +55,17 @@ int block_free(uint32_t offset) {
     return n_dev_write(now_disk, FM, bits() + index, block_mapi_off(j), 1);
 }
 
+
+void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size);
+
+uint32_t super_start = -1;
+#define SUPER_BUF 512
 void load_super_block() {
+    char buf[SUPER_BUF];
+    n_dev_read(now_disk, FM, buf, super_start, SUPER_BUF);
+    // the following may change if we save more info in the super
+    // block
+    uint32_t *b = (uint32_t *)buf;
+    init_inode(b[0], b[1], b[2], b[3]);
+    init_block(b[4], b[5], b[6], b[7]);
 }

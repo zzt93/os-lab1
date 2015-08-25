@@ -32,5 +32,9 @@ struct INODE{
 
 typedef struct INODE iNode;
 
+extern const int inode_size;
+extern uint32_t inode_map_start;
+extern uint32_t inode_start;
+extern uint32_t inode_area_size;
 
 #endif /* __INODE_H__ */

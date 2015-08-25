@@ -89,7 +89,7 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
     list_init(&(pcb->vir_mem));
     // initialize wait pid list
     list_init(&pcb->waitpid);
-    init_fd_table();
+    init_fd_table(pcb, cwd);
 }
 
 
@@ -117,7 +117,7 @@ create_kthread(void *fun) {
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
 
-    init_pcb_content(pcb, get_kcr3()->val, KERNEL);
+    init_pcb_content(pcb, get_kcr3()->val, KERNEL, default_cwd);
     return pcb;
 }
 
@@ -126,7 +126,7 @@ void store_vir(PCB *pcb, ListHead *link) {
     list_del(link);
 }
 
-PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListHead *vir) {
+PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListHead *vir, FTE *cwd) {
     PCB* pcb = kmalloc(PCB_SIZE);
     /**
        trapFrame is always located on the kernel stack
@@ -136,7 +136,7 @@ PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListH
     init_user_tf(frame, f);
     pcb->tf = frame;
 
-    init_pcb_content(pcb, pdir, USER);
+    init_pcb_content(pcb, pdir, USER, cwd);
     store_vir(pcb, vir);
     /**
        in order to switch back to user stack
@@ -148,6 +148,12 @@ PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListH
 
 
 // TODO try finish it
+
+/**
+   NOTICE: when creating a kernel thread which doesn't
+   need stack switch, ie the real trapFrame to be recovered
+   doesn't contain `esp0` and `ss`.
+ */
 PCB* create_kthread_with_args(void* fun, int arg) {
     PCB* pcb = kmalloc(PCB_SIZE);
     // the address which out of boundary
@@ -158,7 +164,7 @@ PCB* create_kthread_with_args(void* fun, int arg) {
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
 
-    init_pcb_content(pcb, get_kcr3()->val, KERNEL);
+    init_pcb_content(pcb, get_kcr3()->val, KERNEL, default_cwd);
     return pcb;
 }
 
