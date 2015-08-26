@@ -46,4 +46,6 @@ void set_cwd(PCB *pcb, FTE *fte) {
     assign_fte(&pcb->fd_table[CWD], fte);
 }
 
+void init_fd_table(PCB *pcb, FTE *cwd);
+
 #endif /* __TRAPFRAME_H__ */

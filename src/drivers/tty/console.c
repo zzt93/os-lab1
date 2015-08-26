@@ -174,7 +174,7 @@ backsp(Console *c) {
 static size_t
 get_cooked(Console *c, pid_t pid, char *buf, int count) {
     assert(c->f != c->r);
-    // TODO move it to dev_rw -- wrong
+    // move it to dev_rw -- move it is wrong
     // convertion have to be in the target process and
     // dev_rw is at source process
     char *aim = get_pa(&fetch_pcb(pid)->pdir, (uint32_t)buf);

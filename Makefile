@@ -27,6 +27,10 @@ kernel: $(OBJS)
 	objdump -D kernel > code.txt	# disassemble result
 	readelf -a kernel > elf.txt		# obtain more information about the executable
 
+harddisk.img: disk.img
+	python3 harddisk/makeimg.py
+	cat harddisk/harddisk disk.img > disk.img
+
 -include $(OBJS:.o=.d)
 
 clean:

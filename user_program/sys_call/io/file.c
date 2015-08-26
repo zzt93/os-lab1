@@ -1,19 +1,19 @@
 #include "kernel/syscall.h"
 
 int createfile(const char *name) {
-    return syscall(SYS_createfile, name);
+    return syscall(SYS_create, name);
 }
 
 int makedir(const char *name) {
-    return syscall(SYS_makedir, name);
+    return syscall(SYS_make, name);
 }
 
 int delfile(const char *name) {
-    return syscall(SYS_delfile, name);
+    return syscall(SYS_del, name);
 }
 
 int deldir(const char *name) {
-    return syscall(SYS_deldir, name);
+    return syscall(SYS_del, name);
 }
 
 int listdir(const char *name, char *buf) {

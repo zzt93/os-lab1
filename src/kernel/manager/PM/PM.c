@@ -219,7 +219,7 @@ PCB *create_process(Msg* m) {
 
     send(MM, m);
     receive(MM, m);
-    // TODO which segment, although all segment are
+    // which segment, although all segment are
     // the same for time being
     uint32_t ss = SELECTOR_USER(SEG_USER_DATA);
     uint32_t esp = (uint32_t)(va + USER_STACK_SIZE);

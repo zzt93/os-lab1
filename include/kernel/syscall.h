@@ -8,18 +8,17 @@ int syscall(int, ...);
 void do_syscall(TrapFrame*);
 
 enum {
-    SYS_createfile,
-    SYS_makedir,
-    SYS_delfile,
-    SYS_deldir,
-    SYS_listdir,
+    SYS_create,
+    SYS_make,
+    SYS_del,
     SYS_open,
     SYS_read,
     SYS_write,
+    SYS_close,
     SYS_lseek,
     SYS_dup,
     SYS_dup2,
-    SYS_close,
+    SYS_lsdir,
     // FM and PM delimiter
     FM_PM,
     // process related system call
@@ -69,6 +68,7 @@ int createfile(const char *name);
 int makedir(const char *name);
 int delfile(const char *name);
 int deldir(const char *name);
+// name(with path)
 int listdir(const char *name, char *buf);
 
 #endif /* __SYSCALL_H__ */

@@ -32,6 +32,21 @@ void do_syscall(TrapFrame *tf) {
 
     if (id < FM_PM) {
         switch (id) {
+            case SYS_create:
+                m.type = FM_create;
+                // name of file
+                m.dev_id = tf->ebx;
+                break;
+            case SYS_make:
+                m.type = FM_make;
+                // name of directory
+                m.dev_id = tf->ebx;
+                brea;
+            case SYS_del:
+                m.type = FM_del;
+                // name of file
+                m.dev_id = tf->ebx;
+                break;
             case SYS_open:
                 m.type = FM_open;
                 // file name
@@ -81,12 +96,19 @@ void do_syscall(TrapFrame *tf) {
                 break;
             case SYS_dup2:
                 m.type = FM_dup2;
-                m.buf = current;
+                m.i[2] = current;
                 // old_fd
                 m.i[0] = tf->ebx;
                 // new_fd in dev_id
                 m.i[1] = tf->ecx;
                 break;
+            case SYS_lsdir:
+                m.type = FM_lsdir;
+                // name(with path)
+                m.dev_id = tf->ebx;
+                m.buf = current;
+                // the target buffer
+                m.req_pid = tf->ecx;
             default:
                 printk(RED"no such system call %d "RESET, id);
                 assert(0);

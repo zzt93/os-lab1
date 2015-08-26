@@ -92,9 +92,9 @@ void init_test_proc() {
 }
 
 void init_idle() {
-    current->count_of_lock = 1;
+    //current->count_of_lock = 1; -- remove to main.c:os_init_cont
     current->pdir.val = get_kcr3()->val;
-    init_fd_table(current, default_cwd);
+    //TODO init_fd_table(current, default_cwd);
 }
 
 

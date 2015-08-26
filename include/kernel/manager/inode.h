@@ -37,4 +37,6 @@ extern uint32_t inode_map_start;
 extern uint32_t inode_start;
 extern uint32_t inode_area_size;
 
+iNode * get_node(char *name);
+
 #endif /* __INODE_H__ */

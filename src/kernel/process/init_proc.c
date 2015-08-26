@@ -61,7 +61,7 @@ static void init_user_tf(TrapFrame* frame, void* fun) {
     frame->eflags = 0x200;// set IF = 1, that is enable interrupt
 }
 
-static void init_fd_table(PCB *pcb, FTE *cwd) {
+void init_fd_table(PCB *pcb, FTE *cwd) {
     // initialize fd table
     memset(pcb->fd_table, 0, sizeof(FDE) * PROCESS_MAX_FD);
     assign_fte(&pcb->fd_table[STDIN_FILENO], stdin);
@@ -147,13 +147,13 @@ PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListH
 }
 
 
-// TODO try finish it
 
 /**
    NOTICE: when creating a kernel thread which doesn't
    need stack switch, ie the real trapFrame to be recovered
    doesn't contain `esp0` and `ss`.
  */
+// TODO try finish it
 PCB* create_kthread_with_args(void* fun, int arg) {
     PCB* pcb = kmalloc(PCB_SIZE);
     // the address which out of boundary

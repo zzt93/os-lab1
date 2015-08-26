@@ -54,6 +54,8 @@ os_init_cont(void) {
     //The Intel 8259 is a Programmable Interrupt Controller (PIC)
 	init_intr();
 
+    // to make it NOINTR
+    current->count_of_lock = 1;
     // initialize kmalloc -- have to initialize it before process,
     // for using it in allocating memory for PCB
     init_kmalloc();
@@ -65,11 +67,13 @@ os_init_cont(void) {
       initialized by FM
      */
     init_manager();
+    NOINTR;
 	/* Initialize the state of process idle, ie the running
        process for set up right lock num to avoid other
        initialization enable the interrupt and cause problem
     */
-    // TODO init_proc() and init_manager() can replace??
+    // init_proc() and init_manager() can replace??
+    // solved by split set count_of_lock out of init_proc();
 	init_proc();
 
     init_driver();

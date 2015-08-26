@@ -12,14 +12,16 @@ enum {
     FM_dup,
     FM_dup2,
     FM_lseek,
+    FM_create,
+    FM_make,
+    FM_del,
+    FM_lsdir,
 };
 
 void init_FM();
 void read_file(Msg*);
 
 extern int FM;
-
-extern uint32_t init_off;
 
 #include "fd.h"
 

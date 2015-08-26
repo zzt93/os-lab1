@@ -20,7 +20,7 @@ void fill_fte(FTE *fte, iNode *node, uint32_t offset) {
     fte->offset = 0;
     fte->dev_id = node->dev_id;
     fte->ref_count = 0;
-    // TODO pointing an inode means not device?
+    // TODO no block means a device?
     fte->type = ((node->type == NO_BLOCK) ? DEV : REG);
     fte->filesize = node->size;
 }
@@ -54,11 +54,6 @@ FTE * get_fte(PCB *aim, int fd) {
     return (FTE *)fde->ft_entry;
 }
 
-/**
-   TODO init inode bit map; init block bit map
-   init by super block(start and size of each region)
-   initialize STD*** in file table
- */
 void init_file_table() {
     iNode node;
     node.size = -1;

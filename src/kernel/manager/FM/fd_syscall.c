@@ -64,7 +64,7 @@ int dup_file(Msg *m) {
    On error, -1 is returned
  */
 int dup2_file(Msg *m) {
-    PCB *aim = (PCB *)m->buf;
+    PCB *aim = (PCB *)m->i[2];
     int i = m->i[0];
     FDE *src = get_fde(aim, i);
     if (is_invalid_fd(src)) {

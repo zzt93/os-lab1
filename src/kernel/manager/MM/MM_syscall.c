@@ -44,7 +44,7 @@ int page_copy(Msg *m) {
                         memcpy(page, (void *)(s_pt[ptable_idx].page_frame << 12), PAGE_SIZE);
                     } else {
                         assert(s_pt[ptable_idx].read_write == PAGE_R);
-                        // TODO if s_pt[ptable_idx].read_write == PAGE_R, ie
+                        // if s_pt[ptable_idx].read_write == PAGE_R, ie
                         // it is read only, just point to it.
                         make_specific_pte(
                             &ptable[ptable_idx], (void *)(s_pt[ptable_idx].page_frame << 12),

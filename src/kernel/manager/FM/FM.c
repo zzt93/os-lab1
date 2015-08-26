@@ -58,6 +58,12 @@ static void FM_job() {
 
 void load_super_block();
 
+
+/**
+   init by super block(start and size of each region)
+   init inode bit map; init block bit map
+   initialize STD*** in file table
+ */
 void init_file_system() {
     now_disk = d_ramdisk;
     // default system opened file

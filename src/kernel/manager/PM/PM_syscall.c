@@ -28,6 +28,7 @@ static void s_copy(PCB* src, PCB* dest) {
    II. copy just the first TrapFrame:
      In this occasion, only change xxx, ebp is fine
  */
+// TODO work for only user thread to fork??
 void copy_kstack(PCB *father, PCB *child) {
     // handle the content in the first TrapFrame, ebp, xxx
     TrapFrame * s_frame = ((TrapFrame *)father->tf);
@@ -55,7 +56,8 @@ void copy_kstack(PCB *father, PCB *child) {
     child->count_of_lock --;
 }
 
-// TODO only work for user thread to fork
+// this function can't use until finish the conversion
+// of every parameter which is address
 void copy_kstack_full(PCB *father, PCB *child) {
     // @checked size: [tf, (char *)father->kstack + KSTACK_SIZE)
     uint32_t copy_size = (char *)father->kstack + KSTACK_SIZE - (char *)father->tf;
@@ -81,7 +83,7 @@ void copy_kstack_full(PCB *father, PCB *child) {
       我们只需要从tf->ebp开始, 把函数调用链上的每一个ebp 加上父子进程内核栈的相对偏移量,
       子进程将来就可以正确地从异常和函数中返回了.
      */
-    int32_t gap = child->kstack - father->kstack ;
+    int32_t gap = child->kstack - father->kstack;
     // handle epb, esp in the later TrapFrame
     TrapFrame * s_frame = ((TrapFrame *)second_frame);
     // first change it to point to right place, store the pointer to next ebp
@@ -89,7 +91,9 @@ void copy_kstack_full(PCB *father, PCB *child) {
     s_frame->xxx += gap;
     uint32_t* ebp = (uint32_t *)s_frame->ebp;
     while (*ebp >= KERNEL_VA_START) {
-        *ebp += gap; // TODO check addition of uint32_t and int32_t
+        // @checked addition of uint32_t and int32_t
+        // addition is safe, but compare is dangerous
+        *ebp += gap;
         assert(*ebp > (uint32_t)ebp);
         ebp = (uint32_t *)*ebp;
     }
@@ -101,7 +105,8 @@ void copy_kstack_full(PCB *father, PCB *child) {
     f_frame->ebp += gap;
     f_frame->xxx += gap;
     */
-    //TODO change address of message
+    // change every parameter which is address
+    // of every function call on the kernel stack
 }
 
 /*
@@ -140,6 +145,8 @@ PCB * kfork(Msg* m) {
 
     init_kernel_image(get_pdir_addr(child));
     // special handler for kernel stack and tf
+    // copy just the first TrapFrame:
+    // In this occasion, only change xxx, ebp is fine
     copy_kstack(father, child);
 
 
@@ -269,7 +276,7 @@ PCB * kexec(Msg *m) {
     // prepare args on the stack
     // push args *
     memcpy(user_stack_pa(new, USER_STACK_BASE - len), args, len);
-    // TODO `- sizeof(int)` for saved eip
+    // `- sizeof(int)` for saved eip
     set_esp(new, USER_STACK_BASE - len - sizeof(int));
     return new;
 }

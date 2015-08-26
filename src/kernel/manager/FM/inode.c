@@ -67,3 +67,7 @@ int inode_free(uint32_t offset) {
     return n_dev_write(now_disk, FM, bits() + index, node_mapi_off(j), 1);
 }
 
+
+void get_node(FTE *fte, iNode *node) {
+    n_dev_read(now_disk, FM, node, node_off, sizeof(iNode));
+}
