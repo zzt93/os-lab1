@@ -16,6 +16,7 @@ enum {
     FM_make,
     FM_del,
     FM_lsdir,
+    FM_chdir,
 };
 
 void init_FM();

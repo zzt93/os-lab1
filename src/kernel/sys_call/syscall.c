@@ -104,11 +104,16 @@ void do_syscall(TrapFrame *tf) {
                 break;
             case SYS_lsdir:
                 m.type = FM_lsdir;
-                // name(with path)
+                // name
                 m.dev_id = tf->ebx;
                 m.buf = current;
                 // the target buffer
                 m.req_pid = tf->ecx;
+            case SYS_chdir:
+                m.type = FM_chdir;
+                // name
+                m.dev_id = tf->ebx;
+                m.buf = current;
             default:
                 printk(RED"no such system call %d "RESET, id);
                 assert(0);

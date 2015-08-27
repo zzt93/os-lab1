@@ -47,6 +47,18 @@ static void FM_job() {
             case FM_lseek:
                 m.ret = lseek_file(&m);
                 break;
+            case FM_create:
+                m.ret = create_file(&m);
+                break;
+            case FM_del:
+                m.ret = delete_file(&m);
+                break;
+            case FM_lsdir:
+                m.ret = list_dir(&m);
+                break;
+            case FM_chdir:
+                m.ret = ch_dir(&m);
+                break;
             default:
                 assert(false);
                 break;

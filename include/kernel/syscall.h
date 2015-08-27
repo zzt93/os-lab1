@@ -19,6 +19,7 @@ enum {
     SYS_dup,
     SYS_dup2,
     SYS_lsdir,
+    SYS_chdir,
     // FM and PM delimiter
     FM_PM,
     // process related system call
@@ -70,5 +71,6 @@ int delfile(const char *name);
 int deldir(const char *name);
 // name(with path)
 int listdir(const char *name, char *buf);
+int chdir(const char *name);
 
 #endif /* __SYSCALL_H__ */
