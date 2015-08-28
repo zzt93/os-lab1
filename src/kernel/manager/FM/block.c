@@ -1,4 +1,5 @@
 #include "kernel/manager/block.h"
+#include "kernel/manager/f_dir.h"
 #include "adt/d_bit_map.h"
 #include "drivers/hal.h"
 #include "kernel/manager/FM.h"
@@ -28,6 +29,8 @@ static inline int offset_blocki(uint32_t offset) {
     return gap / block_size;
 }
 
+int indirect_datalink_nr;
+int block_dir_num;
 void init_block(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) {
     block_map_start = mstart;
     init_bitmap(msize);
@@ -35,6 +38,8 @@ void init_block(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) 
     block_area_size = size;
     // copy from harddisk
     n_dev_read(now_disk, FM, bits(), mstart, msize);
+    indirect_datalink_nr = block_size / sizeof(int);
+    block_dir_num = block_size / sizeof(Dir_entry);
 }
 
 uint32_t block_alloc() {

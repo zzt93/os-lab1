@@ -68,6 +68,62 @@ int inode_free(uint32_t offset) {
 }
 
 
-void get_node(FTE *fte, iNode *node) {
-    n_dev_read(now_disk, FM, node, node_off, sizeof(iNode));
+/**
+   return the offset in the disk of `index` block for this node
+   (notice not the index for node->index, but the count of
+   node's block)
+   if that index out of bound, assert(0);
+ */
+uint32_t get_block(iNode *node, int index) {
+    if (index * block_size > node->size) {
+        assert(0);
+    }
+    uint32_t res;
+    if (index < DATA_LINK_NUM) {// using direct data link
+        return node->index[index];
+    } // one level indirect link -- read once
+    else if (index < DATA_LINK_NUM + indirect_datalink_nr) {
+        n_dev_read(now_disk, FM, &res,
+            node->index[FIRST_INDIRECT] + sizeof(uint32_t) * (index - DATA_LINK_NUM), sizeof res);
+    } // two level indirect link -- read twice
+    else if (index < DATA_LINK_NUM +
+               indirect_datalink_nr * indirect_datalink_nr) {
+        uint32_t more = index - DATA_LINK_NUM - indirect_datalink_nr;
+        uint32_t first_off = more / indirect_datalink_nr * sizeof(uint32_t);
+        uint32_t second_off = (more % indirect_datalink_nr) * sizeof(uint32_t);
+        uint32_t second;
+        n_dev_read(now_disk, FM, &second,
+            node->index[SEC_INDIRECT] + first_off, sizeof second);
+        n_dev_read(now_disk, FM, &res,
+            second + second_off, sizeof res);
+    } //three level indirect link -- read three time
+    else if (index < DATA_LINK_NUM +
+               indirect_datalink_nr *
+               indirect_datalink_nr *
+               indirect_datalink_nr) {
+        uint32_t more = index - DATA_LINK_NUM - indirect_datalink_nr * indirect_datalink_nr;
+        uint32_t first_off = (more / (indirect_datalink_nr * indirect_datalink_nr)) * sizeof(uint32_t);
+        uint32_t second_off = (more % (indirect_datalink_nr * indirect_datalink_nr)) / indirect_datalink_nr * sizeof(uint32_t);
+        uint32_t thi_off = ((more % (indirect_datalink_nr * indirect_datalink_nr)) % indirect_datalink_nr) * sizeof(uint32_t);
+        uint32_t second, thi;
+        n_dev_read(now_disk, FM, &second,
+            node->index[THI_INDIRECT] + first_off, sizof second);
+        n_dev_read(now_disk, FM, &thi,
+            second + second_off, sizeof thi);
+        n_dev_read(now_disk, Fm, &res,
+            thi + thi_off, sizeof res);
+    } else {
+        assert(0);
+    }
+    return res;
+}
+
+
+/**
+   read node in unit of block [start, end)
+   if `end` == -1, than read to end of file.
+   if `start` is invalid(> end or > size of file's block),
+   return error message
+ */
+void read_block(iNode *node, int start, int end) {
 }

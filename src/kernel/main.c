@@ -1,8 +1,10 @@
 #include "common.h"
+#include "error.h"
 #include "x86/x86.h"
 #include "kernel/memory.h"
 
 #include "lib/malloc.h"
+#include "lib/string.h"
 #include "kernel/semaphore.h"
 #include "test/test.h"
 #include "kernel/manager/manager.h"
@@ -78,6 +80,7 @@ os_init_cont(void) {
 
     init_driver();
 
+    init_error_msg();
     NOINTR;
 	welcome();
     // to initialize shell process, which must later
@@ -155,4 +158,8 @@ welcome(void) {
     test_random();
     */
     test_string();
+}
+
+void init_error_msg() {
+    no_such_size = strlen(no_such) + 1;
 }

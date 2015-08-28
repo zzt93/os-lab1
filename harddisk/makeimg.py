@@ -9,7 +9,7 @@ __author__ = 'zzt'
 
 
 class DirEntry(LittleEndianStructure):
-    _fields_ = [("filename", ctypes.c_char * 32),
+    _fields_ = [("filename", ctypes.c_char * 28),
                 ("inode_off", ctypes.c_int)]
 
 
@@ -73,6 +73,7 @@ class MkImg:
 
     '''
     :return file's inode offset and block offset relative to the end of kernel
+	it will default allocate a block to use
     '''
 
     def make_file(self, filetype, kernel_sz):
@@ -127,6 +128,12 @@ class MkImg:
                 self.buf[start] = b2
                 start += 1
 
+    '''
+    write content in the buf at the offset place
+    '''
+    def write_to_file(self, buf, offset):
+        self.buf[offset: offset + len(buf)] = buf
+
     def make_img(self):
         disk_sz = os.path.getsize(self.disk)
         # although it is append at end, for they are all zero, so it's same
@@ -139,18 +146,24 @@ class MkImg:
         # init root directory
         # write '.' '..' in block, ie a dir
         inode_o, block_o = self.make_file(FileType.DIR, disk_sz)
-        current = DirEntry.from_buffer(self.buf, block_o)
+        buf1 = bytearray(sizeof(DirEntry))
+        current = DirEntry.from_buffer(buf1)
         current.filename = b'.'
         current.inode_off = inode_o + disk_sz
-        father = DirEntry.from_buffer(self.buf, block_o + sizeof(current))
+        self.write_to_file(buf1, block_o)
+        buf2 = bytearray(sizeof(DirEntry))
+        father = DirEntry.from_buffer(buf2)
         father.filename = b'..'
         father.inode_off = inode_o + disk_sz
-		node = Inode.from_buffer(self.buf, inode_o)
-		node.size = 2 * sizeof(current)
+        self.write_to_file(buf2, block_o + sizeof(current))
+        node = Inode.from_buffer(self.buf, inode_o)
+        node.size = 2 * sizeof(current)
         with open(os.path.join(self.dir, 'harddisk.img'), 'wb') as img:
             img.write(bytearray(self.buf))
 
 
 if __name__ == '__main__':
+    assert (sizeof(DirEntry) % 32 == 0)
+    assert (sizeof(Inode) % 128 == 0)
     a = MkImg('./disk.img', 2 ** 12, 2 ** 10, 1)
     a.make_img()

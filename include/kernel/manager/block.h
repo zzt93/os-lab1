@@ -17,4 +17,9 @@ extern uint32_t block_map_start;
 extern uint32_t block_start;
 extern uint32_t block_area_size;
 
+// const -- how many offset can a block store
+extern int indirect_datalink_nr;
+// const -- how many directory entry can a block store
+extern int block_dir_num;
+
 #endif /* __BLOCK_H__ */

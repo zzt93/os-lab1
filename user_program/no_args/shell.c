@@ -4,11 +4,12 @@
 
 
 #define BUF_SZ 256
+#define MAX_PARAMETER_NR 10
 
 
 int entry() {
     char cmd[BUF_SZ], copy[BUF_SZ];
-    char *save[10] = {0};
+    char *save[MAX_PARAMETER_NR] = {0};
     int filename = -1;
     int pid, count, res;
     while(1) {
@@ -17,6 +18,7 @@ int entry() {
         read_line(cmd, BUF_SZ);
         memcpy(copy, cmd, BUF_SZ);
         count = split(copy, ' ', save);
+        assert(MAX_PARAMETER_NR >= count);
         if (count <= 1) {
             printf("Unknown command: %s\n", cmd);
             continue;

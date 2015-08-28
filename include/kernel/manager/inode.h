@@ -12,14 +12,16 @@ typedef enum {
 typedef uint32_t block_t;
 
 #define FILE_LINK_NUM 15
-// this is actually should be read from super-block
-// rather than a macro, which may be changed by using kmalloc
-// to allocate an area for bit_map.h
-// #define NR_INODE (1 << 12)
+// start from 0
+#define DATA_LINK_NUM 12
+#define FIRST_INDIRECT DATA_LINK_NUM
+#define SEC_INDIRECT (FIRST_INDIRECT + 1)
+#define THI_INDIRECT (SEC_INDIRECT + 1)
+
 
 struct INODE{
 	//char filename[32];
-    // file size
+    // file size in bytes
 	size_t size;
     // ram or hda
     int dev_id;
@@ -32,11 +34,15 @@ struct INODE{
 
 typedef struct INODE iNode;
 
+#define INVALID_NODE_OFF 0
+
 extern const int inode_size;
 extern uint32_t inode_map_start;
 extern uint32_t inode_start;
 extern uint32_t inode_area_size;
 
-iNode * get_node(char *name);
+#include "file_table.h"
+
+uint32_t get_block(iNode *node, int index);
 
 #endif /* __INODE_H__ */
