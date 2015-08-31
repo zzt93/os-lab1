@@ -19,4 +19,6 @@
 
 #define _ALIGN_(x, a) (((x) + (a)) & ~(a))
 
+#define MIN(x, y) (((x) > (y)) ? (y) : (x))
+
 #endif /* __MACRO_H__ */

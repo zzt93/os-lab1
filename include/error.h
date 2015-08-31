@@ -1,8 +1,10 @@
 #ifndef __ERROR_H__
 #define __ERROR_H__
 
-extern const char *const no_such;
-extern int no_such_size;
+extern const char *const err[];
+extern int err_size[];
+
+#define ARR_LEN(c) (sizeof(x) / sizeof((x)[0]))
 
 void init_error_msg();
 

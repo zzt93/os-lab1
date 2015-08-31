@@ -10,17 +10,17 @@ typedef enum {
     REG,
 } Node_e;
 
+/**
+   if type == DEV, node_off, filesize is meaningless
+*/
 typedef struct {
-    // node index in ramdisk/disk relative to region node
+    // node offset in ramdisk/disk relative to region node
     uint32_t node_off;
     // file cursor offset relative to start of file
     int offset;
     // uniquely identify a device
     int dev_id;
     int ref_count;
-    /**
-       if type == DEV, node_off, filesize is meaningless
-     */
     Node_e type;
     // cached value -- needing update
     uint32_t filesize;

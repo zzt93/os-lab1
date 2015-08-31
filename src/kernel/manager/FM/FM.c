@@ -77,7 +77,7 @@ void load_super_block();
    initialize STD*** in file table
  */
 void init_file_system() {
-    now_disk = d_ramdisk;
+    now_disk = d_ide;
     // default system opened file
     init_file_table();
     // init each region start and size

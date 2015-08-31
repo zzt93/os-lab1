@@ -120,10 +120,26 @@ uint32_t get_block(iNode *node, int index) {
 
 
 /**
-   read node in unit of block [start, end)
-   if `end` == -1, than read to end of file.
-   if `start` is invalid(> end or > size of file's block),
+   read file in unit of bytes in range of
+   [offset, offset + len) and return how
+   many bytes are actually read
+   if `offset` is invalid( > size of file),
    return error message
  */
-void read_block(iNode *node, int start, int end) {
+size_t read_file(char *buf, iNode *node, int offset, int len) {
+    if (offset > node->size || offset + len > node->size) {
+        return 0;
+    }
+    int index = offset / block_size;
+    uint32_t block_off = get_block(node, index) + offset % block_size;
+    size_t read = 0;
+    int to_read = MIN(len, block_size - offset % block_size);
+    while (len > read) {
+        read += n_dev_read(now_disk, FM, buf + read, block_off, to_read);
+        index ++;
+        block_off = get_block(node, index);
+        to_read = MIN(len - read, block_size);
+    }
+    assert(len == read);
+    return read;
 }

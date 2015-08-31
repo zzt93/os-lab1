@@ -15,16 +15,14 @@ uint32_t find_node(Msg *, iNode *);
 
 int open_file(Msg *m) {
     // find that inode
-    /*
     iNode node;
-    uint32_t offset = find_node(m, &node);
+    uint32_t node_off = find_node(m, &node);
     // add an entry in system opened file table
-    FTE *fte = add_fte(&node, offset);
+    FTE *fte = add_fte(&node, node_off);
     // add a FDE in process fd table
     PCB *aim = (PCB *)m->buf;
     int j = first_fd(aim, INVALID_FD);
     assign_fte(aim->fd_table[j].ft_entry, fte);
-    */
     return 1;
 }
 

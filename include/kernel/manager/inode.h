@@ -34,7 +34,6 @@ struct INODE{
 
 typedef struct INODE iNode;
 
-#define INVALID_NODE_OFF 0
 
 extern const int inode_size;
 extern uint32_t inode_map_start;
@@ -44,5 +43,7 @@ extern uint32_t inode_area_size;
 #include "file_table.h"
 
 uint32_t get_block(iNode *node, int index);
+
+size_t read_file(char *buf, iNode *node, int offset, int len);
 
 #endif /* __INODE_H__ */

@@ -161,5 +161,8 @@ welcome(void) {
 }
 
 void init_error_msg() {
-    no_such_size = strlen(no_such) + 1;
+    int i;
+    for (i = 0; i < ARR_LEN(err); i++) {
+        err_size[i] = strlen(err[i]) + 1;
+    }
 }

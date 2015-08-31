@@ -3,7 +3,7 @@
 
 #define MAX_FILENAME_LEN 28
 
-typedef int inode_t;
+typedef uint32_t inode_t;
 
 typedef struct {
 	char filename[MAX_FILENAME_LEN];
@@ -16,7 +16,13 @@ typedef struct {
 
 extern const char *const current_dir;
 extern const char *const father_dir;
+extern const char *const default_cwd_name;
 
-#define NOT_CONTAIN 0
+#include "error.h"
+
+// the error must correspond to the order of err
+// @see set_error_msg()
+#define NO_SUCH 0
+#define NOT_DIR 1
 
 #endif /* __F_DIR_H__ */
