@@ -130,9 +130,12 @@ class MkImg:
 
     '''
     write content in the buf at the offset place
+	and update size
     '''
-    def write_to_file(self, buf, offset):
-        self.buf[offset: offset + len(buf)] = buf
+    def write_to_file(self, inode_o, src, offset):
+        self.buf[offset: offset + len(buf)] = src
+        node = Inode.from_buffer(self.buf, inode_o)
+		node.size += len(buf)
 
     def make_img(self):
         disk_sz = os.path.getsize(self.disk)
@@ -156,8 +159,6 @@ class MkImg:
         father.filename = b'..'
         father.inode_off = inode_o + disk_sz
         self.write_to_file(buf2, block_o + sizeof(current))
-        node = Inode.from_buffer(self.buf, inode_o)
-        node.size = 2 * sizeof(current)
         with open(os.path.join(self.dir, 'harddisk.img'), 'wb') as img:
             img.write(bytearray(self.buf))
 

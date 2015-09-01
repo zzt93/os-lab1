@@ -19,5 +19,6 @@ void print_str(void (*printer)(char), char *);
 int to_int(char *);
 int split(char *s, char delimiter, char **save);
 
+int find_char(const char *str, int ith, char aim);
 
 #endif

@@ -101,3 +101,35 @@ int is_letter(char c) {
     return (c <= 'z' && c >= 'a')
         || (c <= 'Z' && c >= 'A');
 }
+
+/**
+   return the index of `ith` `aim` in the string `str`
+   if can't find suitable one, return a negative number
+   ith -- 1 .default to be counted from left to right,
+   2. can be negative, i.e. means count from right to left
+   3. range [1, max] && [-max, -1]
+ */
+int find_char(const char *str, int ith, char aim) {
+    int start = 0;
+    if (ith < 0) {
+        start = strlen(str);
+        while (start--) {
+            if (str[start] == aim) {
+                ith --;
+            }
+            if (ith == 0) {
+                return start;
+            }
+        }
+    } else {
+        while (str[start] != '\0') {
+            if (str[start] == aim) {
+                ith ++;
+            }
+            if (ith == 0) {
+                return start;
+            }
+            start ++;
+        }
+    }
+}

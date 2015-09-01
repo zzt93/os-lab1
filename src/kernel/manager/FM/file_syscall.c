@@ -100,9 +100,63 @@ static inode_t file_path(inode_t cwd, char *name) {
     return node_off;
 }
 
+/**
+   check whether file exist by checking node offset with
+   inode area's start
+ */
 static inline
 int file_exist(inode_t off) {
     return off >= inode_start;
+}
+
+int default_file_block = 1;
+/**
+   return: the node offset of this empty file, if has
+   any problem, return FAIL
+   set the inode the newly created file
+   - default only allocate a block for a newly-created file
+ */
+static
+int make_empty_file(File_e type, char *name, PCB *aim,
+    iNode *node) {
+    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
+    inode_t dir;
+    char *filename;
+    // analyze file path
+    int last_slash = find_char(name, -1, '/');
+    if (last_slash < 0) {// doesn't contain '/'
+        dir = cwd;
+        filename = name;
+    } else {
+        filename = name + last_slash + 1;
+        // split name to directory and filename
+        // by adding a '\0' between them
+        name[last_slash] = '\0';
+        // get the node offset of directory of this file
+        dir = file_path(cwd, name);
+    }
+    if (!file_exist(dir)) {
+        return FAIL;
+    }
+    // allocate new inode and block
+    inode_t new = inode_alloc();
+    n_dev_read(now_disk, FM, node, new, sizeof node);
+    node.size = 0;
+    node.dev_id = now_disk;
+    for (i = 0; i < default_file_block; i++) {
+        node.index[i] = block_alloc();
+    }
+    node.link_count = 1;
+    node.type = type;
+
+    // write to directory's block
+    iNode dir_node;
+    n_dev_read(now_disk, FM, &dir_node, dir, sizeof dir_node);
+    Dir_entry dir_content;
+    memcpy(dir_content.filename, filename);
+    dir_content.inode_off = new;
+    write_file(&dir_node, dir_content);
+    return new;
 }
 
 int create_file(Msg *m) {
@@ -110,24 +164,10 @@ int create_file(Msg *m) {
     if (name == NULL) {
         return FAIL;
     }
-    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
-    inode_t dir;
-    char *filename;
-    int last_slash = find(name, -1, '/');
-    if (last_slash < 0) {// doesn't contain '/'
-        dir = cwd;
-        filename = name;
-    } else {
-        filename = name + last_slash + 1;
-        name[last_slash] = '\0';
-        dir = file_path(cwd, name);
-    }
-    if (!file_exist(dir)) {
-        return FAIL;
-    }
-
-    // whether it is already exist
-    return SUCC;
+    PCB *aim = (PCB *)m->buf;
+    iNode node;
+    return make_empty_file(PLAIN, name, aim, &node) == FAIL ?
+        FAIL : SUCC;
 }
 
 int make_dir(Msg *m) {
@@ -135,13 +175,18 @@ int make_dir(Msg *m) {
     if (name == NULL) {
         return FAIL;
     }
-    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
-    inode_t off = file_path(cwd, name);
-    if (file_exist(off)) {
+    PCB *aim = (PCB *)m->buf;
+    iNode node;
+    int res = make_empty_file(DIR, name, aim, &node);
+    if (!file_exist(res)) {
         return FAIL;
     }
-
-
+    Dir_entry dir;
+    memcpy(dir.filename, current_dir, 2);
+    dir.inode_off = res;
+    write_file(&node, &dir);
+    memcpy(dir.filename, father_dir, 3);
+    dir.inode_off = 
     return SUCC;
 }
 

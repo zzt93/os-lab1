@@ -21,4 +21,6 @@
 
 #define MIN(x, y) (((x) > (y)) ? (y) : (x))
 
+#define ARR_LEN(x) (sizeof(x) / sizeof((x)[0]))
+
 #endif /* __MACRO_H__ */

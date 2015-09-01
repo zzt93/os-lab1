@@ -36,16 +36,19 @@ void do_syscall(TrapFrame *tf) {
                 m.type = FM_create;
                 // name of file
                 m.dev_id = tf->ebx;
+                m.buf = current;
                 break;
             case SYS_make:
                 m.type = FM_make;
                 // name of directory
                 m.dev_id = tf->ebx;
+                m.buf = current;
                 brea;
             case SYS_del:
                 m.type = FM_del;
                 // name of file
                 m.dev_id = tf->ebx;
+                m.buf = current;
                 break;
             case SYS_open:
                 m.type = FM_open;

@@ -4,7 +4,7 @@
 extern const char *const err[];
 extern int err_size[];
 
-#define ARR_LEN(c) (sizeof(x) / sizeof((x)[0]))
+#include "macro.h"
 
 void init_error_msg();
 

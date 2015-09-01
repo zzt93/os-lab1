@@ -12,10 +12,35 @@ void test_string() {
     assert(i == j);
     printk("%d ", j);
 
+    // test split
     char str[50] = "2 gcc -O2 -o test test.c";
     char *save[10] = {0};
     int res = split(str, ' ', save);
     assert(res == 6);
     int k = to_int(save[0]);
     assert(k == 2);
+
+    // test find_char
+    char *path[] = {
+        "/a/b/c/d",
+        "./a/b/c/d",
+        "../a/b/c/d",
+        "aaa/b/c/d"
+    };
+    int index[ARR_LEN(path)];
+    int i;
+    for (i = 0; i < ARR_LEN(path); i++) {
+        index[i] = find_char(path[i], -1, '/');
+    }
+    for (i = 0; i < ARR_LEN(path); i++) {
+        assert(index[i] == strlen(path[i]) - 2);
+    }
+
+    for (i = 0; i < ARR_LEN(path); i++) {
+        index[i] = find_char(path[i], 1, '/');
+    }
+    for (i = 0; i < ARR_LEN(path); i++) {
+        assert(index[i] == i);
+    }
+
  }
