@@ -67,22 +67,35 @@ int inode_free(uint32_t offset) {
     return n_dev_write(now_disk, FM, bits() + index, node_mapi_off(j), 1);
 }
 
+#define NO_DATA_BLOCK 1
+// the following three invalid block number
+// respectively mean:
+// no first level link and a data link
+#define NO_F_LINK 2
+// no first
+#define NO_S_LINK 3
+#define NO_T_LINK 4
+static inline
+int invalid_block(iNode *node, int index) {
+    return index * block_size >= node->size;
+}
 
 /**
    return the offset in the disk of `index` block for this node
    (notice not the index for node->index, but the count of
    node's block)
-   if that index out of bound, assert(0);
+   if that index out of bound, allocate a new block;
  */
 uint32_t get_block(iNode *node, int index) {
-    if (index * block_size > node->size) {
-        assert(0);
-    }
     uint32_t res;
     if (index < DATA_LINK_NUM) {// using direct data link
+        if (invalid_block(node, index)) {
+            node->index[index] = block_alloc();
+        }
         return node->index[index];
     } // one level indirect link -- read once
     else if (index < DATA_LINK_NUM + indirect_datalink_nr) {
+        
         n_dev_read(now_disk, FM, &res,
             node->index[FIRST_INDIRECT] + sizeof(uint32_t) * (index - DATA_LINK_NUM), sizeof res);
     } // two level indirect link -- read twice
@@ -118,6 +131,23 @@ uint32_t get_block(iNode *node, int index) {
     return res;
 }
 
+static
+size_t rw_file(char *buf, iNode node, uint32_t offset, int len,
+    size_t (*n_dev_rw)(int, pid_t, void *, off_t, size_t)) {
+    assert(len > 0);
+    int block_i = offset / block_size;
+    int block_inner_off = offset % block_size;
+    uint32_t block_off = get_block(node, index) + offset % block_size;
+    size_t rw = 0;
+    int to_rw = MIN(len, block_size - block_inner_off);
+    while (len > rw) {
+        rw += n_dev_rw(now_disk, FM, buf + rw, block_off, to_rw);
+        index ++;
+        block_off = get_block(node, index);
+        to_rw = MIN(len - rw, block_size);
+    }
+    return rw;
+}
 
 /**
    read file in unit of bytes in range of
@@ -126,20 +156,24 @@ uint32_t get_block(iNode *node, int index) {
    if `offset` is invalid( > size of file),
    return error message
  */
-size_t read_file(char *buf, iNode *node, int offset, int len) {
+size_t read_file(char *buf, iNode *node, uint32_t offset, int len) {
     if (offset > node->size || offset + len > node->size) {
         return 0;
     }
-    int index = offset / block_size;
-    uint32_t block_off = get_block(node, index) + offset % block_size;
-    size_t read = 0;
-    int to_read = MIN(len, block_size - offset % block_size);
-    while (len > read) {
-        read += n_dev_read(now_disk, FM, buf + read, block_off, to_read);
-        index ++;
-        block_off = get_block(node, index);
-        to_read = MIN(len - read, block_size);
-    }
+    int read = rw_file(buf, node, offset, len, n_dev_read);
     assert(len == read);
     return read;
+}
+
+/**
+   write content to buffer, set right file size
+   and extend block if necessary
+ */
+size_t write_file(iNode *node, uint32_t offset, char *buf, int len) {
+    if (offset > node->size) {
+        return 0;
+    }
+    size_t write = rw_file(buf, node, offset, len, n_dev_write);
+    node->size += write;
+    return write;
 }

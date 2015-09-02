@@ -44,6 +44,11 @@ extern uint32_t inode_area_size;
 
 uint32_t get_block(iNode *node, int index);
 
-size_t read_file(char *buf, iNode *node, int offset, int len);
+size_t read_block_file(char *buf, iNode *node, uint32_t offset, int len);
+// write to current file cursor
+size_t write_block_file(iNode *node, uint32_t offset, char *buf, int len);
+
+uint32_t inode_alloc();
+int inode_free(uint32_t);
 
 #endif /* __INODE_H__ */

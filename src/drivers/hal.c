@@ -133,6 +133,7 @@ dev_write(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t len)
 /**
    `reqst_pid` read from device dev_id == aim,
    `offset` place into `buf`(which has `capacity` bytes )
+   i.e. at most read `capacity` bytes of content
    offset -- meanless for tty_, for console itself know where
    to read
  */

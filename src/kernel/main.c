@@ -162,7 +162,7 @@ welcome(void) {
 
 void init_error_msg() {
     int i;
-    for (i = 0; i < ARR_LEN(err); i++) {
+    for (i = 0; i < len_err; i++) {
         err_size[i] = strlen(err[i]) + 1;
     }
 }

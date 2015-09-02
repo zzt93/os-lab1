@@ -16,6 +16,7 @@ const char *const err[] = {
     "No such file or directory",
     "Not a directory",
 };
+const int len_err = ARR_LEN(err);
 int err_size[ARR_LEN(err)];
 
 static
@@ -138,44 +139,48 @@ int make_empty_file(File_e type, char *name, PCB *aim,
     if (!file_exist(dir)) {
         return FAIL;
     }
-    // allocate new inode and block
+    // allocate new inode and default block
     inode_t new = inode_alloc();
-    n_dev_read(now_disk, FM, node, new, sizeof node);
-    node.size = 0;
-    node.dev_id = now_disk;
+    node->size = 0;
+    node->dev_id = now_disk;
+    int i;
     for (i = 0; i < default_file_block; i++) {
-        node.index[i] = block_alloc();
+        node->index[i] = block_alloc();
     }
-    node.link_count = 1;
-    node.type = type;
+    for (i = default_file_block; i < FILE_LINK_NUM; i ++) {
+        node->index[i] = 0;
+    }
+    node->link_count = 1;
+    node->type = type;
+    n_dev_write(now_disk, FM, node, new, sizeof(iNode));
 
     // write to directory's block
     iNode dir_node;
     n_dev_read(now_disk, FM, &dir_node, dir, sizeof dir_node);
     Dir_entry dir_content;
-    memcpy(dir_content.filename, filename);
+    memcpy(dir_content.filename, filename, strlen(filename) + 1);
     dir_content.inode_off = new;
-    write_file(&dir_node, dir_content);
+    write_block_file(&dir_node, dir_node.size, (char *)&dir_content, sizeof(Dir_entry));
     return new;
 }
 
 int create_file(Msg *m) {
+    PCB *aim = (PCB *)m->buf;
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
     if (name == NULL) {
         return FAIL;
     }
-    PCB *aim = (PCB *)m->buf;
     iNode node;
     return make_empty_file(PLAIN, name, aim, &node) == FAIL ?
         FAIL : SUCC;
 }
 
 int make_dir(Msg *m) {
+    PCB *aim = (PCB *)m->buf;
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
     if (name == NULL) {
         return FAIL;
     }
-    PCB *aim = (PCB *)m->buf;
     iNode node;
     int res = make_empty_file(DIR, name, aim, &node);
     if (!file_exist(res)) {
@@ -184,9 +189,10 @@ int make_dir(Msg *m) {
     Dir_entry dir;
     memcpy(dir.filename, current_dir, 2);
     dir.inode_off = res;
-    write_file(&node, &dir);
+    write_block_file(&node, node.size, (char *)&dir, sizeof dir);
     memcpy(dir.filename, father_dir, 3);
-    dir.inode_off = 
+    dir.inode_off =;
+    write_block_file(&node, node.size, (char *)&dir, sizeof dir);
     return SUCC;
 }
 
@@ -194,6 +200,7 @@ int make_dir(Msg *m) {
    create a regular file or a directory
 */
 int delete_file(Msg *m) {
+    PCB *aim = (PCB *)m->buf;
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
     if (name == NULL) {
         return FAIL;
@@ -209,8 +216,8 @@ int delete_file(Msg *m) {
 }
 
 int list_dir(Msg *m) {
-    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
     PCB *aim = (PCB *)m->buf;
+    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
     char *buf = (char *)get_pa(&aim->pdir, m->req_pid);
     assert(buf != NULL);
     // if not specify the list name,
@@ -227,7 +234,7 @@ int list_dir(Msg *m) {
     n_dev_read(now_disk, FM, &node, node_off, sizeof(iNode));
     if (node.type == DIR) {
         // read the content of file by node info
-        read_file(buf, &node, 0, node.size);
+        read_block_file(buf, &node, 0, node.size);
     } else {
         // not a directory, so just return it's parameter
         memcpy(buf, name, strlen(name) + 1);
@@ -236,11 +243,11 @@ int list_dir(Msg *m) {
 }
 
 int ch_dir(Msg *m) {
+    PCB *aim = (PCB *)m->buf;
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
     if (name == NULL) {
         name = default_cwd_name;
     }
-    PCB *aim = (PCB *)m->buf;
     // if not specify the list name,
     // using default file path -- current working directory node_off
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
@@ -253,4 +260,5 @@ int ch_dir(Msg *m) {
     n_dev_read(now_disk, FM, &node, off, sizeof node);
     FTE *fte = add_fte(&node, off);
     set_cwd(aim, fte);
+    return SUCC;
 }

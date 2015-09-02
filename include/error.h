@@ -2,6 +2,7 @@
 #define __ERROR_H__
 
 extern const char *const err[];
+extern const int len_err;
 extern int err_size[];
 
 #include "macro.h"
