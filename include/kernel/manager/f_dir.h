@@ -25,4 +25,8 @@ extern const char *const default_cwd_name;
 #define NO_SUCH 0
 #define NOT_DIR 1
 
+#include "inode.h"
+
+uint32_t get_dir_e_off(iNode *dir, inode_t aim);
+
 #endif /* __F_DIR_H__ */

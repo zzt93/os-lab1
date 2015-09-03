@@ -114,27 +114,35 @@ int default_file_block = 1;
 /**
    return: the node offset of this empty file, if has
    any problem, return FAIL
-   set the inode the newly created file
+   - set the inode's field of the newly created file
+   and write back to now_disk
    - default only allocate a block for a newly-created file
+   - write to father directory
  */
 static
 int make_empty_file(File_e type, char *name, PCB *aim,
-    iNode *node) {
+    // the following two parameter is only useful for directory
+    iNode *node, inode_t *dir_off) {
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
     inode_t dir;
     char *filename;
     // analyze file path
+    // find the last '/' in the file path
     int last_slash = find_char(name, -1, '/');
-    if (last_slash < 0) {// doesn't contain '/'
+    if (last_slash < 0) {// doesn't contain '/', i.e. just a file name
         dir = cwd;
         filename = name;
-    } else {
+    } else {// directory/filename
+        if (last_slash == 0) {// just like `/media`
+            dir = inode_start;
+        } else {
+            // split name to directory and filename
+            // by adding a '\0' between them
+            name[last_slash] = '\0';
+            // get the node offset of directory of this file
+            dir = file_path(cwd, name);
+        }
         filename = name + last_slash + 1;
-        // split name to directory and filename
-        // by adding a '\0' between them
-        name[last_slash] = '\0';
-        // get the node offset of directory of this file
-        dir = file_path(cwd, name);
     }
     if (!file_exist(dir)) {
         return FAIL;
@@ -154,14 +162,24 @@ int make_empty_file(File_e type, char *name, PCB *aim,
     node->type = type;
     n_dev_write(now_disk, FM, node, new, sizeof(iNode));
 
-    // write to directory's block
+    // write to father directory's block
     iNode dir_node;
     n_dev_read(now_disk, FM, &dir_node, dir, sizeof dir_node);
     Dir_entry dir_content;
     memcpy(dir_content.filename, filename, strlen(filename) + 1);
     dir_content.inode_off = new;
     write_block_file(&dir_node, dir_node.size, (char *)&dir_content, sizeof(Dir_entry));
+
+    // prepare returned pointer
+    *dir_off = dir;
     return new;
+}
+
+static inline
+int make_plain_file(char *name, PCB *aim) {
+    iNode node;
+    inode_t i;
+    return make_empty_file(PLAIN, name, aim, &node, &i);
 }
 
 int create_file(Msg *m) {
@@ -170,8 +188,7 @@ int create_file(Msg *m) {
     if (name == NULL) {
         return FAIL;
     }
-    iNode node;
-    return make_empty_file(PLAIN, name, aim, &node) == FAIL ?
+    return make_plain_file(name, aim) == FAIL ?
         FAIL : SUCC;
 }
 
@@ -181,23 +198,56 @@ int make_dir(Msg *m) {
     if (name == NULL) {
         return FAIL;
     }
-    iNode node;
-    int res = make_empty_file(DIR, name, aim, &node);
+    iNode new_dir;
+    inode_t dir_off;
+    // the node offset of new directory
+    int res = make_empty_file(DIR, name, aim, &new_dir, &dir_off);
     if (!file_exist(res)) {
         return FAIL;
     }
     Dir_entry dir;
+    // copy "."
     memcpy(dir.filename, current_dir, 2);
     dir.inode_off = res;
-    write_block_file(&node, node.size, (char *)&dir, sizeof dir);
+    write_block_file(&new_dir, new_dir.size, (char *)&dir, sizeof dir);
+    // copy ".."
     memcpy(dir.filename, father_dir, 3);
-    dir.inode_off =;
-    write_block_file(&node, node.size, (char *)&dir, sizeof dir);
+    dir.inode_off = dir_off;
+    write_block_file(&new_dir, new_dir.size, (char *)&dir, sizeof dir);
     return SUCC;
 }
 
 /**
-   create a regular file or a directory
+   delete it in father's directory
+   free inode, block in map
+*/
+int delete_a_file(inode_t father, inode_t this) {
+    iNode this_node;
+    n_dev_read(now_disk, FM,
+        &this_node, this, sizeof this_node);
+    if (this_node.type == DIR) {
+        int num_files = this_node.size / sizeof(Dir_entry);
+        assert(this_node.size % sizeof(Dir_entry) == 0);
+        Dir_entry dirs[num_files];
+        int i;
+        for (i = 0; i < num_files; i++) {
+            delete_a_file(this, dirs[i].inode_off);
+        }
+    } else {
+        assert(this_node.type == PLAIN);
+        iNode father_node;
+        n_dev_read(now_disk, FM,
+            &father_node, father, sizeof(iNode));
+        uint32_t offset = get_dir_e_off(&father_node, this);
+        assert(offset != -1);
+        del_block_file_content(&father_node, offset, sizeof(Dir_entry));
+    }
+    return SUCC;
+}
+
+/**
+   delete a regular file or
+   a directory(which will delete the files it contains recursively)
 */
 int delete_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
@@ -211,7 +261,6 @@ int delete_file(Msg *m) {
     if (!file_exist(off)) {
         return FAIL;
     }
-
     return SUCC;
 }
 

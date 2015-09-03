@@ -48,6 +48,8 @@ size_t read_block_file(char *buf, iNode *node, uint32_t offset, int len);
 // write to current file cursor
 size_t write_block_file(iNode *node, uint32_t offset, char *buf, int len);
 
+size_t del_block_file_content(iNode *file, uint32_t offset, int len);
+
 uint32_t inode_alloc();
 int inode_free(uint32_t);
 
