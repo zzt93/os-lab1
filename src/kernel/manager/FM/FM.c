@@ -3,6 +3,7 @@
 #include "kernel/message.h"
 
 #include "kernel/manager/fd.h"
+#include "kernel/manager/f_dir.h"
 #include "kernel/manager/file_table.h"
 #include "drivers/hal.h"
 
@@ -49,6 +50,9 @@ static void FM_job() {
                 break;
             case FM_create:
                 m.ret = create_file(&m);
+                break;
+            case FM_make:
+                m.ret = make_dir(&m);
                 break;
             case FM_del:
                 m.ret = delete_file(&m);

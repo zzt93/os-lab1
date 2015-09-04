@@ -2,6 +2,8 @@
 #include "drivers/hal.h"
 
 #include "kernel/manager/FM.h"
+#include "kernel/manager/block.h"
+#include "kernel/manager/f_dir.h"
 #include "adt/d_bit_map.h"
 
 D_BIT_MAP();
@@ -174,10 +176,10 @@ uint32_t get_block(iNode *node, int index) {
                 thi + thi_off, sizeof res);
         } else {
             n_dev_read(now_disk, FM, &second,
-                node->index[THI_INDIRECT] + first_off, sizof second);
+                node->index[THI_INDIRECT] + first_off, sizeof second);
             n_dev_read(now_disk, FM, &thi,
                 second + second_off, sizeof thi);
-            n_dev_read(now_disk, Fm, &res,
+            n_dev_read(now_disk, FM, &res,
                 thi + thi_off, sizeof res);
         }
     } else {
@@ -186,6 +188,10 @@ uint32_t get_block(iNode *node, int index) {
     return res;
 }
 
+/**
+   offset -- the offset relative to file start, for offset relative
+   to the start of whole image is meaning less for a file.
+ */
 static
 size_t rw_file(char *buf, iNode *node, uint32_t offset, int len,
     size_t (*n_dev_rw)(int, pid_t, void *, off_t, size_t)) {
@@ -214,7 +220,7 @@ size_t rw_file(char *buf, iNode *node, uint32_t offset, int len,
    if `offset` is invalid( > size of file),
    return error message
  */
-size_t read_block_file(char *buf, iNode *node, uint32_t offset, int len) {
+size_t read_block_file(iNode *node, uint32_t offset, char *buf, int len) {
     if (offset > node->size || offset + len > node->size) {
         return 0;
     }
@@ -236,30 +242,56 @@ size_t write_block_file(iNode *node, uint32_t offset, char *buf, int len) {
     return write;
 }
 
-/**
-   return how many bytes are deleted
-*/
+/*
+   return how many bytes are deleted -- may be no use
 size_t del_block_file_content(iNode *file, uint32_t offset, int len) {
-    int index = offset / sizeof(Dir_entry);
-    uint32_t block_off = get_block(file, index);
-    size_t del = 0;
-    file->size -= del;
-    return del;
+    assert(offset + len < file->size);
+    size_t to_rw = file->size - offset - len;
+    char buf[to_rw];
+    size_t read = rw_file(buf, file, offset + len, to_rw, n_dev_read);
+    size_t write = rw_file(buf, file, offset, to_rw, n_dev_write);
+    // if using less block
+    if ((node->size - len) / block_size < node->size / block_size) {
+        block_free(node->size / block_size);
+    }
+    assert(read == write && write == len);
+    file->size -= len;
+    return len;
 }
+*/
 
 /**
    return the offset of the directory entry whose offset
    is `aim`
  */
 uint32_t get_dir_e_off(iNode *dir, inode_t aim) {
-    int num_files = this_node.size / sizeof(Dir_entry);
-    assert(this_node.size % sizeof(Dir_entry) == 0);
-    Dir_entry dirs[num_files];
+    int num_files = dir->size / sizeof(Dir_entry);
+    assert(dir->size % sizeof(Dir_entry) == 0);
+    Dir_entry entries[num_files];
+    rw_file((char *)entries, dir, 0, dir->size, n_dev_read);
     int i;
     for (i = 0; i < num_files; i++) {
-        if (this == dirs[i].inode_off) {
+        if (aim == entries[i].inode_off) {
             return i * sizeof(Dir_entry);
         }
     }
     return -1;
+}
+
+size_t del_block_file_dir(iNode *file, inode_t aim) {
+    uint32_t offset = get_dir_e_off(file, aim);
+    // if offset == -1, the following would also fail
+    size_t to_rw = sizeof(Dir_entry);
+    assert((file->size - offset) % to_rw == 0);
+    assert(offset + to_rw <= file->size);
+    char buf[to_rw];
+    size_t read = rw_file(buf, file, file->size - to_rw, to_rw, n_dev_read);
+    size_t write = rw_file(buf, file, offset, to_rw, n_dev_write);
+    // if using less block
+    if ((file->size - to_rw) / block_size < file->size / block_size) {
+        block_free(file->size / block_size);
+    }
+    assert(read == write && write == to_rw);
+    file->size -= to_rw;
+    return to_rw;
 }

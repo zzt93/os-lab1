@@ -34,6 +34,7 @@ struct INODE{
 
 typedef struct INODE iNode;
 
+typedef uint32_t inode_t;
 
 extern const int inode_size;
 extern uint32_t inode_map_start;
@@ -44,13 +45,21 @@ extern uint32_t inode_area_size;
 
 uint32_t get_block(iNode *node, int index);
 
-size_t read_block_file(char *buf, iNode *node, uint32_t offset, int len);
+// this one is metaphor for `=` assignment, but for unify read
+// and write change it to write like
+//size_t read_block_file(char *buf, iNode *node, uint32_t offset, int len);
+size_t read_block_file(iNode *node, uint32_t offset, char *buf, int len);
 // write to current file cursor
 size_t write_block_file(iNode *node, uint32_t offset, char *buf, int len);
 
-size_t del_block_file_content(iNode *file, uint32_t offset, int len);
+size_t del_block_file_dir(iNode *file, inode_t aim);
 
 uint32_t inode_alloc();
 int inode_free(uint32_t);
+
+static inline
+int invalid_inode(inode_t off) {
+    return off < inode_start;
+}
 
 #endif /* __INODE_H__ */

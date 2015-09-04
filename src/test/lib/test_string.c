@@ -28,19 +28,18 @@ void test_string() {
         "aaa/b/c/d"
     };
     int index[ARR_LEN(path)];
-    int i;
-    for (i = 0; i < ARR_LEN(path); i++) {
-        index[i] = find_char(path[i], -1, '/');
+    int in;
+    for (in = 0; in < ARR_LEN(path); in++) {
+        index[in] = find_char(path[in], -1, '/');
     }
-    for (i = 0; i < ARR_LEN(path); i++) {
-        assert(index[i] == strlen(path[i]) - 2);
-    }
-
-    for (i = 0; i < ARR_LEN(path); i++) {
-        index[i] = find_char(path[i], 1, '/');
-    }
-    for (i = 0; i < ARR_LEN(path); i++) {
-        assert(index[i] == i);
+    for (in = 0; in < ARR_LEN(path); in++) {
+        assert(index[in] == strlen(path[in]) - 2);
     }
 
+    for (in = 0; in < ARR_LEN(path); in++) {
+        index[in] = find_char(path[in], 1, '/');
+    }
+    for (in = 0; in < ARR_LEN(path); in++) {
+        assert(index[in] == in);
+    }
  }

@@ -43,7 +43,7 @@ void do_syscall(TrapFrame *tf) {
                 // name of directory
                 m.dev_id = tf->ebx;
                 m.buf = current;
-                brea;
+                break;
             case SYS_del:
                 m.type = FM_del;
                 // name of file
@@ -65,7 +65,7 @@ void do_syscall(TrapFrame *tf) {
                 init_msg(&m,
                     current->pid,
                     FM_read,
-                    INVALID_ID, tf->ebx, (void *)tf->ecx, 0, tf->edx);
+                    (pid_t)current, tf->ebx, (void *)tf->ecx, 0, tf->edx);
                 break;
             case SYS_write:
                 // tf->ebx -- fd
@@ -74,7 +74,7 @@ void do_syscall(TrapFrame *tf) {
                 init_msg(&m,
                     current->pid,
                     FM_write,
-                    INVALID_ID, tf->ebx, (void *)tf->ecx, 0, tf->edx);
+                    (pid_t)current, tf->ebx, (void *)tf->ecx, 0, tf->edx);
                 break;
             case SYS_close:
                 m.type = FM_close;
@@ -99,7 +99,7 @@ void do_syscall(TrapFrame *tf) {
                 break;
             case SYS_dup2:
                 m.type = FM_dup2;
-                m.i[2] = current;
+                m.i[2] = (int)current;
                 // old_fd
                 m.i[0] = tf->ebx;
                 // new_fd in dev_id

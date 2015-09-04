@@ -35,7 +35,7 @@ const char *const default_cwd_name = "/";
    0 -- not contain
    node_offset of the file which called `name`
  */
-static int contain_file(inode_t node_off, char *name) {
+static inode_t contain_file(inode_t node_off, char *name) {
     iNode node;
     n_dev_read(now_disk, FM, &node, node_off, sizeof node);
     if (node.type != DIR) {
@@ -71,7 +71,7 @@ static int contain_file(inode_t node_off, char *name) {
    and return node offset of that file
    -- path can't be NULL
  */
-static inode_t file_path(inode_t cwd, char *name) {
+inode_t file_path(inode_t cwd, char *name) {
     assert(name != NULL);
     // assume it as a relative path
     // i.e., set node_off as cwd's node
@@ -185,7 +185,7 @@ int make_plain_file(char *name, PCB *aim) {
 int create_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
-    if (name == NULL) {
+    if (invalid_filename(name)) {
         return FAIL;
     }
     return make_plain_file(name, aim) == FAIL ?
@@ -195,7 +195,7 @@ int create_file(Msg *m) {
 int make_dir(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
-    if (name == NULL) {
+    if (invalid_filename(name)) {
         return FAIL;
     }
     iNode new_dir;
@@ -238,9 +238,16 @@ int delete_a_file(inode_t father, inode_t this) {
         iNode father_node;
         n_dev_read(now_disk, FM,
             &father_node, father, sizeof(iNode));
-        uint32_t offset = get_dir_e_off(&father_node, this);
-        assert(offset != -1);
-        del_block_file_content(&father_node, offset, sizeof(Dir_entry));
+        // delete it in father's directory
+        del_block_file_dir(&father_node, this);
+        // free this file's block
+        int index = this_node.size / block_size;
+        int i;
+        for (i = index; i >= 0; i--) {
+            block_free(get_block(&this_node, index));
+        }
+        // free this file's inode
+        inode_free(this);
     }
     return SUCC;
 }
@@ -252,15 +259,35 @@ int delete_a_file(inode_t father, inode_t this) {
 int delete_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
-    if (name == NULL) {
+    if (invalid_filename(name)) {
         return FAIL;
     }
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
-    inode_t off = file_path(cwd, name);
-    // whether it is exist
-    if (!file_exist(off)) {
+    inode_t dir;
+    char *filename;
+    // analyze file path
+    // find the last '/' in the file path
+    int last_slash = find_char(name, -1, '/');
+    if (last_slash < 0) {// doesn't contain '/', i.e. just a file name
+        dir = cwd;
+        filename = name;
+    } else {// directory/filename
+        if (last_slash == 0) {// just like `/media`
+            dir = inode_start;
+        } else {
+            // split name to directory and filename
+            // by adding a '\0' between them
+            name[last_slash] = '\0';
+            // get the node offset of directory of this file
+            dir = file_path(cwd, name);
+        }
+        filename = name + last_slash + 1;
+    }
+    if (!file_exist(dir)) {
         return FAIL;
     }
+    inode_t new = contain_file(dir, filename);
+    delete_a_file(dir, new);
     return SUCC;
 }
 
@@ -283,7 +310,7 @@ int list_dir(Msg *m) {
     n_dev_read(now_disk, FM, &node, node_off, sizeof(iNode));
     if (node.type == DIR) {
         // read the content of file by node info
-        read_block_file(buf, &node, 0, node.size);
+        read_block_file(&node, 0, buf, node.size);
     } else {
         // not a directory, so just return it's parameter
         memcpy(buf, name, strlen(name) + 1);
@@ -294,8 +321,31 @@ int list_dir(Msg *m) {
 int ch_dir(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
-    if (name == NULL) {
-        name = default_cwd_name;
+    // if not specify the list name,
+    // using default file path -- current working directory node_off
+    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
+    inode_t off = cwd;
+    if (name != NULL) {
+        off = file_path(cwd, name);
+    }
+    if (off < inode_start) {
+        return FAIL;
+    }
+    iNode node;
+    n_dev_read(now_disk, FM, &node, off, sizeof node);
+    // set file table entry
+    FTE *fte = add_fte(&node, off);
+    set_cwd(aim, fte);
+    return SUCC;
+}
+
+size_t rw_prepare(Msg *m,
+    size_t (*rw_block_file)(iNode *, uint32_t, char *buf, int len)) {
+    PCB *aim = (PCB *)m->req_pid;
+    char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
+    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
+    if (invalid_filename(name)) {
+        return FAIL;
     }
     // if not specify the list name,
     // using default file path -- current working directory node_off
@@ -304,10 +354,15 @@ int ch_dir(Msg *m) {
     if (off < inode_start) {
         return FAIL;
     }
-    // set file table entry
     iNode node;
     n_dev_read(now_disk, FM, &node, off, sizeof node);
-    FTE *fte = add_fte(&node, off);
-    set_cwd(aim, fte);
-    return SUCC;
+    return rw_block_file(&node, off, buf, m->len);
+}
+
+size_t write_file(Msg *m) {
+    return rw_prepare(m, write_block_file);
+}
+
+size_t n_read_file(Msg *m) {
+    return rw_prepare(m, read_block_file);
 }

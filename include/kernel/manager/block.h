@@ -18,6 +18,7 @@ extern uint32_t block_start;
 extern uint32_t block_area_size;
 
 uint32_t block_alloc();
+int block_free(uint32_t offset);
 
 // const -- how many offset can a block store
 extern int indirect_datalink_nr;

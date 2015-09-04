@@ -19,6 +19,8 @@ void print_str(void (*printer)(char), char *);
 int to_int(char *);
 int split(char *s, char delimiter, char **save);
 
+#define INVALID_INDEX -1
+
 int find_char(const char *str, int ith, char aim);
 
 #endif

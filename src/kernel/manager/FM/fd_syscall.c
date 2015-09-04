@@ -3,6 +3,11 @@
 #include "kernel/manager/fd.h"
 
 #include "kernel/manager/fd_ft.h"
+#include "kernel/manager/f_dir.h"
+
+#include "kernel/manager/MM_util.h"
+#include "kernel/manager/FM.h"
+#include "drivers/hal.h"
 
 int first_fd(PCB *start, void *value);
 
@@ -11,16 +16,21 @@ FDE * get_fde(PCB *aim, int i) {
     return aim->fd_table + i;
 }
 
-uint32_t find_node(Msg *, iNode *);
 
 int open_file(Msg *m) {
-    // find that inode
+    PCB *aim = (PCB *)m->buf;
+    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
+    if (invalid_filename(name)) {
+        return FAIL;
+    }
+    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
+    uint32_t node_off = file_path(cwd, name);
     iNode node;
-    uint32_t node_off = find_node(m, &node);
+    n_dev_read(now_disk, FM,
+        &node, node_off, sizeof node);
     // add an entry in system opened file table
     FTE *fte = add_fte(&node, node_off);
     // add a FDE in process fd table
-    PCB *aim = (PCB *)m->buf;
     int j = first_fd(aim, INVALID_FD);
     assign_fte(aim->fd_table[j].ft_entry, fte);
     return 1;

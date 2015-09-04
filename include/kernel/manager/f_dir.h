@@ -3,7 +3,7 @@
 
 #define MAX_FILENAME_LEN 28
 
-typedef uint32_t inode_t;
+#include "inode.h"
 
 typedef struct {
 	char filename[MAX_FILENAME_LEN];
@@ -25,8 +25,29 @@ extern const char *const default_cwd_name;
 #define NO_SUCH 0
 #define NOT_DIR 1
 
-#include "inode.h"
 
 uint32_t get_dir_e_off(iNode *dir, inode_t aim);
+
+#include "lib/string.h"
+static inline
+int invalid_filename(char *name) {
+    if (name == NULL || strlen(name) >= MAX_FILENAME_LEN) {
+        return 1;
+    }
+    return 0;
+}
+
+inode_t file_path(inode_t cwd, char *name);
+
+#include "kernel/message.h"
+
+int list_dir(Msg *m);
+int ch_dir(Msg *m);
+size_t write_file(Msg *m);
+size_t n_read_file(Msg *m);
+int delete_file(Msg *m);
+int make_dir(Msg *m);
+int create_file(Msg *m);
+
 
 #endif /* __F_DIR_H__ */

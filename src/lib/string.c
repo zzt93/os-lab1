@@ -132,4 +132,5 @@ int find_char(const char *str, int ith, char aim) {
             start ++;
         }
     }
+    return INVALID_INDEX;
 }
