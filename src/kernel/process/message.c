@@ -68,7 +68,7 @@ static Msg* find_message(PCB* p, pid_t id) {
 void get_message(PCB* p, pid_t id, Msg* m) {
     // find and delete aim message
     Msg *tmp = find_message(p, id);
-    printk("#%d: src %d, dest %d\n", current->pid, tmp->src, tmp->dest);
+    printk("#%d get_message: src %d, dest %d\n", current->pid, tmp->src, tmp->dest);
     assert(tmp != NULL
         && (tmp->src == id || id == ANY)
         && tmp->dest == current->pid);
@@ -88,7 +88,7 @@ void send(pid_t dest, Msg *m) {
     NOINTR;
     PCB* de = fetch_pcb(dest);
     NOINTR;
-    printk("-------#%d to send src: %d to dest: %d------", current->pid, m->src, dest);
+    printk("sd %d:-------#%d send to #%d------\n", current->pid, m->src, dest);
     assert(de != NULL && dest == de->pid);
     NOINTR;
     //Sem* s = &(de->mes_lock);
@@ -104,7 +104,7 @@ void send(pid_t dest, Msg *m) {
 }
 
 void receive(pid_t src, Msg *m) {
-    printk("%d:--------receive from %d----------\n", current->pid, src);
+    printk("rcv %d:--------receive from %d----------\n", current->pid, src);
     lock();
     printk("list size %d ", list_size(&(current->mes)) );
     NOINTR;

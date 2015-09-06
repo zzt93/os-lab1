@@ -86,6 +86,7 @@ dev_rw(Dev *dev, int type, pid_t reqst_pid, void *buf, off_t offset, size_t len)
     //unlock();
     //printk("%x ", dev);
 	assert(dev != NULL);
+    assert(offset >= 0);
     //printk("%d %s %x ", dev->pid, dev_name, dev);
 
     /**
@@ -138,16 +139,16 @@ dev_write(const char *aim, pid_t reqst_pid, void *buf, off_t offset, size_t len)
    to read
  */
 size_t
-n_dev_read(int aim, pid_t reqst_pid, void *buf, off_t offset, size_t capacity) {
-	return dev_rw(hal_get(aim), DEV_READ, reqst_pid, buf, offset, capacity);
+n_dev_read(int dev_id, pid_t reqst_pid, void *buf, off_t offset, size_t capacity) {
+	return dev_rw(hal_get(dev_id), DEV_READ, reqst_pid, buf, offset, capacity);
 }
 
 /**
-   `reqst_pid` write `len` bytes to device dev_id == `aim` from `buf`
+   `reqst_pid` write `len` bytes to device dev_id == `dev_id` from `buf`
    offset -- meanless for tty_, for console itself know where
    to write
  */
 size_t
-n_dev_write(int aim, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
-	return dev_rw(hal_get(aim), DEV_WRITE, reqst_pid, buf, offset, len);
+n_dev_write(int dev_id, pid_t reqst_pid, void *buf, off_t offset, size_t len) {
+	return dev_rw(hal_get(dev_id), DEV_WRITE, reqst_pid, buf, offset, len);
 }

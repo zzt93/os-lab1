@@ -33,7 +33,8 @@ int indirect_datalink_nr;
 int block_dir_num;
 void init_block(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) {
     block_map_start = mstart;
-    init_bitmap(msize);
+    // change to original number of block
+    init_bitmap(msize * BYTES_BITS);
     block_start = start;
     block_area_size = size;
     // copy from harddisk
@@ -63,14 +64,17 @@ int block_free(uint32_t offset) {
 
 void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size);
 
-uint32_t super_start = -1;
+uint32_t super_start = 1368064;
 #define SUPER_BUF 512
 void load_super_block() {
     char buf[SUPER_BUF];
-    n_dev_read(now_disk, FM, buf, super_start, SUPER_BUF);
+    //n_dev_read(now_disk, FM, buf, super_start, SUPER_BUF);
+    n_dev_read(now_disk, FM, buf, super_start, sizeof(uint32_t) * 8);
     // the following may change if we save more info in the super
     // block
     uint32_t *b = (uint32_t *)buf;
-    init_inode(b[0], b[1], b[2], b[3]);
-    init_block(b[4], b[5], b[6], b[7]);
+    // @checked the super block content is the same with
+    // the parameter in makeimg.py
+    init_inode(b[0], b[1], b[4], b[5]);
+    init_block(b[2], b[3], b[6], b[7]);
 }

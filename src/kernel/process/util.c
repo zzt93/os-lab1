@@ -91,10 +91,10 @@ void init_test_proc() {
     add2wake(create_kthread(user_process));
 }
 
+// init_idle() part two
 void init_idle() {
-    //current->count_of_lock = 1; -- remove to main.c:os_init_cont
-    current->pdir.val = get_kcr3()->val;
-    //TODO init_fd_table(current, default_cwd);
+    //current->count_of_lock = 1; -- move to main.c:os_init_cont
+    init_fd_table(current, default_cwd);
 }
 
 

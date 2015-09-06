@@ -29,7 +29,8 @@
     static void init_bitmap(int size) {                         \
         assert(size > 0);                                       \
         _bitmap_array =                                         \
-            kmalloc(sizeof(uint32_t) * (size / BITS + 1));      \
+            kmalloc(sizeof(uint32_t) * (size % BITS == 0 ?      \
+                    size / BITS : size / BITS + 1));            \
         _bitmap_size = size;                                    \
     }                                                           \
                                                                 \

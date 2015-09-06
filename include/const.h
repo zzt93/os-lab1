@@ -12,4 +12,6 @@ typedef enum {
     SEEK_END,
 } File_seek;
 
+#define BYTES_BITS 8
+
 #endif

@@ -47,28 +47,31 @@ ide_driver_thread(void) {
 		receive(ANY, &m);
 
 		if (m.src == MSG_HARD_INTR) {
+            printk("msg hard interrupt ");
 			if (m.type == IDE_WRITEBACK) {
 				cache_writeback();
 			} else {
 				panic("IDE interrupt is leaking");
 			}
 		} else if (m.type == DEV_READ) {
+            printk("device read ");
 			uint32_t i;
 			uint8_t data;
 			for (i = 0; i < m.len; i ++) {
 				data = read_byte(m.offset + i);
 				//copy_from_kernel(fetch_pcb(m.req_pid), m.buf + i, &data, 1);
-                memcpy(m.buf + i, &data, 1);
+                memcpy(m.buf + i, &data, sizeof data);
 			}
 			m.ret = i;
 			m.dest = m.src;
 			m.src = IDE;
 			send(m.dest, &m);
 		} else if (m.type == DEV_WRITE) {
+            printk("device write ");
 			uint32_t i;
 			uint8_t data;
 			for (i = 0; i < m.len; i ++) {
-                memcpy(&data, m.buf + i, 1);
+                memcpy(&data, m.buf + i, sizeof data);
 				//copy_to_kernel(fetch_pcb(m.req_pid), &data, m.buf + i, 1);
 				write_byte(m.offset + i, data);
 			}
@@ -85,6 +88,8 @@ ide_driver_thread(void) {
 
 static void
 ide_intr(void) {
+    // for it is NOINTR, so using static message is fine
+    NOINTR;
 	static Msg m;
 	m.type = IDE_READY;
 	m.src = MSG_HARD_INTR;
@@ -93,6 +98,7 @@ ide_intr(void) {
 
 static void
 time_intr(void) {
+    NOINTR;
 	static Msg m;
 	static uint32_t counter = 0;
 	counter = (counter + 1) % (WRITEBACK_TIME * HZ);

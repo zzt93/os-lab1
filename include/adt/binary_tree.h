@@ -6,78 +6,83 @@
 #include "lib/malloc.h"
 
 /**
-  T: the type parameter
-  f: the comparing funciton, bool f(T, T);
-  name: the name of tree
+   T: the type parameter
+   f: the comparing funciton, bool f(T, T);
+   name: the name of tree
 
-  the order: forbiden to add same element
-  left < mid < right
+   the order: forbiden to add same element
+   left < mid < right
 
-  no duplicate:
-  if there are more than one same elements -- defined by your
-  comparing function -- added, only first is added
+   no duplicate:
+   if there are more than one same elements -- defined by your
+   comparing function -- added, only first is added
 
 
-  implementation detail:
-  use a TreeNode* as the head, and only use the left link
+   implementation detail:
+   use a TreeNode* as the head, and only use the left link
 */
 
-#define BI_TREE(T, f, name)                                             \
-    typedef struct {                                                    \
-        T t;                                                            \
-        NodeLink link;                                                  \
-    } TNode_##name;                                                     \
-                                                                        \
-    static TNode_##name h;                                              \
-    static TNode_##name* name##_head = &h;                              \
-                                                                        \
-    static inline TNode_##name* left(TNode_##name* t) {                 \
-        assert(t != NULL);                                              \
-        NodeLink l = t->link;                                           \
-        if (l.left == NULL) {                                           \
-            return NULL;                                                \
-        }                                                               \
-        return ptr2container(l.left, TNode_##name, link);               \
-    }                                                                   \
-    static inline TNode_##name* right(TNode_##name* t) {                \
-        assert(t != NULL);                                              \
-        NodeLink l = t->link;                                           \
-        if (l.right == NULL) {                                          \
-            return NULL;                                                \
-        }                                                               \
-        return ptr2container(l.right, TNode_##name, link);              \
-    }                                                                   \
-    static inline void set_le(TNode_##name* n, TNode_##name *l) {       \
-        assert(n != NULL);                                              \
-        assert(n != l);                                                 \
-        if (l != NULL) {                                                \
-            assert(f(n->t, l->t) != 0);                                 \
-        }                                                               \
-        (n->link).left = (l == NULL) ? NULL : &(l->link);               \
-    }                                                                   \
-    static inline void set_ri(TNode_##name* n, TNode_##name *r) {       \
-        assert(n != NULL);                                              \
-        assert(n != r);                                                 \
-        if (r != NULL) {                                                \
-            assert(f(n->t, r->t) != 0);                                 \
-        }                                                               \
-        (n->link).right = (r == NULL) ? NULL : &(r->link);              \
-    }                                                                   \
-                                                                        \
-    static void init_node(TNode_##name* n, T t,                         \
-        TNode_##name* l, TNode_##name* r) {                             \
-        n->t = t;                                                       \
-        set_le(n, l);                                                   \
-        set_ri(n, r);                                                   \
-    }                                                                   \
-                                                                        \
-                                                                        \
-                                                                        \
-    bool name##_empty() {                                               \
-        return left(name##_head) == NULL &&                             \
-            right(name##_head) == NULL;                                 \
-    }                                                                   \
-                                                                        \
+#define BI_TREE(T, f, name)                                 \
+    typedef struct {                                        \
+        T t;                                                \
+        NodeLink link;                                      \
+    } TNode_##name;                                         \
+                                                            \
+    static TNode_##name h;                                  \
+    static TNode_##name* name##_head = &h;                  \
+                                                            \
+    static inline                                           \
+    TNode_##name* left(TNode_##name* t) {                   \
+        assert(t != NULL);                                  \
+        NodeLink l = t->link;                               \
+        if (l.left == NULL) {                               \
+            return NULL;                                    \
+        }                                                   \
+        return ptr2container(l.left, TNode_##name, link);   \
+    }                                                       \
+    static inline                                           \
+    TNode_##name* right(TNode_##name* t) {                  \
+        assert(t != NULL);                                  \
+        NodeLink l = t->link;                               \
+        if (l.right == NULL) {                              \
+            return NULL;                                    \
+        }                                                   \
+        return ptr2container(l.right, TNode_##name, link);  \
+    }                                                       \
+    static inline                                           \
+    void set_le(TNode_##name* n, TNode_##name *l) {         \
+        assert(n != NULL);                                  \
+        assert(n != l);                                     \
+        /*if n->t == NULL, means `n` is root */             \
+        if (l != NULL && n->t != NULL) {                    \
+            assert(f(n->t, l->t) != 0);                     \
+        }                                                   \
+        (n->link).left = (l == NULL) ? NULL : &(l->link);   \
+    }                                                       \
+    static inline                                           \
+    void set_ri(TNode_##name* n, TNode_##name *r) {         \
+        assert(n != NULL);                                  \
+        assert(n != r);                                     \
+        if (r != NULL) {                                    \
+            assert(f(n->t, r->t) != 0);                     \
+        }                                                   \
+        (n->link).right = (r == NULL) ? NULL : &(r->link);  \
+    }                                                       \
+                                                            \
+    static void init_node(TNode_##name* n, T t,             \
+        TNode_##name* l, TNode_##name* r) {                 \
+        n->t = t;                                           \
+        set_le(n, l);                                       \
+        set_ri(n, r);                                       \
+    }                                                       \
+                                                            \
+                                                            \
+                                                            \
+    bool name##_empty() {                                   \
+        return left(name##_head) == NULL &&                 \
+            right(name##_head) == NULL;                     \
+    }                                                       \
+                                                            \
     /**
        return NULL if empty tree
        return the place to insert if no such element

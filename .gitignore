@@ -15,3 +15,5 @@ log
 *.elf
 *.dump
 *.ar
+
+harddisk/__pycache__/

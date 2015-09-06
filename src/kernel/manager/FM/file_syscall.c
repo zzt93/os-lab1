@@ -292,15 +292,19 @@ int delete_file(Msg *m) {
 }
 
 int list_dir(Msg *m) {
+    assert((char *)m->req_pid != NULL);
     PCB *aim = (PCB *)m->buf;
-    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
     char *buf = (char *)get_pa(&aim->pdir, m->req_pid);
-    assert(buf != NULL);
-    // if not specify the list name,
-    // using default file path -- current working directory node_off
-    inode_t node_off = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
-    if (name != NULL) {
-        node_off = file_path(node_off, name);
+    inode_t node_off;
+    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
+    char *name;
+    if ((char *)m->dev_id == NULL) { // i.e. name is empty
+        node_off = cwd;
+    } else {
+        name = (char *)get_pa(&aim->pdir, m->dev_id);
+        // if not specify the list name,
+        // using default file path -- current working directory node_off
+        node_off = file_path(cwd, name);
     }
     if (node_off < inode_start) {
         set_error_msg(buf, node_off);
@@ -309,6 +313,7 @@ int list_dir(Msg *m) {
     // get the node info of this file
     n_dev_read(now_disk, FM, &node, node_off, sizeof(iNode));
     if (node.type == DIR) {
+        // if name is NULL, it has to be go this branch
         // read the content of file by node info
         read_block_file(&node, 0, buf, node.size);
     } else {

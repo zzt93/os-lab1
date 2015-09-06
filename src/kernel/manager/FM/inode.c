@@ -39,10 +39,21 @@ static inline int off_nodei(uint32_t offset) {
 /**
    initialize the bit map for inode from ramdisk/disk
    initialize the inode number from ramdisk/disk
+   msize -- is in unit of bytes in order to read from now_disk
  */
 void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) {
     inode_map_start = mstart;
-    init_bitmap(msize);
+    // change to original number of inode
+    /*
+      @bug-fixed: allocating less array causing array out
+      of bound.
+      for the old wrong size, it will
+      allocate less space than needed, when read from
+      FM and then write to bitmap, it will overlap
+      the head info of next allocated memory block, which
+      cause `kmalloc()` assert fail.
+    */
+    init_bitmap(msize * BYTES_BITS);
     inode_start = start;
     inode_area_size = size;
     // copy from harddisk

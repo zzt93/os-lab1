@@ -2,8 +2,9 @@ from _ctypes import sizeof
 from ctypes import LittleEndianStructure, c_char, c_int, c_uint
 import ctypes
 import os
-from learn_class.os.bitmap import BitMap
-from learn_class.os.filetype import FileType
+import sys
+from bitmap import BitMap
+from filetype import FileType
 
 __author__ = 'zzt'
 
@@ -30,7 +31,6 @@ class MkImg:
     # argument: ./disk.img, indoe number, block number, block size(in kB)
     def __init__(self, disk, ino, bno, bsize):
         assert self.NODE_SZ == 128
-        self.dir = os.path.dirname(disk)
         self.disk = disk
         self.inode_num = ino
         self.block_num = bno
@@ -73,7 +73,7 @@ class MkImg:
 
     '''
     :return file's inode offset and block offset relative to the end of kernel
-	it will default allocate a block to use
+    it will default allocate a block to use
     '''
 
     def make_file(self, filetype, kernel_sz):
@@ -87,7 +87,7 @@ class MkImg:
         # set block offset, type in inode
         node = Inode.from_buffer(self.buf, inode_off)
         # IDE driver
-        node.dev_id = 6
+        node.dev_id = 5
         node.index[0] = block_off + kernel_sz
         node.link_count = 1
         node.type = filetype.value
@@ -130,12 +130,13 @@ class MkImg:
 
     '''
     write content in the buf at the offset place
-	and update size
+    and update size
     '''
-    def write_to_file(self, inode_o, src, offset):
-        self.buf[offset: offset + len(buf)] = src
+
+    def write_to_file(self, inode_o, offset, src):
+        self.buf[offset: offset + len(src)] = src
         node = Inode.from_buffer(self.buf, inode_o)
-		node.size += len(buf)
+        node.size += len(src)
 
     def make_img(self):
         disk_sz = os.path.getsize(self.disk)
@@ -153,18 +154,19 @@ class MkImg:
         current = DirEntry.from_buffer(buf1)
         current.filename = b'.'
         current.inode_off = inode_o + disk_sz
-        self.write_to_file(buf1, block_o)
+        self.write_to_file(inode_o, block_o, buf1)
         buf2 = bytearray(sizeof(DirEntry))
         father = DirEntry.from_buffer(buf2)
         father.filename = b'..'
         father.inode_off = inode_o + disk_sz
-        self.write_to_file(buf2, block_o + sizeof(current))
-        with open(os.path.join(self.dir, 'harddisk.img'), 'wb') as img:
+        self.write_to_file(inode_o, block_o + sizeof(current), buf2)
+        with open('./hard_disk', 'wb') as img:
             img.write(bytearray(self.buf))
 
 
 if __name__ == '__main__':
     assert (sizeof(DirEntry) % 32 == 0)
     assert (sizeof(Inode) % 128 == 0)
-    a = MkImg('./disk.img', 2 ** 12, 2 ** 10, 1)
+    sys.path.extend(['/media/zzt/01CEC27C454731B01/recent/os/ics/os/os-lab1/harddisk'])
+    a = MkImg('../disk.img', 2 ** 12, 2 ** 10, 1)
     a.make_img()

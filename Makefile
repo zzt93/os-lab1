@@ -10,13 +10,15 @@ CFILES  = $(shell find src/ -name "*.c")
 SFILES  = $(shell find src/ -name "*.S")
 OBJS    = $(CFILES:.c=.o) $(SFILES:.S=.o)
 
-run: disk.img
-	$(QEMU) -no-shutdown -serial stdio disk.img
+run: hardDisk
+	$(QEMU) -no-shutdown -serial stdio harddisk/harddisk.img
 
-debug: disk.img
+debug: hardDisk
 	gnome-terminal -e "bash -c \"gdb -s kernel; exec bash\""
-	$(QEMU) -serial stdio -s -S disk.img
+	$(QEMU) -serial stdio -s -S harddisk/harddisk.img
 
+hardDisk: disk.img
+	@cd harddisk; make
 
 disk.img: kernel
 	@cd boot; make

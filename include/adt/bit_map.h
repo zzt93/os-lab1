@@ -22,7 +22,8 @@
 #define INVALID -1
 
 #define BIT_MAP(size)                               \
-    static uint32_t free[size / BITS + 1];          \
+    static uint32_t free[size % BITS == 0 ?         \
+        size / BITS : size / BITS + 1];             \
                                                     \
     static void set_val(int i, int val) {           \
         assert(val == FREE || val == USED);         \

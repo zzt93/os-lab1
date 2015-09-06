@@ -24,7 +24,7 @@ void init_kmalloc() {
 
   args: {size: use the sizeof to produce numbers of bytes}
   return value: if has free space, return the pointer to the first char; otherwise return null
-  Usage:
+  Usage: return the a memory block which has `size` bytes
 
   use the first sign bit as indicator of use or not
        1 as use
@@ -91,7 +91,17 @@ void *kmalloc(unsigned int size) {
     // update last_i
     last_i = gap + s;
     if (free != s) {
-        // update free space header info
+        // update free space header info if
+        // we won't write a `0` to it. i.e.
+        // we run out of a block memory in middle
+        /**
+           eg. s = 4
+          ----------------------------------------------
+          |   used1  | free = 4 | used2  | free = ...  |
+          ----------------------------------------------
+                     ^
+                   old last_i
+         */
         *(space_head() + last_i) = free - s;
     }
 

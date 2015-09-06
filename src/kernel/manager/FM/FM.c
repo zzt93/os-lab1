@@ -82,17 +82,20 @@ void load_super_block();
  */
 void init_file_system() {
     now_disk = d_ide;
-    // default system opened file
-    init_file_table();
     // init each region start and size
     load_super_block();
+    /**
+       default system opened file -- load_super_block() have to
+       before init_file_table();
+    */
+    init_file_table();
 }
 
 void init_FM() {
     PCB* p = create_kthread(FM_job);
     FM = p->pid;
     add2wake(p);
-    //init_file_system();
+    init_file_system();
 }
 
 
