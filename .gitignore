@@ -17,3 +17,4 @@ log
 *.ar
 
 harddisk/__pycache__/
+harddisk/hard_disk

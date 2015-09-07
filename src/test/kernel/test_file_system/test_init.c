@@ -9,15 +9,17 @@
 /**
    test the initial state of hard-disk
  */
-void test_init() {
+void test_list(char *name) {
     Msg m;
-    char buf[SZ];
+    int size = SZ / sizeof(Dir_entry);
+    Dir_entry entry[size];
     init_msg(&m,
         current->pid,
         FM_lsdir,
-        (pid_t)buf, (int)NULL, current, INVALID_ID, SZ);
-    int size = SZ / sizeof(Dir_entry);
-    Dir_entry entry[size];
+        (int)entry, (int)NULL, current, INVALID_ID, SZ);
+    m.ret = list_dir(&m);
+    assert(m.ret != FAIL);
+    size = m.ret;
     assert(strcmp(entry[0].filename, ".") == 0);
     assert(strcmp(entry[1].filename, "..") == 0);
     int i;
@@ -25,4 +27,14 @@ void test_init() {
         printk("%s, ", entry[i].filename);
     }
 
+}
+
+void test_mkdir() {
+    Msg m;
+    m.buf = current;
+    char name[] = "first_dir";
+    m.dev_id = (int)name;
+    m.ret = make_dir(&m);
+    assert(m.ret == SUCC);
+    test_list(NULL);
 }

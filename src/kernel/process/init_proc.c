@@ -63,12 +63,14 @@ static void init_user_tf(TrapFrame* frame, void* fun) {
 
 void init_fd_table(PCB *pcb, FTE *cwd) {
     // initialize fd table
+    lock();
     memset(pcb->fd_table, 0, sizeof(FDE) * PROCESS_MAX_FD);
     assign_fte(&pcb->fd_table[STDIN_FILENO], stdin);
     assign_fte(&pcb->fd_table[STDOUT_FILENO], stdout);
     assign_fte(&pcb->fd_table[STDERR_FILENO], stderr);
     // set the current working directory
     set_cwd(pcb, cwd);
+    unlock();
 }
 
 static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
@@ -80,6 +82,8 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
     list_init(&(pcb->link));
     list_init(&(pcb->mes));
     //create_sem(&(pcb->mes_lock), 1);
+    // default state is no lock, which is different from
+    // the first idle process
     pcb->count_of_lock = 0;
     // initialize the page directory address
     set_pdir(pcb, val);

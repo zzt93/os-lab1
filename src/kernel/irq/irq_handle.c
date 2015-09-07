@@ -42,6 +42,7 @@ void schedule();
 extern PCB* current;
 
 void irq_handle(TrapFrame *tf) {
+    printk(RED" interrupt "RESET);
     NOINTR;
     assert(current != NULL);
     current->count_of_lock++;

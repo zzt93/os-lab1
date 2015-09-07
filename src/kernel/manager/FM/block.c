@@ -32,14 +32,16 @@ static inline int offset_blocki(uint32_t offset) {
 int indirect_datalink_nr;
 int block_dir_num;
 void init_block(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) {
+    lock();
     block_map_start = mstart;
     // change to original number of block
     init_bitmap(msize * BYTES_BITS);
     block_start = start;
     block_area_size = size;
+    indirect_datalink_nr = block_size / sizeof(int);
+    unlock();
     // copy from harddisk
     n_dev_read(now_disk, FM, bits(), mstart, msize);
-    indirect_datalink_nr = block_size / sizeof(int);
     block_dir_num = block_size / sizeof(Dir_entry);
 }
 
@@ -64,7 +66,7 @@ int block_free(uint32_t offset) {
 
 void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size);
 
-uint32_t super_start = 1368064;
+uint32_t super_start = 1369600;
 #define SUPER_BUF 512
 void load_super_block() {
     char buf[SUPER_BUF];

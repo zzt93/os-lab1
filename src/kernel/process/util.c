@@ -101,5 +101,3 @@ void init_idle() {
 void init_proc() {
     init_idle();
 }
-/*
-*/

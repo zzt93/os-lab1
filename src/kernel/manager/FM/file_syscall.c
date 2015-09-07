@@ -312,15 +312,17 @@ int list_dir(Msg *m) {
     iNode node;
     // get the node info of this file
     n_dev_read(now_disk, FM, &node, node_off, sizeof(iNode));
+    size_t read = 0;
     if (node.type == DIR) {
         // if name is NULL, it has to be go this branch
         // read the content of file by node info
-        read_block_file(&node, 0, buf, node.size);
+        read = read_block_file(&node, 0, buf, node.size);
     } else {
         // not a directory, so just return it's parameter
         memcpy(buf, name, strlen(name) + 1);
+        return FAIL;
     }
-    return SUCC;
+    return read / sizeof(Dir_entry);
 }
 
 int ch_dir(Msg *m) {

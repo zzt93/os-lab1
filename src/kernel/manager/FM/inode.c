@@ -42,6 +42,7 @@ static inline int off_nodei(uint32_t offset) {
    msize -- is in unit of bytes in order to read from now_disk
  */
 void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) {
+    lock();
     inode_map_start = mstart;
     // change to original number of inode
     /*
@@ -56,6 +57,7 @@ void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) 
     init_bitmap(msize * BYTES_BITS);
     inode_start = start;
     inode_area_size = size;
+    unlock();
     // copy from harddisk
     n_dev_read(now_disk, FM, bits(), mstart, msize);
 }

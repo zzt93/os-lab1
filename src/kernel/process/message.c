@@ -106,12 +106,13 @@ void send(pid_t dest, Msg *m) {
 void receive(pid_t src, Msg *m) {
     printk("rcv %d:--------receive from %d----------\n", current->pid, src);
     lock();
-    printk("list size %d ", list_size(&(current->mes)) );
+    printk("Msg number %d; ", list_size(&(current->mes)) );
     NOINTR;
     while (!has_message(current, src)) {// no such message
         // go to sleep
         // if some thread send message to it, it will wake_up this,
         // so return from here and continue
+        printk(".");
         sleep();
     }
     //P(s);

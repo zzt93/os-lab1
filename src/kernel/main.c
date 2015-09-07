@@ -75,34 +75,46 @@ os_init_cont(void) {
     NOINTR;
 
     /**
-       init_driver() have to before init_manager() for FM have
+       init_driver() have to before init_file_system() for FM have
        to send message to `ide` to read file system
      */
     init_driver();
-    /**
-      init_manager() have to before init_proc()
-      for init_proc() will using the `default_cwd` which is
-      initialized by FM
-     */
     init_manager();
     NOINTR;
+    init_error_msg();
+    // init_proc() and init_manager() can replace??
+    // solved by split set count_of_lock out of init_proc();
+
+    //more_frequent();
+
+    unlock(); // set interrupt enabled
+    INTR;
+
+    // @checked: move from locked state to unlocked state
+    init_file_system();
+    /**
+       init_file_system() have to before init_proc()
+       for init_proc() will using the `default_cwd` which is
+       initialized by FM
+    */
     /* Initialize the state of process idle, ie the running
        process for set up right lock num to avoid other
        initialization enable the interrupt and cause problem
     */
-    // init_proc() and init_manager() can replace??
-    // solved by split set count_of_lock out of init_proc();
+    // @checked: move from locked state to unlocked state
     init_proc();
 
-    init_error_msg();
-    NOINTR;
+    // @checked: move from locked state to unlocked state
     welcome();
+    // set idle not to using cpu time
+    // for it is originally set to sleep when send message
+    current->state = IDLE;
     // to initialize shell process, which must later
     // than init_manager -- for it will send message to
     // managers
+    // @checked: move from locked state to unlocked state
     init_test_proc();
-    more_frequent();
-    unlock(); // set interrupt enabled
+
 
     /* This context now becomes the idle process. */
     while (1) {
@@ -161,7 +173,7 @@ welcome(void) {
     test_random();
     test_string();
     */
-    test_init();
+    test_list(NULL);
 }
 
 void init_error_msg() {

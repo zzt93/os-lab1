@@ -57,14 +57,17 @@ ide_driver_thread(void) {
             printk("device read ");
 			uint32_t i;
 			uint8_t data;
+            printk("device read %d ", m.len);
 			for (i = 0; i < m.len; i ++) {
 				data = read_byte(m.offset + i);
 				//copy_from_kernel(fetch_pcb(m.req_pid), m.buf + i, &data, 1);
                 memcpy(m.buf + i, &data, sizeof data);
 			}
+            printk("device read ");
 			m.ret = i;
 			m.dest = m.src;
 			m.src = IDE;
+            printk("device read ");
 			send(m.dest, &m);
 		} else if (m.type == DEV_WRITE) {
             printk("device write ");

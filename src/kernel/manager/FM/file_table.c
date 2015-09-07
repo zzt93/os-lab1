@@ -54,6 +54,7 @@ FTE * get_fte(PCB *aim, int fd) {
     return (FTE *)fde->ft_entry;
 }
 
+inode_t file_path(inode_t cwd, char *name);
 void init_file_table() {
     iNode node;
     node.size = -1;
@@ -66,7 +67,9 @@ void init_file_table() {
     stderr = add_fte(&node, -1);
     // set to a directory -- now is root
     // read it from disk
-    n_dev_read(now_disk, FM, (char *)&node, inode_start, sizeof node);
+    inode_t aim = file_path(0, "/");
+    assert(aim == inode_start);
+    n_dev_read(now_disk, FM, (char *)&node, aim, sizeof node);
     default_cwd = add_fte(&node, inode_start);
 }
 
