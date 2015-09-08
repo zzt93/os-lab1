@@ -89,6 +89,9 @@ void init_file_system() {
        before init_file_table(); for file_table will use inode_start
     */
     init_file_table();
+    // for many thread is already initialized with `0`, so
+    // re-init them
+    init_thread_cwd();
 }
 
 void init_FM() {

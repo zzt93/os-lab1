@@ -7,6 +7,7 @@
 #include "kernel/process.h"
 #include "kernel/message.h"
 #include "kernel/manager/PM.h"
+#include "kernel/manager/FM.h"
 
 /*
   // not correctly implemented now:

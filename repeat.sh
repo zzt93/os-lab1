@@ -38,9 +38,9 @@ do
     elif [ $i == $maxrun ]
     then
         die '\n\033[1;31mReach maximal run!\033[0m'
-    elif [ $(grep -c 'Now: current is #0' $logfile) -ge 5 ]
+    elif [ $(grep -c 'Now: current is #0' $logfile) -ge 20 ]
     then
-        die '\n\033[1;31mMysterious repeatation is detected!\033[0m'
+        die '\n\033[1;31mMysterious repetition is detected!\033[0m'
     fi
 
     pkill -9 qemu

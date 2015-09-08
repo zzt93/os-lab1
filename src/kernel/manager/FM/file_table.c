@@ -83,3 +83,11 @@ int detach_fte(FDE *fd, FTE *fte) {
     fte->ref_count --;
     return SUCC;
 }
+
+void init_thread_cwd() {
+    int i, thread_num = pcb_size();
+    PCB *pcbs[thread_num] = fetch_all_pcb();
+    for (i = 0; i < thread_num; i++) {
+        set_cwd(pcbs[i], default_cwd);
+    }
+}

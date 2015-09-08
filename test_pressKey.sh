@@ -71,7 +71,7 @@ while true; do
 	echo -e "\nstart the ${i}th test..."
 
 	> $fifo
-	tail -f $fifo | qemu-system-i386 -serial file:$logfile -monitor stdio disk.img 2>> $logfile &
+	tail -f $fifo | qemu-system-i386 -serial file:$logfile -monitor stdio harddisk/harddisk.img 2>> $logfile &
 	sleep $initinterval
 
 	exec_cmdfile $cmdfile
@@ -85,6 +85,9 @@ while true; do
 		die '\n\033[1;31mMysterious reboot is detected!\033[0m'
 	elif [ $i == $maxrun ]; then
 		die
+	elif [ $(grep -c 'Now: current is #0' $logfile) -ge 20 ]
+    then
+        die '\n\033[1;31mMysterious repetition is detected!\033[0m'
 	fi
 
 	pkill -9 tail

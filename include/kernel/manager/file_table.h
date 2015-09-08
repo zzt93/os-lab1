@@ -38,5 +38,6 @@ extern FTE *stderr;
 extern FTE *default_cwd;
 
 void init_file_table();
+void init_thread_cwd();
 
 #endif /* __FILE_TABLE_H__ */

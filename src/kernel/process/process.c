@@ -14,6 +14,16 @@ PCB* fetch_pcb(pid_t id) {
     return all_get(id);
 }
 
+void fetch_all_pcb(PCB **pcbs) {
+    return all_get_all(pcbs);
+}
+
+size_t pcb_size() {
+    int size = all_get_map_size();
+    assert(size >= 0);
+    return size;
+}
+
 int remove_process(PCB *pcb) {
     assert(pcb != NULL);
     return all_remove(pcb->pid);

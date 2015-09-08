@@ -111,7 +111,10 @@ sizeof(iNode) == 128B
 - ie, now inode number is 2**12, 4096, block number is 2**20
 - operations to file system by `n_dev_read & n_dev_write` will add an offset of that section's start  
 which is invisible for user.
- 
+- for most kernel process(pid [1-10]) are initialized before  
+  file_system was loaded, in which `default_cwd` is  
+  setted, so for kernel thread, `current working directory` are invalid for them  
+
 
 
 ## i386 ISA

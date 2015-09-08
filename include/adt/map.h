@@ -27,14 +27,15 @@
    Why call left in get then interrupt then cause page fault
    -- for the `call lock()` in asm_do_irq change the value of
    $eax, $edx
- */
+*/
 #define MAP(K, V, name)                                     \
     typedef struct {                                        \
         K k;                                                \
         V v;                                                \
     } Entry;                                                \
                                                             \
-    static Entry aim;                                       \
+    static Entry name##_aim;                                \
+    static int map_size = 0;                                \
                                                             \
     void name##_init_entry(Entry* e, K k, V v) {            \
         e->k = k;                                           \
@@ -56,8 +57,8 @@
     /*get a node using the funciton when init as criteria*/ \
     V name##_get(K k) {                                     \
         lock();                                             \
-        aim.k = k;                                          \
-        TNode_##name* e = find_fa(&aim);                    \
+        name##_aim.k = k;                                   \
+        TNode_##name* e = find_fa(&name##_aim);             \
         if (e == NULL) {                                    \
             printk(RED"no such key"RESET);                  \
             return NULL;                                    \
@@ -81,26 +82,31 @@
     }                                                       \
                                                             \
     void name##_put(K k, V v) {                             \
-        Entry* e = kmalloc(sizeof(Entry));                  \
-        name##_init_entry(e, k, v);                         \
-        lock();                                             \
-        if (name##_has(e)) {                                \
-            TNode_##name* t = name##_get_node(e);           \
-            assert(t != NULL);                              \
-            assert((t->t)->k = k);                          \
-            t->t = e;                                       \
-        } else {                                            \
-            name##_add(e);                                  \
-        }                                                   \
-        unlock();                                           \
+    Entry* e = kmalloc(sizeof(Entry));                      \
+    name##_init_entry(e, k, v);                             \
+    lock();                                                 \
+    if (name##_has(e)) {                                    \
+        TNode_##name* t = name##_get_node(e);               \
+        assert(t != NULL);                                  \
+        assert((t->t)->k = k);                              \
+        t->t = e;                                           \
+    } else {                                                \
+        map_size++;                                         \
+        name##_add(e);                                      \
+    }                                                       \
+    unlock();                                               \
     }                                                       \
                                                             \
     int name##_remove(K k) {                                \
         lock();                                             \
-        aim.k = k;                                          \
-        int res = name##_delete(&aim);                      \
+        name##_aim.k = k;                                   \
+        int res = name##_delete(&name##_aim);               \
         unlock();                                           \
         return res;                                         \
+    }                                                       \
+                                                            \
+    int name##_get_map_size() {                             \
+        return map_size;                                    \
     }                                                       \
                                                             \
 

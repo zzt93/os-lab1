@@ -87,11 +87,19 @@ os_init_cont(void) {
 
     //more_frequent();
 
-    unlock(); // set interrupt enabled
-    INTR;
+
+    // to initialize shell process, which must later
+    // than init_manager -- for it will send message to
+    // managers
+    // @checked: move from locked state to unlocked state
+    init_test_proc();
 
     // @checked: move from locked state to unlocked state
     init_file_system();
+
+    unlock(); // set interrupt enabled
+    INTR;
+
     /**
        init_file_system() have to before init_proc()
        for init_proc() will using the `default_cwd` which is
@@ -109,11 +117,6 @@ os_init_cont(void) {
     // set idle not to using cpu time
     // for it is originally set to sleep when send message
     current->state = IDLE;
-    // to initialize shell process, which must later
-    // than init_manager -- for it will send message to
-    // managers
-    // @checked: move from locked state to unlocked state
-    init_test_proc();
 
 
     /* This context now becomes the idle process. */
@@ -174,6 +177,7 @@ welcome(void) {
     test_string();
     */
     test_list(NULL);
+    test_mkdir();
 }
 
 void init_error_msg() {
