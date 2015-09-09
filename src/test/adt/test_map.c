@@ -14,44 +14,42 @@ static void print_tree(TNode_num* root) {
 
 }
 
+char *const one_s = "1";
+char *const two_s = "2";
+char *const thr_s = "3";
+
 void test_put() {
-    num_put(1, "1");
+    num_put(1, one_s);
     print_tree(left(num_head));
-    num_put(2, "2");
+    num_put(2, two_s);
     print_tree(left(num_head));
-    num_put(3, "3");
+    num_put(3, thr_s);
     print_tree(left(num_head));
 }
 
 void test_get() {
     print_tree(left(num_head));
     char * one = num_get(1);
-    assert(one[0] == '1');
-    assert(strcmp(one, "1") == 0);
+    assert(strcmp(one, one_s) == 0);
     char *two = num_get(2);
-    assert(two[0] == '2');
-    assert(strcmp(two, "2") == 0);
+    assert(strcmp(two, two_s) == 0);
     char *thr = num_get(3);
-    assert(thr[0] == '3');
-    assert(strcmp(thr, "3") == 0);
+    assert(strcmp(thr, thr_s) == 0);
 }
 
 void test_map() {
-    num_put(1, "1");
-    print_tree(left(num_head));
-    num_put(2, "2");
-    print_tree(left(num_head));
-    num_put(3, "3");
-    print_tree(left(num_head));
-    
-    char * one = num_get(1);
-    assert(one[0] == '1');
-    assert(strcmp(one, "1") == 0);
-    char *two = num_get(2);
-    assert(two[0] == '2');
-    assert(strcmp(two, "2") == 0);
-    char *thr = num_get(3);
-    assert(thr[0] == '3');
-    assert(strcmp(thr, "3") == 0);
+    test_put();
+
+    test_get();
     //assert(one == NULL && two == NULL && thr == NULL);
+
+    int count = 5;
+    int c = count;
+    char *numbers[count];
+    num_values(numbers, &count);
+    assert(c - 3 == count);
+    int i;
+    for (i = c - 1; i >= c - count - 1; i--) {
+        printk("%s ", numbers[i]);
+    }
 }

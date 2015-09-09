@@ -109,6 +109,22 @@
         return map_size;                                    \
     }                                                       \
                                                             \
+    static int values_container_c;                          \
+    static V *values_container;                             \
+    static                                                  \
+    void adder(Entry *e) {                                  \
+        values_container_c --;                              \
+        values_container[values_container_c] = e->v;        \
+    }                                                       \
+                                                            \
+    /* !!the content is put reversed in container */        \
+    void name##_values(V *v, int *capacity) {               \
+        lock();                                             \
+        values_container = v;                               \
+        values_container_c = *capacity;                     \
+        name##_in_order(adder, capacity);                   \
+        unlock();                                           \
+    }                                                       \
 
 
 #endif /* __MAP_H__ */

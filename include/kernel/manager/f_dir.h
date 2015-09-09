@@ -37,14 +37,12 @@ int invalid_filename(char *name) {
     return 0;
 }
 
-inode_t file_path(inode_t cwd, char *name);
+inode_t file_path(inode_t cwd, const char * const name);
 
 #include "kernel/message.h"
 
 int list_dir(Msg *m);
 int ch_dir(Msg *m);
-size_t write_file(Msg *m);
-size_t n_read_file(Msg *m);
 int delete_file(Msg *m);
 int make_dir(Msg *m);
 int create_file(Msg *m);

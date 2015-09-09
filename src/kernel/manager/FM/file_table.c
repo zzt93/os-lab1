@@ -1,5 +1,6 @@
 #include "adt/bit_map.h"
 #include "kernel/manager/fd.h"
+#include "kernel/manager/f_dir.h"
 #include "kernel/manager/manager.h"
 
 #include "lib/string.h"
@@ -54,7 +55,6 @@ FTE * get_fte(PCB *aim, int fd) {
     return (FTE *)fde->ft_entry;
 }
 
-inode_t file_path(inode_t cwd, char *name);
 void init_file_table() {
     iNode node;
     node.size = -1;
@@ -65,12 +65,14 @@ void init_file_table() {
     stdin = add_fte(&node, -1);
     stdout = add_fte(&node, -1);
     stderr = add_fte(&node, -1);
+    NOINTR;
     // set to a directory -- now is root
     // read it from disk
-    inode_t aim = file_path(0, "/");
+    inode_t aim = file_path(0, default_cwd_name);
     assert(aim == inode_start);
     n_dev_read(now_disk, FM, (char *)&node, aim, sizeof node);
     default_cwd = add_fte(&node, inode_start);
+    NOINTR;
 }
 
 int detach_fte(FDE *fd, FTE *fte) {
@@ -86,8 +88,37 @@ int detach_fte(FDE *fd, FTE *fte) {
 
 void init_thread_cwd() {
     int i, thread_num = pcb_size();
-    PCB *pcbs[thread_num] = fetch_all_pcb();
+    PCB *pcbs[thread_num];
+    int res = fetch_all_pcb(pcbs, thread_num);
+    assert(res == 0);
     for (i = 0; i < thread_num; i++) {
-        set_cwd(pcbs[i], default_cwd);
+        init_fd_table(pcbs[i], default_cwd);
     }
+}
+
+size_t rw_prepare(Msg *m,
+    size_t (*rw_block_file)(inode_t, uint32_t, char *buf, int len)) {
+    PCB *aim = (PCB *)m->req_pid;
+    char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
+    int fd = m->dev_id;
+    if (is_invalid_fd(&aim->fd_table[fd])) {
+        return FAIL;
+    }
+    // if not specify the list name,
+    // using default file path -- current working directory node_off
+    FTE *fte = ((FTE *)aim->fd_table[fd].ft_entry);
+    inode_t nodeoff = fte->node_off;
+    int offset = fte->offset;
+    if (nodeoff < inode_start) {
+        return FAIL;
+    }
+    return rw_block_file(nodeoff, offset, buf, m->len);
+}
+
+size_t write_file(Msg *m) {
+    return rw_prepare(m, write_block_file);
+}
+
+size_t n_read_file(Msg *m) {
+    return rw_prepare(m, read_block_file);
 }

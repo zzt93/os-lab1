@@ -19,7 +19,7 @@
 
 
    implementation detail:
-   use a TreeNode* as the head, and only use the left link
+   use a T(ree)Node_##name* as the head, and only use the left link
 */
 
 #define BI_TREE(T, f, name)                                 \
@@ -297,6 +297,30 @@
             return ri;                                                  \
         }                                                               \
     }                                                                   \
+                                                                        \
+    static                                                          \
+    void tree_in_order(TNode_##name *root,                              \
+            void (* consumer)(T), int *capacity) {                      \
+        if (root == NULL) {                                             \
+            return ;                                                    \
+        }                                                               \
+        tree_in_order(left(root), consumer, capacity);                  \
+        (*capacity) --;                                                 \
+        if (*capacity >= 0) {                                           \
+            consumer(root->t);                                          \
+        }                                                               \
+        tree_in_order(right(root), consumer, capacity);                 \
+    }                                                                   \
+                                                                        \
+void name##_in_order(void (* consumer)(T), int *capacity) {             \
+        if (name##_empty()) {                                           \
+            return;                                                     \
+        }                                                               \
+        TNode_##name *le = left(name##_head);                           \
+        assert(le != NULL);                                             \
+        tree_in_order(le, consumer, capacity);                          \
+    }                                                                   \
+
 /*\
   bool empty_subtree(TNode_##name* root) {                     \
   assert(root != NULL);                                           \

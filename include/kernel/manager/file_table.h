@@ -40,4 +40,9 @@ extern FTE *default_cwd;
 void init_file_table();
 void init_thread_cwd();
 
+#include "kernel/message.h"
+
+size_t write_file(Msg *m);
+size_t n_read_file(Msg *m);
+
 #endif /* __FILE_TABLE_H__ */

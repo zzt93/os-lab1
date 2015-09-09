@@ -110,7 +110,7 @@ os_init_cont(void) {
        initialization enable the interrupt and cause problem
     */
     // @checked: move from locked state to unlocked state
-    init_proc();
+    //init_proc();
 
     // @checked: move from locked state to unlocked state
     welcome();
@@ -169,15 +169,16 @@ welcome(void) {
     */
     /*
     test_tree();
-    test_map();
     test_page_alloc();
     test_bit_map();
     test_heap();
     test_random();
     test_string();
     */
+    test_map();
     test_list(NULL);
     test_mkdir();
+    test_deldir();
 }
 
 void init_error_msg() {

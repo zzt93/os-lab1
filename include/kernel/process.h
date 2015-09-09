@@ -92,6 +92,8 @@ void delete_ref(PCB*);
 PCB* fetch_pcb(int);
 void add_process(PCB*);
 int remove_process(PCB *pcb);
+size_t pcb_size();
+int fetch_all_pcb(PCB **pcbs, int capacity);
 
 static inline void * get_pdir_addr(PCB *p) {
     return (void *)(p->pdir.page_directory_base << 12);

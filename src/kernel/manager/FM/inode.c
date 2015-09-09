@@ -202,11 +202,14 @@ uint32_t get_block(iNode *node, int index) {
 }
 
 /**
+   Only update the block area(may be block map area if necessary)
+   so, for write, have to update inode yourself.
+   
    offset -- the offset relative to file start, for offset relative
    to the start of whole image is meaning less for a file.
  */
 static
-size_t rw_file(char *buf, iNode *node, uint32_t offset, int len,
+size_t rw_file_block(char *buf, iNode *node, uint32_t offset, int len,
     size_t (*n_dev_rw)(int, pid_t, void *, off_t, size_t)) {
     assert(len > 0);
     int block_i = offset / block_size;
@@ -232,12 +235,20 @@ size_t rw_file(char *buf, iNode *node, uint32_t offset, int len,
    many bytes are actually read
    if `offset` is invalid( > size of file),
    return error message
+
+   - len can be -1 which refer to as R_LAST_BYTE
  */
-size_t read_block_file(iNode *node, uint32_t offset, char *buf, int len) {
-    if (offset > node->size || offset + len > node->size) {
+size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
+    iNode node;
+    n_dev_read(now_disk, FM, &node, nodeoff, sizeof node);
+    if (len == R_LAST_BYTE) {
+        len = node.size;
+    }
+
+    if (offset > node.size || offset + len > node.size) {
         return 0;
     }
-    int read = rw_file(buf, node, offset, len, n_dev_read);
+    int read = rw_file_block(buf, &node, offset, len, n_dev_read);
     assert(len == read);
     return read;
 }
@@ -245,13 +256,26 @@ size_t read_block_file(iNode *node, uint32_t offset, char *buf, int len) {
 /**
    write content to buffer, set right file size
    and extend block if necessary
+   offset can be last byte refer to as -1.
+
+   area updated:
+   - inode map area -- file size
+   - block area -- write content
+   - block map area(may be need to extend)
  */
-size_t write_block_file(iNode *node, uint32_t offset, char *buf, int len) {
-    if (offset > node->size) {
+size_t write_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
+    iNode node;
+    n_dev_read(now_disk, FM, &node, nodeoff, sizeof node);
+    if (offset == W_LAST_BYTE) {
+        offset = node.size;
+    }
+    if (offset > node.size) {
         return 0;
     }
-    size_t write = rw_file(buf, node, offset, len, n_dev_write);
-    node->size += write;
+    size_t write = rw_file_block(buf, &node, offset, len, n_dev_write);
+    node.size += write;
+    n_dev_write(now_disk, FM,
+        &node, nodeoff, sizeof(iNode));
     return write;
 }
 
@@ -261,8 +285,8 @@ size_t del_block_file_content(iNode *file, uint32_t offset, int len) {
     assert(offset + len < file->size);
     size_t to_rw = file->size - offset - len;
     char buf[to_rw];
-    size_t read = rw_file(buf, file, offset + len, to_rw, n_dev_read);
-    size_t write = rw_file(buf, file, offset, to_rw, n_dev_write);
+    size_t read = rw_file_block(buf, file, offset + len, to_rw, n_dev_read);
+    size_t write = rw_file_block(buf, file, offset, to_rw, n_dev_write);
     // if using less block
     if ((node->size - len) / block_size < node->size / block_size) {
         block_free(node->size / block_size);
@@ -281,7 +305,7 @@ uint32_t get_dir_e_off(iNode *dir, inode_t aim) {
     int num_files = dir->size / sizeof(Dir_entry);
     assert(dir->size % sizeof(Dir_entry) == 0);
     Dir_entry entries[num_files];
-    rw_file((char *)entries, dir, 0, dir->size, n_dev_read);
+    rw_file_block((char *)entries, dir, 0, dir->size, n_dev_read);
     int i;
     for (i = 0; i < num_files; i++) {
         if (aim == entries[i].inode_off) {
@@ -291,6 +315,7 @@ uint32_t get_dir_e_off(iNode *dir, inode_t aim) {
     return -1;
 }
 
+// TODO update inode area
 size_t del_block_file_dir(iNode *file, inode_t aim) {
     uint32_t offset = get_dir_e_off(file, aim);
     // if offset == -1, the following would also fail
@@ -298,8 +323,8 @@ size_t del_block_file_dir(iNode *file, inode_t aim) {
     assert((file->size - offset) % to_rw == 0);
     assert(offset + to_rw <= file->size);
     char buf[to_rw];
-    size_t read = rw_file(buf, file, file->size - to_rw, to_rw, n_dev_read);
-    size_t write = rw_file(buf, file, offset, to_rw, n_dev_write);
+    size_t read = rw_file_block(buf, file, file->size - to_rw, to_rw, n_dev_read);
+    size_t write = rw_file_block(buf, file, offset, to_rw, n_dev_write);
     // if using less block
     if ((file->size - to_rw) / block_size < file->size / block_size) {
         block_free(file->size / block_size);

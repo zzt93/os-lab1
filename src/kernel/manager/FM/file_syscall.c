@@ -71,7 +71,7 @@ static inode_t contain_file(inode_t node_off, char *name) {
    and return node offset of that file
    -- path can't be NULL
  */
-inode_t file_path(inode_t cwd, char *name) {
+inode_t file_path(inode_t cwd, const char * const name) {
     assert(name != NULL);
     // assume it as a relative path
     // i.e., set node_off as cwd's node
@@ -121,8 +121,9 @@ int default_file_block = 1;
  */
 static
 int make_empty_file(File_e type, char *name, PCB *aim,
-    // the following two parameter is only useful for directory
-    iNode *node, inode_t *dir_off) {
+    // the following one parameter is only useful for directory
+    inode_t *dir_off) {
+    iNode node;
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
     inode_t dir;
     char *filename;
@@ -149,26 +150,24 @@ int make_empty_file(File_e type, char *name, PCB *aim,
     }
     // allocate new inode and default block
     inode_t new = inode_alloc();
-    node->size = 0;
-    node->dev_id = now_disk;
+    node.size = 0;
+    node.dev_id = now_disk;
     int i;
     for (i = 0; i < default_file_block; i++) {
-        node->index[i] = block_alloc();
+        node.index[i] = block_alloc();
     }
     for (i = default_file_block; i < FILE_LINK_NUM; i ++) {
-        node->index[i] = 0;
+        node.index[i] = 0;
     }
-    node->link_count = 1;
-    node->type = type;
-    n_dev_write(now_disk, FM, node, new, sizeof(iNode));
+    node.link_count = 1;
+    node.type = type;
+    n_dev_write(now_disk, FM, &node, new, sizeof(iNode));
 
     // write to father directory's block
-    iNode dir_node;
-    n_dev_read(now_disk, FM, &dir_node, dir, sizeof dir_node);
     Dir_entry dir_content;
     memcpy(dir_content.filename, filename, strlen(filename) + 1);
     dir_content.inode_off = new;
-    write_block_file(&dir_node, dir_node.size, (char *)&dir_content, sizeof(Dir_entry));
+    write_block_file(dir, W_LAST_BYTE, (char *)&dir_content, sizeof(Dir_entry));
 
     // prepare returned pointer
     *dir_off = dir;
@@ -177,9 +176,8 @@ int make_empty_file(File_e type, char *name, PCB *aim,
 
 static inline
 int make_plain_file(char *name, PCB *aim) {
-    iNode node;
     inode_t i;
-    return make_empty_file(PLAIN, name, aim, &node, &i);
+    return make_empty_file(PLAIN, name, aim, &i);
 }
 
 int create_file(Msg *m) {
@@ -198,23 +196,21 @@ int make_dir(Msg *m) {
     if (invalid_filename(name)) {
         return FAIL;
     }
-    iNode new_dir;
     inode_t dir_off;
     // the node offset of new directory
-    int res = make_empty_file(DIR, name, aim, &new_dir, &dir_off);
-    if (!file_exist(res)) {
+    int new = make_empty_file(DIR, name, aim, &dir_off);
+    if (!file_exist(new)) {
         return FAIL;
     }
-    Dir_entry dir;
+    Dir_entry dir[2];
     // copy "."
-    memcpy(dir.filename, current_dir, 2);
-    dir.inode_off = res;
-    write_block_file(&new_dir, new_dir.size, (char *)&dir, sizeof dir);
+    memcpy(dir[0].filename, current_dir, 2);
+    dir[0].inode_off = new;
     // copy ".."
-    memcpy(dir.filename, father_dir, 3);
-    dir.inode_off = dir_off;
-    write_block_file(&new_dir, new_dir.size, (char *)&dir, sizeof dir);
-    return SUCC;
+    memcpy(dir[1].filename, father_dir, 3);
+    dir[1].inode_off = dir_off;
+    write_block_file(new, W_LAST_BYTE, (char *)&dir, 2 * sizeof(Dir_entry));
+    return new;
 }
 
 /**
@@ -316,7 +312,7 @@ int list_dir(Msg *m) {
     if (node.type == DIR) {
         // if name is NULL, it has to be go this branch
         // read the content of file by node info
-        read = read_block_file(&node, 0, buf, node.size);
+        read = read_block_file(node_off, 0, buf, R_LAST_BYTE);
     } else {
         // not a directory, so just return it's parameter
         memcpy(buf, name, strlen(name) + 1);
@@ -346,8 +342,10 @@ int ch_dir(Msg *m) {
     return SUCC;
 }
 
+/* TODO need a write_to_file specify name && off_in_file??
+   how to get offset???
 size_t rw_prepare(Msg *m,
-    size_t (*rw_block_file)(iNode *, uint32_t, char *buf, int len)) {
+    size_t (*rw_block_file)(inode_t, uint32_t, char *buf, int len)) {
     PCB *aim = (PCB *)m->req_pid;
     char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
@@ -357,13 +355,11 @@ size_t rw_prepare(Msg *m,
     // if not specify the list name,
     // using default file path -- current working directory node_off
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
-    inode_t off = file_path(cwd, name);
-    if (off < inode_start) {
+    inode_t nodeoff = file_path(cwd, name);
+    if (nodeoff < inode_start) {
         return FAIL;
     }
-    iNode node;
-    n_dev_read(now_disk, FM, &node, off, sizeof node);
-    return rw_block_file(&node, off, buf, m->len);
+    return rw_block_file(nodeoff, , buf, m->len);
 }
 
 size_t write_file(Msg *m) {
@@ -373,3 +369,4 @@ size_t write_file(Msg *m) {
 size_t n_read_file(Msg *m) {
     return rw_prepare(m, read_block_file);
 }
+*/

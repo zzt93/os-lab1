@@ -45,13 +45,15 @@ extern uint32_t inode_area_size;
 
 uint32_t get_block(iNode *node, int index);
 
+#define W_LAST_BYTE -1
+#define R_LAST_BYTE -1
 // this one is metaphor for `=` assignment, but for unify read
 // and write change it to write like
 //size_t read_block_file(char *buf, iNode *node, uint32_t offset, int len);
-size_t read_block_file(iNode *node, uint32_t offset, char *buf, int len);
-// write to current file cursor
-size_t write_block_file(iNode *node, uint32_t offset, char *buf, int len);
+size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len);
 
+// write to current file cursor
+size_t write_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len);
 size_t del_block_file_dir(iNode *file, inode_t aim);
 
 uint32_t inode_alloc();

@@ -16,7 +16,7 @@ void test_list(char *name) {
     init_msg(&m,
         current->pid,
         FM_lsdir,
-        (int)entry, (int)NULL, current, INVALID_ID, SZ);
+        (int)entry, (int)name, current, INVALID_ID, SZ);
     m.ret = list_dir(&m);
     assert(m.ret != FAIL);
     size = m.ret;
@@ -35,6 +35,17 @@ void test_mkdir() {
     char name[] = "first_dir";
     m.dev_id = (int)name;
     m.ret = make_dir(&m);
+    assert(m.ret != FAIL);
+    test_list(NULL);
+    test_list(name);
+}
+
+void test_deldir() {
+    Msg m;
+    m.buf = current;
+    char name[] = "first_dir";
+    m.dev_id = (int)name;
+    m.ret = delete_file(&m);
     assert(m.ret == SUCC);
     test_list(NULL);
 }
