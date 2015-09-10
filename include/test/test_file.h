@@ -5,5 +5,6 @@ void test_list(char *);
 
 void test_mkdir();
 void test_deldir();
+void test_mk_del();
 
 #endif /* __TEST_FILE_H__ */

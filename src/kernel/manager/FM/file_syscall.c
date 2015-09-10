@@ -145,7 +145,8 @@ int make_empty_file(File_e type, char *name, PCB *aim,
         }
         filename = name + last_slash + 1;
     }
-    if (!file_exist(dir)) {
+    // directory not exist or file is already exist
+    if (!file_exist(dir) || file_exist(contain_file(dir, filename))) {
         return FAIL;
     }
     // allocate new inode and default block
@@ -225,17 +226,20 @@ int delete_a_file(inode_t father, inode_t this) {
         int num_files = this_node.size / sizeof(Dir_entry);
         assert(this_node.size % sizeof(Dir_entry) == 0);
         Dir_entry dirs[num_files];
+        read_block_file(this, 0, (char *)dirs, R_LAST_BYTE);
+        assert(strcmp(dirs[0].filename, current_dir) == 0);
+        assert(strcmp(dirs[1].filename, father_dir) == 0);
         int i;
-        for (i = 0; i < num_files; i++) {
+        // skip current_dir and father_dir for it
+        // doesn't need to
+        for (i = 2; i < num_files; i++) {
             delete_a_file(this, dirs[i].inode_off);
         }
+        del_block_file_dir(father, this);
     } else {
         assert(this_node.type == PLAIN);
-        iNode father_node;
-        n_dev_read(now_disk, FM,
-            &father_node, father, sizeof(iNode));
         // delete it in father's directory
-        del_block_file_dir(&father_node, this);
+        del_block_file_dir(father, this);
         // free this file's block
         int index = this_node.size / block_size;
         int i;
@@ -253,12 +257,12 @@ int delete_a_file(inode_t father, inode_t this) {
    a directory(which will delete the files it contains recursively)
 */
 int delete_file(Msg *m) {
-    PCB *aim = (PCB *)m->buf;
-    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
+    PCB *pcb = (PCB *)m->buf;
+    char *name = (char *)get_pa(&pcb->pdir, m->dev_id);
     if (invalid_filename(name)) {
         return FAIL;
     }
-    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
+    inode_t cwd = ((FTE *)pcb->fd_table[CWD].ft_entry)->node_off;
     inode_t dir;
     char *filename;
     // analyze file path
@@ -282,9 +286,12 @@ int delete_file(Msg *m) {
     if (!file_exist(dir)) {
         return FAIL;
     }
-    inode_t new = contain_file(dir, filename);
-    delete_a_file(dir, new);
-    return SUCC;
+    inode_t aim = contain_file(dir, filename);
+    if (aim == NO_SUCH || aim == NOT_DIR) {
+        return FAIL;
+    }
+    delete_a_file(dir, aim);
+    return aim;
 }
 
 int list_dir(Msg *m) {

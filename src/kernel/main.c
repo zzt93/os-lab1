@@ -174,11 +174,13 @@ welcome(void) {
     test_heap();
     test_random();
     test_string();
-    */
+
     test_map();
+    */
     test_list(NULL);
     test_mkdir();
     test_deldir();
+    //test_mk_del();
 }
 
 void init_error_msg() {

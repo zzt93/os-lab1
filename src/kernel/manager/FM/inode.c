@@ -316,20 +316,33 @@ uint32_t get_dir_e_off(iNode *dir, inode_t aim) {
 }
 
 // TODO update inode area
-size_t del_block_file_dir(iNode *file, inode_t aim) {
-    uint32_t offset = get_dir_e_off(file, aim);
+size_t del_block_file_dir(inode_t father, inode_t aim) {
+    iNode file;
+    n_dev_read(now_disk, FM,
+        &file, father, sizeof(iNode));
+    uint32_t offset = get_dir_e_off(&file, aim);
     // if offset == -1, the following would also fail
     size_t to_rw = sizeof(Dir_entry);
-    assert((file->size - offset) % to_rw == 0);
-    assert(offset + to_rw <= file->size);
-    char buf[to_rw];
-    size_t read = rw_file_block(buf, file, file->size - to_rw, to_rw, n_dev_read);
-    size_t write = rw_file_block(buf, file, offset, to_rw, n_dev_write);
-    // if using less block
-    if ((file->size - to_rw) / block_size < file->size / block_size) {
-        block_free(file->size / block_size);
+    assert((file.size - offset) % to_rw == 0);
+    assert(offset + to_rw <= file.size);
+    // more content behind to overwrite it
+    size_t read;
+    size_t write;
+    if (offset + to_rw < file.size) {
+        char buf[to_rw];
+        // change the content of block area
+        read = rw_file_block(buf, &file, offset + to_rw, to_rw, n_dev_read);
+        write = rw_file_block(buf, &file, offset, to_rw, n_dev_write);
+        assert(read == write && write == to_rw);
     }
-    assert(read == write && write == to_rw);
-    file->size -= to_rw;
+
+    // if using less block
+    if ((file.size - to_rw) / block_size < file.size / block_size) {
+        // change the block bitmap if necessary
+        block_free(file.size / block_size);
+    }
+    // change the content of inode information(size, )
+    file.size -= to_rw;
+    n_dev_write(now_disk, FM, &file, father, sizeof(iNode));
     return to_rw;
 }

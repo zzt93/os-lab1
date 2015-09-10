@@ -29,23 +29,46 @@ void test_list(char *name) {
 
 }
 
-void test_mkdir() {
+int set_mk_del_msg(char *name, int (*f)(Msg *)) {
     Msg m;
     m.buf = current;
-    char name[] = "first_dir";
     m.dev_id = (int)name;
-    m.ret = make_dir(&m);
-    assert(m.ret != FAIL);
-    test_list(NULL);
+    m.ret = f(&m);
     test_list(name);
+    return m.ret;
+}
+
+void test_mkdir() {
+    int res;
+    char name[] = "first_dir";
+    res = set_mk_del_msg(name, make_dir);
+    assert(res != FAIL);
+    char name2[] = "second_dir";
+    res = set_mk_del_msg(name2, make_dir);
+    assert(res != FAIL);
+    // make a duplicate directory
+    res = set_mk_del_msg(name2, make_dir);
+    assert(res == FAIL);
+    //char name3[] = "/third_dir";
+    //set_mk_del_msg(name3, make_dir);
+    test_list(NULL);
 }
 
 void test_deldir() {
-    Msg m;
-    m.buf = current;
+    int res;
     char name[] = "first_dir";
-    m.dev_id = (int)name;
-    m.ret = delete_file(&m);
-    assert(m.ret == SUCC);
+    res = set_mk_del_msg(name, delete_file);
+    assert(res != FAIL);
+    res = set_mk_del_msg(name, delete_file);
+    assert(res == FAIL);
     test_list(NULL);
+}
+
+void test_mk_del() {
+    int count = 100000;
+    int i;
+    for (i = 0; i < count; i++) {
+        test_mkdir();
+        test_deldir();
+    }
 }
