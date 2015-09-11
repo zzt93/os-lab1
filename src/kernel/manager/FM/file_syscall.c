@@ -140,7 +140,16 @@ int make_empty_file(File_e type, char *name, PCB *aim,
             // split name to directory and filename
             // by adding a '\0' between them
             name[last_slash] = '\0';
-            // get the node offset of directory of this file
+            if (name[last_slash + 1] == '\0') {
+                // i.e. /media/
+                if (type == PLAIN) {
+                    return FAIL;
+                }
+                // re-find a meaningful '/';
+                last_slash = find_char(name, -1, '/');
+            }
+
+            // get the node offset of directory this file resides
             dir = file_path(cwd, name);
         }
         filename = name + last_slash + 1;

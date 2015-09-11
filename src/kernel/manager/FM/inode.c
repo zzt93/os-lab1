@@ -331,7 +331,8 @@ size_t del_block_file_dir(inode_t father, inode_t aim) {
     if (offset + to_rw < file.size) {
         char buf[to_rw];
         // change the content of block area
-        read = rw_file_block(buf, &file, offset + to_rw, to_rw, n_dev_read);
+        // read the last directory and write the aim place
+        read = rw_file_block(buf, &file, file.size - to_rw, to_rw, n_dev_read);
         write = rw_file_block(buf, &file, offset, to_rw, n_dev_write);
         assert(read == write && write == to_rw);
     }
