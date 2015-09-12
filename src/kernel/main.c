@@ -179,7 +179,8 @@ welcome(void) {
     */
     test_list(NULL);
     test_mkdir();
-    test_deldir();
+    //test_deldir();
+    test_ch();
     //test_mk_del();
 }
 

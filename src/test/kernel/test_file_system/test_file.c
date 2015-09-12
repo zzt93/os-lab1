@@ -41,39 +41,46 @@ int set_mk_del_msg(char *name, int (*f)(Msg *)) {
     return m.ret;
 }
 
+static char name[] = "bin";
+static char name2[] = "dev";
+static char name3[] = "/home";
+static char name4[] = "./media";
+static char name5[] = "home/zzt/";
+static char name6[] = "home/zzt/Desktop/";
+static char name7[] = "home/zzt/Downloads/";
+static char pic[] = "Picture";
+static char doc[] = "Documents";
+static char doc2[] = "Documents/os";
+
 void test_mkdir() {
     int res;
-    char name[] = "bin";
     res = set_mk_del_msg(name, make_dir);
     assert(res != FAIL);
-    char name2[] = "dev";
     res = set_mk_del_msg(name2, make_dir);
     assert(res != FAIL);
     // make a duplicate directory
     res = set_mk_del_msg(name2, make_dir);
     assert(res == FAIL);
     // absolute path
-    char name3[] = "/home";
     res = set_mk_del_msg(name3, make_dir);
     assert(res != FAIL);
     // relative one
-    char name4[] = "./media";
     res = set_mk_del_msg(name4, make_dir);
     assert(res != FAIL);
-    char name5[] = "home/zzt";
     res = set_mk_del_msg(name5, make_dir);
     assert(res != FAIL);
-    char name6[] = "home/zzt/Desktop/";
     res = set_mk_del_msg(name6, make_dir);
+    assert(res != FAIL);
+    res = set_mk_del_msg(name7, make_dir);
     assert(res != FAIL);
 
     test_list(name3);
+    test_list(name5);
     test_list(NULL);
 }
 
 void test_deldir() {
     int res;
-    char name[] = "bin";
     res = set_mk_del_msg(name, delete_file);
     assert(res != FAIL);
     res = set_mk_del_msg(name, delete_file);
@@ -88,6 +95,21 @@ void test_delfile() {
 }
 
 void test_ch() {
+    int res;
+    res = set_mk_del_msg(name5, ch_dir);
+    assert(res != FAIL);
+    test_list(NULL);
+
+    res = set_mk_del_msg(name4, make_dir);
+    assert(res != FAIL);
+    res = set_mk_del_msg(pic, make_dir);
+    assert(res != FAIL);
+    res = set_mk_del_msg(doc, make_dir);
+    assert(res != FAIL);
+    res = set_mk_del_msg(doc2, make_dir);
+    assert(res != FAIL);
+
+    test_list(NULL);
 }
 
 void test_mk_del() {

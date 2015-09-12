@@ -30,7 +30,7 @@ uint32_t get_dir_e_off(iNode *dir, inode_t aim);
 
 #include "lib/string.h"
 static inline
-int invalid_filename(char *name) {
+int invalid_filename(const char *name) {
     if (name == NULL || strlen(name) >= MAX_FILENAME_LEN) {
         return 1;
     }

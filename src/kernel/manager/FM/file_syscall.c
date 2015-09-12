@@ -86,7 +86,12 @@ inode_t file_path(inode_t cwd, const char * const name) {
     int len = strlen(name) + 1;
     char path[len];
     memcpy(path, name, len);
-    // TODO split "//afd/asd"
+    assert(len >= 2);
+    if (name[len - 2] == '/') {
+        path[len - 2] = '\0';
+    }
+
+    // TODO split "/afd/asd/"
     int parts = split(path, '/', save);
     assert(parts <= MAX_DIR_DEPTH);
     int i;
@@ -118,14 +123,19 @@ int default_file_block = 1;
    and write back to now_disk
    - default only allocate a block for a newly-created file
    - write to father directory
+
+   - this function change the content of name, may be changed later
  */
 static
-int make_empty_file(File_e type, char *name, PCB *aim,
+int make_empty_file(File_e type, const char *fname, PCB *aim,
     // the following one parameter is only useful for directory
     inode_t *dir_off) {
     iNode node;
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
     inode_t dir;
+    int filenamelen = strlen(fname) + 1;
+    char name[filenamelen];
+    memcpy(name, fname, filenamelen);
     char *filename;
     // analyze file path
     // find the last '/' in the file path
@@ -141,12 +151,13 @@ int make_empty_file(File_e type, char *name, PCB *aim,
             // by adding a '\0' between them
             name[last_slash] = '\0';
             if (name[last_slash + 1] == '\0') {
-                // i.e. /media/
+                // e.g. /media/
                 if (type == PLAIN) {
                     return FAIL;
                 }
                 // re-find a meaningful '/';
                 last_slash = find_char(name, -1, '/');
+                name[last_slash] = '\0';
             }
 
             // get the node offset of directory this file resides
@@ -185,14 +196,14 @@ int make_empty_file(File_e type, char *name, PCB *aim,
 }
 
 static inline
-int make_plain_file(char *name, PCB *aim) {
+int make_plain_file(const char *name, PCB *aim) {
     inode_t i;
     return make_empty_file(PLAIN, name, aim, &i);
 }
 
 int create_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
-    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
+    const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
     if (invalid_filename(name)) {
         return FAIL;
     }
@@ -202,8 +213,8 @@ int create_file(Msg *m) {
 
 int make_dir(Msg *m) {
     PCB *aim = (PCB *)m->buf;
-    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
-    if (invalid_filename(name)) {
+    const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
+    if (name == NULL) {
         return FAIL;
     }
     inode_t dir_off;
@@ -264,15 +275,20 @@ int delete_a_file(inode_t father, inode_t this) {
 /**
    delete a regular file or
    a directory(which will delete the files it contains recursively)
+
+   - this function change the content of name, may be changed later
 */
 int delete_file(Msg *m) {
     PCB *pcb = (PCB *)m->buf;
-    char *name = (char *)get_pa(&pcb->pdir, m->dev_id);
-    if (invalid_filename(name)) {
+    const char *fname = (const char *)get_pa(&pcb->pdir, m->dev_id);
+    if (invalid_filename(fname)) {
         return FAIL;
     }
     inode_t cwd = ((FTE *)pcb->fd_table[CWD].ft_entry)->node_off;
     inode_t dir;
+    int filenamelen = strlen(fname) + 1;
+    char name[filenamelen];
+    memcpy(name, fname, filenamelen);
     char *filename;
     // analyze file path
     // find the last '/' in the file path
@@ -287,6 +303,13 @@ int delete_file(Msg *m) {
             // split name to directory and filename
             // by adding a '\0' between them
             name[last_slash] = '\0';
+            if (name[last_slash + 1] == '\0') {
+                // e.g. /media/
+                 // re-find a meaningful '/';
+                last_slash = find_char(name, -1, '/');
+                name[last_slash] = '\0';
+            }
+
             // get the node offset of directory of this file
             dir = file_path(cwd, name);
         }
@@ -309,11 +332,11 @@ int list_dir(Msg *m) {
     char *buf = (char *)get_pa(&aim->pdir, m->req_pid);
     inode_t node_off;
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
-    char *name;
+    const char *name;
     if ((char *)m->dev_id == NULL) { // i.e. name is empty
         node_off = cwd;
     } else {
-        name = (char *)get_pa(&aim->pdir, m->dev_id);
+        name = (const char *)get_pa(&aim->pdir, m->dev_id);
         // if not specify the list name,
         // using default file path -- current working directory node_off
         node_off = file_path(cwd, name);
@@ -339,7 +362,7 @@ int list_dir(Msg *m) {
 
 int ch_dir(Msg *m) {
     PCB *aim = (PCB *)m->buf;
-    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
+    const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
     // if not specify the list name,
     // using default file path -- current working directory node_off
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
@@ -364,7 +387,7 @@ size_t rw_prepare(Msg *m,
     size_t (*rw_block_file)(inode_t, uint32_t, char *buf, int len)) {
     PCB *aim = (PCB *)m->req_pid;
     char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
-    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
+    const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
     if (invalid_filename(name)) {
         return FAIL;
     }
