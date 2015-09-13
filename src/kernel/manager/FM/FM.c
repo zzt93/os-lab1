@@ -26,7 +26,9 @@ static void FM_job() {
     while (true) {
         receive(ANY, &m);
         pid_t dest = m.src;
-        switch(m.type) {
+        int type = m.type;
+        m.ret = FM_ERR;
+        switch(type) {
             case FM_read:
                 read_file(&m);
                 break;
@@ -34,34 +36,34 @@ static void FM_job() {
                 assert(false);
                 break;
             case FM_open:
-                m.ret = open_file(&m);
+                open_file(&m);
                 break;
             case FM_close:
-                m.ret = close_file(&m);
+                close_file(&m);
                 break;
             case FM_dup:
-                m.ret = dup_file(&m);
+                dup_file(&m);
                 break;
             case FM_dup2:
-                m.ret = dup2_file(&m);
+                dup2_file(&m);
                 break;
             case FM_lseek:
-                m.ret = lseek_file(&m);
+                lseek_file(&m);
                 break;
             case FM_create:
-                m.ret = create_file(&m);
+                create_file(&m);
                 break;
             case FM_make:
-                m.ret = make_dir(&m);
+                make_dir(&m);
                 break;
             case FM_del:
-                m.ret = delete_file(&m);
+                delete_file(&m);
                 break;
             case FM_lsdir:
-                m.ret = list_dir(&m);
+                list_dir(&m);
                 break;
             case FM_chdir:
-                m.ret = ch_dir(&m);
+                ch_dir(&m);
                 break;
             default:
                 assert(false);

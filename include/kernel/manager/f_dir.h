@@ -20,10 +20,6 @@ extern const char *const default_cwd_name;
 
 #include "error.h"
 
-// the error must correspond to the order of err
-// @see set_error_msg()
-#define NO_SUCH 0
-#define NOT_DIR 1
 
 
 uint32_t get_dir_e_off(iNode *dir, inode_t aim);

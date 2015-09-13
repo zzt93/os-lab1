@@ -5,6 +5,7 @@
 #include "lib/malloc.h"
 
 
+char assert_enum[FM_ERR == 1 ? 1 : -1];
 /**
    Intenal:
    send() message to A will copy to A's list

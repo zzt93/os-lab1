@@ -12,15 +12,10 @@
 
 char test_sizeof_Dir_entry[sizeof(Dir_entry) % 32 == 0 ? 1 : -1];
 
-const char *const err[] = {
-    "No such file or directory",
-    "Not a directory",
-};
-const int len_err = ARR_LEN(err);
-int err_size[ARR_LEN(err)];
 
 static
 void set_error_msg(char *buf, int i) {
+    assert(i >= 0);
     memcpy(buf, err[i], err_size[i]);
 }
 
@@ -166,8 +161,11 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
         filename = name + last_slash + 1;
     }
     // directory not exist or file is already exist
-    if (!file_exist(dir) || file_exist(contain_file(dir, filename))) {
-        return FAIL;
+    if (!file_exist(dir)) {
+        return NO_SUCH;
+    }
+    if (file_exist(contain_file(dir, filename))) {
+        return FILE_EXIST;
     }
     // allocate new inode and default block
     inode_t new = inode_alloc();
@@ -207,22 +205,29 @@ int create_file(Msg *m) {
     if (invalid_filename(name)) {
         return FAIL;
     }
-    return make_plain_file(name, aim) == FAIL ?
-        FAIL : SUCC;
+    inode_t res = make_plain_file(name, aim);
+    m->ret = res;
+    if (file_exist(res)) {
+        m->ret = SUCC;
+    }
+    return res;
 }
 
 int make_dir(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
     if (name == NULL) {
-        return FAIL;
+        return FM_ERR;
     }
     inode_t dir_off;
     // the node offset of new directory
     int new = make_empty_file(DIR, name, aim, &dir_off);
     if (!file_exist(new)) {
-        return FAIL;
+        m->ret = new;
+        return new;
     }
+    m->ret = SUCC;
+
     Dir_entry dir[2];
     // copy "."
     memcpy(dir[0].filename, current_dir, 2);
@@ -231,6 +236,7 @@ int make_dir(Msg *m) {
     memcpy(dir[1].filename, father_dir, 3);
     dir[1].inode_off = dir_off;
     write_block_file(new, W_LAST_BYTE, (char *)&dir, 2 * sizeof(Dir_entry));
+
     return new;
 }
 
@@ -282,7 +288,7 @@ int delete_file(Msg *m) {
     PCB *pcb = (PCB *)m->buf;
     const char *fname = (const char *)get_pa(&pcb->pdir, m->dev_id);
     if (invalid_filename(fname)) {
-        return FAIL;
+        return FM_ERR;
     }
     inode_t cwd = ((FTE *)pcb->fd_table[CWD].ft_entry)->node_off;
     inode_t dir;
@@ -316,16 +322,21 @@ int delete_file(Msg *m) {
         filename = name + last_slash + 1;
     }
     if (!file_exist(dir)) {
-        return FAIL;
+        m->ret = NO_SUCH;
+        return NO_SUCH;
     }
     inode_t aim = contain_file(dir, filename);
     if (aim == NO_SUCH || aim == NOT_DIR) {
-        return FAIL;
+        m->ret = NO_SUCH;
+        return NO_SUCH;
     }
-    delete_a_file(dir, aim);
+    m->ret = delete_a_file(dir, aim);
     return aim;
 }
 
+/**
+   return: how many directory entry is read
+ */
 int list_dir(Msg *m) {
     assert((char *)m->req_pid != NULL);
     PCB *aim = (PCB *)m->buf;
@@ -342,22 +353,25 @@ int list_dir(Msg *m) {
         node_off = file_path(cwd, name);
     }
     if (node_off < inode_start) {
+        m->ret = NO_SUCH;
         set_error_msg(buf, node_off);
+        return 0;
     }
     iNode node;
     // get the node info of this file
     n_dev_read(now_disk, FM, &node, node_off, sizeof(iNode));
     size_t read = 0;
+    m->ret = SUCC;
     if (node.type == DIR) {
         // if name is NULL, it has to be go this branch
         // read the content of file by node info
         read = read_block_file(node_off, 0, buf, R_LAST_BYTE);
+        return read / sizeof(Dir_entry);
     } else {
         // not a directory, so just return it's parameter
         memcpy(buf, name, strlen(name) + 1);
-        return FAIL;
+        return 1;
     }
-    return read / sizeof(Dir_entry);
 }
 
 int ch_dir(Msg *m) {
@@ -371,6 +385,7 @@ int ch_dir(Msg *m) {
         off = file_path(cwd, name);
     }
     if (off < inode_start) {
+        m->ret = NO_SUCH;
         return FAIL;
     }
     iNode node;
@@ -378,7 +393,9 @@ int ch_dir(Msg *m) {
     // set file table entry
     FTE *fte = add_fte(&node, off);
     set_cwd(aim, fte);
-    return SUCC;
+
+    m->ret = SUCC;
+    return off;
 }
 
 /* TODO need a write_to_file specify name && off_in_file??

@@ -61,9 +61,10 @@ MM -- 10  -- deal with memory management
 user process invoker -- 11  
 first user process -- 12  -- shell program -- bound to tty4, ie read from/write to it  
 
+-------------
 
 ## Drivers and devices:
-- For a single process may take care different devices(eg, TTY -- keyboard and screen)  
+- For a single process may take care different devices(e.g., TTY -- keyboard and screen)  
 so pid is not able to identify a devices.  
 - @deprecated In my implementation, devices is uniquely identified by its **name**(or `pid & dev_id`),  
 that is why `dev_read() & dev_write()` using `name` as first argument.  
@@ -76,8 +77,8 @@ Aug 2 2015 update:
 ## State of a process
 - running -- store in `current`
 - ready -- store in `wake queue`
-- sleeped -- `sleeped tree`, eg `receive()`, `sleep()`, all system call
-- blocked on a semaphore -- linked by `pcb->link`, eg `P() & V()`
+- sleeped -- `sleeped tree`, e.g. `receive()`, `sleep()`, all system call
+- blocked on a semaphore -- linked by `pcb->link`, e.g. `P() & V()`
 
 
 ----------------------
@@ -117,7 +118,7 @@ which is invisible for user.
 - for a system call about change the content of a file(write related)  
   have to notice all the four areas(inode bitmap, block bitmap, inode, block).
 
-
+------------
 
 ## i386 ISA
 1. push -- first minus 2/4 bytes, then store values, ie the esp always point to old value. If it is `push %esp`, it will save the old value before minus which means push original esp value.  
@@ -130,6 +131,14 @@ For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %es
 [user process stack state](docs/pic/user_process_stack.jpg)
 
 
+--------------------
+
+## process communication -- message
+
+- receiver: `T f(Msg *m);` is the recommended form. 
+	- return value is the most important information this function has( e.g. `PCB * create_process(Msg *);`)
+	- `m->ret` can be set in the function body, choose one from the enum in message.h
+
 ---------------------
 
 ## NOTICE in the future:
@@ -138,6 +147,9 @@ For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %es
 
 - put the original global variable to parameter can better re-use some data structure.(ListHead)
 - using macro when need different type(Tree<>)
-- using special name convention when implement data structure, eg `_bitmap_array`
+- using special name convention when implement data structure, e.g. `_bitmap_array`
 
+- design an error return system between 'client' and 'server'(in os is 'os user' and 'os kernel')
+	- `enum`: not a simple `FAIL` and `SUCC` but `no such directory or file`, `Segmentation fault`.
+	- `struct`: a int indicate state, and a string indicate error message.
 

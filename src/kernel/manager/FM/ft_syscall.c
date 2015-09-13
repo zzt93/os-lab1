@@ -33,5 +33,7 @@ int lseek_file(Msg *m) {
         return -1;
     }
     fte->offset = res;
+
+    m->ret = SUCC;
     return res;
 }

@@ -21,7 +21,7 @@ int open_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
     if (invalid_filename(name)) {
-        return FAIL;
+        return INVALID_FD_I;
     }
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
     uint32_t node_off = file_path(cwd, name);
@@ -33,7 +33,8 @@ int open_file(Msg *m) {
     // add a FDE in process fd table
     int j = first_fd(aim, INVALID_FD);
     assign_fte(aim->fd_table[j].ft_entry, fte);
-    return 1;
+    m->ret = SUCC;
+    return j;
 }
 
 int close_file(Msg *m) {
@@ -41,11 +42,13 @@ int close_file(Msg *m) {
     int i =  m->dev_id;
     FDE *fd = get_fde(aim, i);
     if (is_invalid_fd(fd)) {
-        return -1;
+        return INVALID_FD_I;
     }
     FTE *fte = (FTE *)fd->ft_entry;
     detach_fte(fd, fte);
-    return 1;
+
+    m->ret = SUCC;
+    return i;
 }
 
 /**
@@ -57,13 +60,15 @@ int dup_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     FDE *src = get_fde(aim, i);
     if (is_invalid_fd(src)) {
-        return -1;
+        return INVALID_FD_I;
     }
     int j = first_fd(aim, INVALID_FD);
     if (j == INVALID_FD_I) {
         return j;
     }
     assign_fd(get_fde(aim, j), src);
+
+    m->ret = SUCC;
     return j;
 }
 
@@ -76,7 +81,7 @@ int dup2_file(Msg *m) {
     int i = m->i[0];
     FDE *src = get_fde(aim, i);
     if (is_invalid_fd(src)) {
-        return -1;
+        return INVALID_FD_I;
     }
     int j = m->i[1];
     if (!is_invalid_fd(get_fde(aim, j))) {
@@ -84,6 +89,7 @@ int dup2_file(Msg *m) {
         close_file(m);
     }
     assign_fd(get_fde(aim, j), src);
-    return SUCC;
-}
 
+    m->ret = SUCC;
+    return j;
+}
