@@ -181,7 +181,7 @@ welcome(void) {
     test_mkdir();
     //test_deldir();
     test_ch();
-    //test_mk_del();
+    test_mk_del();
 }
 
 void init_error_msg() {

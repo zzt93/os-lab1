@@ -39,7 +39,7 @@ int set_name_msg(char *name, int (*f)(Msg *)) {
     m.buf = current;
     m.dev_id = (int)name;
     f(&m);
-    test_list(name);
+    test_list(NULL);
     return m.ret;
 }
 
@@ -118,11 +118,15 @@ void test_ch() {
     test_list(NULL);
 }
 
+static char repeat[] = "repeat";
 void test_mk_del() {
+    int res;
     int count = 100000;
     int i;
     for (i = 0; i < count; i++) {
-        test_mkdir();
-        test_deldir();
+        res = set_name_msg(repeat, make_dir);
+        assert(res == SUCC);
+        res = set_name_msg(repeat, delete_file);
+        assert(res == SUCC);
     }
 }
