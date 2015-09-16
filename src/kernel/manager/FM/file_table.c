@@ -30,7 +30,9 @@ FTE * add_fte(iNode *node, uint32_t offset) {
     // find the first free
     lock();
     int i = first_val(FREE);
-    assert(i != INVALID);
+    if (i == INVALID) {
+        return NULL;
+    }
     // initialize fte
     FTE *aim = file_table + i;
     fill_fte(aim, node, offset);

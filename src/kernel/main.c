@@ -177,6 +177,7 @@ welcome(void) {
 
     test_map();
     */
+    test_d_bit_map();
     test_list(NULL);
     test_mkdir();
     //test_deldir();

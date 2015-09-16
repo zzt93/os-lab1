@@ -27,7 +27,7 @@
                                                     \
     static void set_val(int i, int val) {           \
         assert(val == FREE || val == USED);         \
-        assert(i >= 0);                             \
+        assert(i >= 0 && i < size);                 \
         int index = i / BITS;                       \
         int j = i % BITS;                           \
         int bit = val << j;                         \
@@ -40,7 +40,7 @@
     }                                               \
                                                     \
     static int is_val(int i, int val) {             \
-        assert(i >= 0);                             \
+        assert(i >= 0 && i < size);                 \
         int index = i / BITS;                       \
         int j = i % BITS;                           \
         int res = free[index] >> j;                 \

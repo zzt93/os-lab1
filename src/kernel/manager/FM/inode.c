@@ -17,8 +17,9 @@ char assert_iNode_size[sizeof(iNode) % 128 == 0 ? 1 : -1];
 char assert_enum_size[sizeof(File_e) == 4 ? 1 : -1];
 
 static inline uint32_t nodei_off(int index) {
-    return inode_start +
-        index * inode_size;
+    uint32_t new = inode_start + index * inode_size;
+    assert(new > inode_start && new < block_start);
+    return new;
 }
 
 /**
@@ -32,7 +33,7 @@ static inline uint32_t node_mapi_off(int index) {
 
 static inline int off_nodei(uint32_t offset) {
     int gap = offset - inode_start;
-    assert(gap > 0 && gap % inode_size);
+    assert(gap > 0 && gap % inode_size == 0);
     return gap / inode_size;
 }
 
@@ -204,7 +205,7 @@ uint32_t get_block(iNode *node, int index) {
 /**
    Only update the block area(may be block map area if necessary)
    so, for write, have to update inode yourself.
-   
+
    offset -- the offset relative to file start, for offset relative
    to the start of whole image is meaning less for a file.
  */
@@ -319,7 +320,6 @@ uint32_t get_dir_e_off(iNode *dir, inode_t aim) {
     return -1;
 }
 
-// TODO update inode area
 size_t del_block_file_dir(inode_t father, inode_t aim) {
     iNode file;
     n_dev_read(now_disk, FM,

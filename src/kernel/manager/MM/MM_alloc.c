@@ -25,7 +25,9 @@ BIT_MAP(USER_FREE_PAGES)
 void* alloc_page() {
     assert(0 < availabe);
     int i = first_val(FREE);
-    assert(i != INVALID);
+    if (i == INVALID) {
+        return NULL;
+    }
     Page *page = page_pa_start + i;
     lock();
     set_val(i, USED);

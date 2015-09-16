@@ -169,6 +169,8 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
     }
     // allocate new inode and default block
     inode_t new = inode_alloc();
+    // TODO change to no enough space
+    assert(new != -1);
     node.size = 0;
     node.dev_id = now_disk;
     int i;
@@ -258,23 +260,21 @@ int delete_a_file(inode_t father, inode_t this) {
         int i;
         // skip current_dir and father_dir for it
         // doesn't need to
+        // delete its child file
         for (i = 2; i < num_files; i++) {
             delete_a_file(this, dirs[i].inode_off);
         }
-        del_block_file_dir(father, this);
-    } else {
-        assert(this_node.type == PLAIN);
-        // delete it in father's directory
-        del_block_file_dir(father, this);
-        // free this file's block
-        int index = this_node.size / block_size;
-        int i;
-        for (i = index; i >= 0; i--) {
-            block_free(get_block(&this_node, index));
-        }
-        // free this file's inode
-        inode_free(this);
     }
+    // delete it in father's directory
+    del_block_file_dir(father, this);
+    // free this file's block
+    int index = this_node.size / block_size;
+    int i;
+    for (i = index; i >= 0; i--) {
+        block_free(get_block(&this_node, index));
+    }
+    // free this file's inode
+    inode_free(this);
     return SUCC;
 }
 
