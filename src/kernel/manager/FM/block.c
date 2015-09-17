@@ -14,13 +14,13 @@ uint32_t block_area_size;
 
 
 static inline uint32_t blocki_offset(int index) {
-    return block_start +
-        index * block_size;
+    uint32_t off = block_start + index * block_size;
+    assert(off > block_start && off < block_start + block_area_size);
+    return off;
 }
 
-static inline uint32_t block_mapi_off(int index) {
-    return block_map_start +
-        index / sizeof(uint8_t);
+static inline uint32_t block_map_s() {
+    return block_map_start;
 }
 
 static inline int offset_blocki(uint32_t offset) {
@@ -52,21 +52,24 @@ uint32_t block_alloc() {
     }
     int index = set_val(j, USED);
     // write back to disk
-    n_dev_write(now_disk, FM, bits() + index, block_mapi_off(j), 1);
+    n_dev_write(now_disk, FM, bits() + index, block_map_s() + index, 1);
     return blocki_offset(j);
 }
 
+/**
+   offset -- block's offset
+ */
 int block_free(uint32_t offset) {
     int j = offset_blocki(offset);
     int index = set_val(j, FREE);
-    // write back to disk
-    return n_dev_write(now_disk, FM, bits() + index, block_mapi_off(j), 1);
+    // write back to disk -- change the block map area
+    return n_dev_write(now_disk, FM, bits() + index, block_map_s() + index, 1);
 }
 
 
 void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size);
 
-uint32_t super_start = 1387520;
+uint32_t super_start = 1388544;
 #define SUPER_BUF 512
 void load_super_block() {
     char buf[SUPER_BUF];
@@ -79,4 +82,8 @@ void load_super_block() {
     // the parameter in makeimg.py
     init_inode(b[0], b[1], b[4], b[5]);
     init_block(b[2], b[3], b[6], b[7]);
+    assert(inode_start + inode_area_size == block_start);
+    assert(b[0] + b[1] == b[2]);
+    assert(b[2] + b[3] == b[4]);
+    assert(b[4] + b[5] == b[6]);
 }

@@ -18,17 +18,13 @@ char assert_enum_size[sizeof(File_e) == 4 ? 1 : -1];
 
 static inline uint32_t nodei_off(int index) {
     uint32_t new = inode_start + index * inode_size;
+    // for first node must be root which is set by python script
     assert(new > inode_start && new < block_start);
     return new;
 }
 
-/**
-   for the offset in harddisk is in unit of
-   bytes, so all the offset have to in bytes
- */
-static inline uint32_t node_mapi_off(int index) {
-    return inode_map_start +
-        index / sizeof(uint8_t);
+static inline uint32_t node_map_s() {
+    return inode_map_start;
 }
 
 static inline int off_nodei(uint32_t offset) {
@@ -71,7 +67,7 @@ uint32_t inode_alloc() {
     }
     int index = set_val(j, USED);
     // write back to disk
-    n_dev_write(now_disk, FM, bits() + index, node_mapi_off(j), 1);
+    n_dev_write(now_disk, FM, bits() + index, node_map_s() + index, 1);
     return nodei_off(j);
 }
 
@@ -80,7 +76,7 @@ int inode_free(uint32_t offset) {
     int j = off_nodei(offset);
     int index = set_val(j, FREE);
     // write back to disk -- at once???
-    return n_dev_write(now_disk, FM, bits() + index, node_mapi_off(j), 1);
+    return n_dev_write(now_disk, FM, bits() + index, node_map_s() + index, 1);
 }
 
 #define FINE 0
