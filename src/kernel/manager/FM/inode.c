@@ -63,6 +63,7 @@ uint32_t inode_alloc() {
     // allocate inode
     int j = first_val(FREE);
     if (j == INVALID) {
+        printk(BLUE"\n no more inode to allocate\n"RESET);
         return -1;
     }
     int index = set_val(j, USED);
@@ -101,25 +102,33 @@ int invalid_block(iNode *node, int index) {
    node's block)
    if that index out of bound, allocate a new block;
 
+   TODO if allocate one block then fail to continue, how to
+   free already allocated disk memory.
  */
 uint32_t get_block(iNode *node, int index) {
     uint32_t res;
     if (index < DATA_LINK_NUM) {// using direct data link
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
-            node->index[index] = block_alloc();
+            ALLOC_CHECK(node->index[index], block_alloc,
+                EMPTY_FREE_STATEMENT);
         }
-        return node->index[index];
+        res = node->index[index];
     } // one level indirect link -- read once
     else if (index < DATA_LINK_NUM + indirect_datalink_nr) {
         uint32_t first_off = (index - DATA_LINK_NUM) * sizeof(uint32_t);
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
+            ALLOC_CHECK(res, block_alloc,
+                EMPTY_FREE_STATEMENT);
             if (first_off == 0) {
-                node->index[FIRST_INDIRECT] = block_alloc();
+                ALLOC_CHECK(
+                    node->index[FIRST_INDIRECT], block_alloc,
+                    block_free(res);
+                            );
             }
-            res = block_alloc();
+            block_in_range_check(node->index[FIRST_INDIRECT] + first_off);
             n_dev_write(now_disk, FM, &res,
                 node->index[FIRST_INDIRECT] + first_off, sizeof res);
-        } else {
+        } else { // block index in range, just read it
             n_dev_read(now_disk, FM, &res,
                 node->index[FIRST_INDIRECT] + first_off, sizeof res);
         }
@@ -131,18 +140,30 @@ uint32_t get_block(iNode *node, int index) {
         uint32_t second_off = (more % indirect_datalink_nr) * sizeof(uint32_t);
         uint32_t second;
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
+            ALLOC_CHECK(res, block_alloc,
+                EMPTY_FREE_STATEMENT);
             if (second_off == 0) { // first time to access it, must be write
+                ALLOC_CHECK(second, block_alloc,
+                    block_free(res);
+                            );
                 if (first_off == 0) {
-                    node->index[SEC_INDIRECT] = block_alloc();
+                    ALLOC_CHECK(
+                        node->index[SEC_INDIRECT], block_alloc,
+                        {
+                            block_free(res);
+                            block_free(second);
+                        }
+                        );
                 }
-                second = block_alloc();
+                block_in_range_check(node->index[SEC_INDIRECT] + first_off);
                 n_dev_write(now_disk, FM, &second,
                     node->index[SEC_INDIRECT] + first_off, sizeof second);
             } else {
+                block_in_range_check(node->index[SEC_INDIRECT] + first_off);
                 n_dev_read(now_disk, FM, &second,
                     node->index[SEC_INDIRECT] + first_off, sizeof second);
             }
-            res = block_alloc();
+            block_in_range_check(second + second_off);
             n_dev_write(now_disk, FM, &res,
                 second + second_off, sizeof res);
         } else {
@@ -162,26 +183,39 @@ uint32_t get_block(iNode *node, int index) {
         uint32_t thi_off = ((more % (indirect_datalink_nr * indirect_datalink_nr)) % indirect_datalink_nr) * sizeof(uint32_t);
         uint32_t second, thi;
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
+            ALLOC_CHECK(res, block_alloc, EMPTY_FREE_STATEMENT);
             if (thi_off == 0) {
+                ALLOC_CHECK(thi, block_alloc,
+                    block_free(res);
+                            );
                 if (second_off == 0) {
+                    ALLOC_CHECK(second, block_alloc,
+                        {
+                            block_free(res);
+                            block_free(thi);
+                        }
+                                );
                     if (first_off == 0) {
-                        node->index[THI_INDIRECT] = block_alloc();
+                        ALLOC_CHECK(node->index[THI_INDIRECT], block_alloc,
+                            {
+                                block_free(res);
+                                block_free(thi);
+                                block_free(second);
+                            }
+                                    );
                     }
-                    second = block_alloc();
                     n_dev_write(now_disk, FM, &second,
                         node->index[THI_INDIRECT] + first_off, sizeof second);
                 } else {
                     n_dev_read(now_disk, FM, &second,
                         node->index[THI_INDIRECT] + first_off, sizeof second);
                 }
-                thi = block_alloc();
                 n_dev_write(now_disk, FM, &thi,
                     second + second_off, sizeof thi);
             } else {
                 n_dev_read(now_disk, FM, &thi,
                     second + second_off, sizeof thi);
             }
-            res = block_alloc();
             n_dev_write(now_disk, FM, &res,
                 thi + thi_off, sizeof res);
         } else {
@@ -195,6 +229,7 @@ uint32_t get_block(iNode *node, int index) {
     } else {
         assert(0);
     }
+    block_in_range_check(res);
     return res;
 }
 
@@ -216,6 +251,10 @@ size_t rw_file_block(char *buf, iNode *node, uint32_t offset, int len,
     int to_rw = MIN(len, block_size - block_inner_off);
     while (len > rw) {
         block_off = get_block(node, block_i) + block_inner_off;
+        if (block_off == NO_MORE_DISK) {
+            return rw;
+        }
+
         // to_rw = MIN(len, block_size - block_inner_off) -- make sure block_inner_off
         // become `0` or len == rw, i.e. read/write is over
         block_inner_off = 0;
@@ -273,7 +312,9 @@ size_t write_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
         return 0;
     }
     size_t write = rw_file_block(buf, &node, offset, len, n_dev_write);
-    assert(write == len);
+    if (write == 0) {
+        return write;
+    }
     node.size += write;
     n_dev_write(now_disk, FM,
         &node, nodeoff, sizeof(iNode));

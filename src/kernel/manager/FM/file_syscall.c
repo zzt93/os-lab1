@@ -107,7 +107,7 @@ inode_t file_path(inode_t cwd, const char * const name) {
  */
 static inline
 int file_exist(inode_t off) {
-    return off >= inode_start;
+    return off >= inode_start && off < inode_start + inode_area_size;
 }
 
 int default_file_block = 1;
@@ -125,7 +125,6 @@ static
 int make_empty_file(File_e type, const char *fname, PCB *aim,
     // the following one parameter is only useful for directory
     inode_t *dir_off) {
-    iNode node;
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
     inode_t dir;
     int filenamelen = strlen(fname) + 1;
@@ -169,13 +168,21 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
     }
     // allocate new inode and default block
     inode_t new = inode_alloc();
-    // TODO change to no enough space
-    assert(new != -1);
+    if (new == INVALID_ALLOC) {
+        return NO_MORE_DISK;
+    }
+
+    iNode node;
     node.size = 0;
     node.dev_id = now_disk;
     int i;
     for (i = 0; i < default_file_block; i++) {
         node.index[i] = block_alloc();
+        if (node.index[i] == INVALID_ALLOC) {
+            // for make a new file failed, free it's resource
+            inode_free(new);
+            return NO_MORE_DISK;
+        }
     }
     for (i = default_file_block; i < FILE_LINK_NUM; i ++) {
         node.index[i] = 0;
@@ -188,7 +195,10 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
     Dir_entry dir_content;
     memcpy(dir_content.filename, filename, strlen(filename) + 1);
     dir_content.inode_off = new;
-    write_block_file(dir, W_LAST_BYTE, (char *)&dir_content, sizeof(Dir_entry));
+    int len = write_block_file(dir, W_LAST_BYTE, (char *)&dir_content, sizeof(Dir_entry));
+    if (len ! = sizeof(Dir_entry)) {
+        return NO_MORE_DISK;
+    }
 
     // prepare returned pointer
     *dir_off = dir;

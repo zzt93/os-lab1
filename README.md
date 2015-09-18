@@ -153,3 +153,6 @@ For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %es
 	- `enum`: not a simple `FAIL` and `SUCC` but `no such directory or file`, `Segmentation fault`.
 	- `struct`: a int indicate state, and a string indicate error message.
 
+- if fail to allocate some resources when allocating a serial of resources,  
+	remember to free already allocated resources.
+

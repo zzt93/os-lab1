@@ -48,7 +48,8 @@ void init_block(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) 
 uint32_t block_alloc() {
     int j = first_val(FREE);
     if (j == INVALID) {
-        return -1;
+        printk(BLUE"\n no more block to allocate\n"RESET);
+        return INVALID_ALLOC;
     }
     int index = set_val(j, USED);
     // write back to disk
