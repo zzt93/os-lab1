@@ -82,8 +82,12 @@ int inode_free(uint32_t offset) {
 
 #define FINE 0
 #define NO_DATA_BLOCK 1
+extern const int default_file_block;
 static inline
 int invalid_block(iNode *node, int index) {
+    if (index < default_file_block) {
+        return FINE;
+    }
     if (index * block_size < node->size) {
         return FINE;
     }

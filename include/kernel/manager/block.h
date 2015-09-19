@@ -8,9 +8,10 @@
 
 extern const int block_size;
 
+#include "common.h"
+extern const uint32_t super_start;
 void load_super_block();
 
-#include "common.h"
 
 extern const int block_size;
 extern uint32_t block_map_start;
@@ -43,7 +44,7 @@ extern int block_dir_num;
 
 static inline
 void block_in_range_check(uint32_t off) {
-    assert(off > block_start &&
+    assert(off >= block_start &&
         off < block_start + block_area_size);
 }
 #endif /* __BLOCK_H__ */

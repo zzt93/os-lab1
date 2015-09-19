@@ -110,7 +110,7 @@ int file_exist(inode_t off) {
     return off >= inode_start && off < inode_start + inode_area_size;
 }
 
-int default_file_block = 1;
+const int default_file_block = 1;
 /**
    return: the node offset of this empty file, if has
    any problem, return FAIL
@@ -196,7 +196,7 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
     memcpy(dir_content.filename, filename, strlen(filename) + 1);
     dir_content.inode_off = new;
     int len = write_block_file(dir, W_LAST_BYTE, (char *)&dir_content, sizeof(Dir_entry));
-    if (len ! = sizeof(Dir_entry)) {
+    if (len != sizeof(Dir_entry)) {
         return NO_MORE_DISK;
     }
 

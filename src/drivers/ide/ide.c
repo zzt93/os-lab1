@@ -29,7 +29,7 @@ void write_byte(uint32_t, uint8_t);
    注册顶半处理ide_intr()和time_intr(), 前者负责在磁盘就绪时通知IDE, 后者负责通知IDE是否到了需要回写cache的时间
    创建IDE主线程
    注册设备"hda"
- */
+*/
 void
 init_ide(void) {
 	cache_init();
@@ -43,7 +43,8 @@ init_ide(void) {
 
 static inline
 void disk_msg_check(Msg *m) {
-    block_in_range_check(m->offset);
+    assert(m->offset >= super_start
+        && m->offset < block_start + block_area_size);
     assert(m->len < block_area_size);
 }
 
@@ -62,7 +63,10 @@ ide_driver_thread(void) {
 				panic("IDE interrupt is leaking");
 			}
 		} else {
-            disk_msg_check(&m);
+            //if (m.src != IDLE_ID) {// mean it is the init of file system
+            if (block_area_size != 0 && block_start != 0) {
+                disk_msg_check(&m);
+            }
             if (m.type == DEV_READ) {
                 printk("device read ");
                 uint32_t i;
