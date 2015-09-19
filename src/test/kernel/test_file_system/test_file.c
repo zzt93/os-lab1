@@ -55,6 +55,10 @@ static char doc[] = "Documents";
 static char doc2[] = "Documents/os";
 
 void test_mkdir() {
+    test_list(name3);
+    test_list(name5);
+    test_list(NULL);
+
     int res;
     res = set_name_msg(name, make_dir);
     assert(res == SUCC);
