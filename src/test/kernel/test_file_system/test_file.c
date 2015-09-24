@@ -36,6 +36,7 @@ void test_list(char *name) {
 
 int set_name_msg(char *name, int (*f)(Msg *)) {
     Msg m;
+    m.ret = FM_ERR;
     m.buf = current;
     m.dev_id = (int)name;
     f(&m);
@@ -94,15 +95,6 @@ void test_deldir() {
     test_list(NULL);
 }
 
-void test_create() {
-    int res;
-    char first_doc[] = "test";
-    res = set_name_msg(first_doc, create_file);
-    assert(res == SUCC);
-}
-
-void test_delfile() {
-}
 
 void test_ch() {
     int res;

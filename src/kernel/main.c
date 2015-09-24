@@ -183,6 +183,8 @@ welcome(void) {
     //test_deldir();
     test_ch();
     test_mk_del();
+    //test_create();
+    //test_delfile();
 }
 
 void init_error_msg() {
