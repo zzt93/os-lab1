@@ -81,10 +81,11 @@ int detach_fte(FDE *fd, FTE *fte) {
     make_invalid(fd);
     assert(fte != NULL);
     // decrease file table count
-    if (fte->ref_count == 1) {
+    fte->ref_count --;
+    assert(fte->ref_count >= 0);
+    if (fte->ref_count == 0) {
         free_fte(fte);
     }
-    fte->ref_count --;
     return SUCC;
 }
 
@@ -98,22 +99,26 @@ void init_thread_cwd() {
     }
 }
 
+/**
+  TODO
+  1. if it is a directory, not permit to write
+  2. the size in fte is out of dated
+ */
 size_t rw_prepare(Msg *m,
     size_t (*rw_block_file)(inode_t, uint32_t, char *buf, int len)) {
     PCB *aim = (PCB *)m->req_pid;
     char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
     int fd = m->dev_id;
     if (is_invalid_fd(&aim->fd_table[fd])) {
-        return FAIL;
+        m.ret = NO_SUCH;
+        return 0;
     }
     // if not specify the list name,
     // using default file path -- current working directory node_off
     FTE *fte = ((FTE *)aim->fd_table[fd].ft_entry);
     inode_t nodeoff = fte->node_off;
     int offset = fte->offset;
-    if (nodeoff < inode_start) {
-        return FAIL;
-    }
+    assert(nodeoff >= inode_start);
     return rw_block_file(nodeoff, offset, buf, m->len);
 }
 

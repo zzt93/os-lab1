@@ -7,6 +7,9 @@
 int detach_fte(FDE *, FTE *);
 
 static inline void assign_fte(FDE *d, FTE *t) {
+    if (!is_invalid_fd(d)) {
+        detach_fte(d, d->ft_entry);
+    }
     d->ft_entry = t;
     t->ref_count ++;
 }

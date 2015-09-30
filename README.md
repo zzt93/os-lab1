@@ -12,7 +12,7 @@ Try to learn os by lab
 ## Running requirement
 - make
 - qemu( I am using `qemu-system-i386` in makefile)
-- gcc
+- gcc  
 `
 ----------------------
 
@@ -52,7 +52,7 @@ list current working directory
 
 
 
-Implement some ADT:  
+###Implement some ADT:  
 circular queue  
 [BST](docs/ADT/BST.md)  
 [map](docs/ADT/map.md)  

@@ -370,6 +370,9 @@ int list_dir(Msg *m) {
     iNode node;
     // get the node info of this file
     n_dev_read(now_disk, FM, &node, node_off, sizeof(iNode));
+    if (node.size > m->len) {
+        return BUF_OF;
+    }
     size_t read = 0;
     m->ret = SUCC;
     if (node.type == DIR) {

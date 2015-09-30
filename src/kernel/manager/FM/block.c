@@ -70,7 +70,7 @@ int block_free(uint32_t offset) {
 
 void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size);
 
-const uint32_t super_start = 1395712;
+const uint32_t super_start = 1396736;
 #define SUPER_BUF 512
 void load_super_block() {
     char buf[SUPER_BUF];

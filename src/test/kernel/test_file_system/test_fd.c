@@ -15,6 +15,22 @@ static char thi_doc[] = "test3";
 static char fou_doc[] = "test4";
 void test_create() {
     int res;
+    /*
+      res = set_name_msg(first_doc, make_dir);
+      assert(res == SUCC);
+      res = set_name_msg(first_doc, make_dir);
+      assert(res == FILE_EXIST);
+      res = set_name_msg(second_doc, make_dir);
+      assert(res == SUCC);
+      res = set_name_msg(thi_doc, make_dir);
+      assert(res == SUCC);
+
+      The upper code and the following code all cause
+      exception #14, so
+      1. it seems have something to do with number of file
+      in a directory
+      2. problem may in make_empty_file
+     */
     res = set_name_msg(first_doc, create_file);
     assert(res == SUCC);
     res = set_name_msg(first_doc, create_file);
@@ -41,6 +57,15 @@ void test_delfile() {
     assert(res == SUCC);
 }
 
+void test_create_del() {
+    int count = 100000;
+    int i;
+    for (i = 0; i < count; i++) {
+        test_create();
+        test_delfile();
+    }
+}
+
 static int set_fd_msg(int fd, int (*f)(Msg *)) {
     Msg m;
     m.ret = FM_ERR;
@@ -60,19 +85,20 @@ static int test_open(char *name) {
     fd = open_file(&m);
     test_list(NULL);
 
-    assert(m.ret == SUCC);
     return fd;
 }
 
-static void test_close(int fd) {
+static int test_close(int fd) {
     int res;
     res = set_fd_msg(fd, close_file);
-    assert(res == SUCC);
+    return res;
 }
 
 void test_open_close() {
+    int res;
     int fd = test_open(first_doc);
-    test_close(fd);
+    res = test_close(fd);
+    assert(res == SUCC);
 }
 
 void test_dup() {

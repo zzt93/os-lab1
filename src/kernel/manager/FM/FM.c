@@ -31,9 +31,10 @@ static void FM_job() {
         switch(type) {
             case FM_read:
                 read_file(&m);
+                //n_read_file(&m);
                 break;
             case FM_write:
-                assert(false);
+                write_file(&m);
                 break;
             case FM_open:
                 open_file(&m);

@@ -182,9 +182,11 @@ welcome(void) {
     test_mkdir();
     //test_deldir();
     test_ch();
-    test_mk_del();
-    //test_create();
+    //test_mk_del();
+    test_create();
     //test_delfile();
+    //test_create_del();
+    test_open_close();
 }
 
 void init_error_msg() {

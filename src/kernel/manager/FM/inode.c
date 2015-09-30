@@ -277,6 +277,7 @@ size_t rw_file_block(char *buf, iNode *node, uint32_t offset, int len,
    return error message
 
    - len can be -1 which refer to as R_LAST_BYTE
+   - len <= len(buf)
  */
 size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
     iNode node;
@@ -297,6 +298,8 @@ size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
    write content to buffer, set right file size
    and extend block if necessary
    offset can be last byte refer to as -1.
+
+   - len >= len(buf)
 
    area updated:
    - inode map area -- file size

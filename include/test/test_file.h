@@ -10,6 +10,7 @@ void test_mk_del();
 void test_ch();
 void test_create();
 void test_delfile();
+void test_create_del();
 
 void test_n_write();
 void test_n_read();

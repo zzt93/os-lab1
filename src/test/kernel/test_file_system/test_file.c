@@ -7,7 +7,7 @@
 
 #include "error.h"
 
-#define SZ 256
+#define SZ 512
 /**
    test the initial state of hard-disk
  */
@@ -19,7 +19,9 @@ void test_list(char *name) {
         current->pid,
         FM_lsdir,
         (int)entry, (int)name, current, INVALID_ID, SZ);
+    m.ret = FM_ERR;
     size = list_dir(&m);
+    assert(m.ret >= SUCC && m.ret < len_err);
     if (m.ret != SUCC) {
         printk("%s", err[m.ret]);
         return;

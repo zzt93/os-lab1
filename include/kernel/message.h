@@ -53,6 +53,7 @@ typedef enum {
     IS_DIR,
     FILE_EXIST,
     NO_MORE_DISK,
+    BUF_OF,
     PM_ERR,
     SEGMENTATION,
     MM_ERR,
