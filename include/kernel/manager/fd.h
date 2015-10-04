@@ -2,10 +2,11 @@
 #define __FD_H__
 
 #include "kernel/message.h"
+#include "kernel/manager/file_table.h"
 
 typedef struct file_descriptor_entry {
     //int fd;
-    void *ft_entry;
+    FTE *ft_entry;
 } FDE; // file descriptor entry
 
 // invalid fd index

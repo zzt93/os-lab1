@@ -4,9 +4,9 @@
 #include "common.h"
 
 typedef enum {
+    NODE_DIR,
+    NODE_PLAIN,
     NO_BLOCK,
-    DIR,
-    PLAIN,
 } File_e;
 
 typedef uint32_t block_t;

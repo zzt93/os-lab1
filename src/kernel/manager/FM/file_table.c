@@ -22,8 +22,22 @@ void fill_fte(FTE *fte, iNode *node, uint32_t offset) {
     fte->dev_id = node->dev_id;
     fte->ref_count = 0;
     // TODO no block means a device?
-    fte->type = ((node->type == NO_BLOCK) ? DEV : REG);
-    fte->filesize = node->size;
+    if (node->type == NO_BLOCK) {
+        fte->type = DEV;
+    } else {
+        fte->type = node->type;
+    }
+    switch(fte->type) {
+        case FT_DIR:
+        case DEV:
+            fte->filesize = -1;
+            break;
+        case FT_PLAIN:
+            fte->filesize = node->size;
+            break;
+        default:
+            assert(0);
+    }
 }
 
 FTE * add_fte(iNode *node, uint32_t offset) {
@@ -73,6 +87,8 @@ void init_file_table() {
     inode_t aim = file_path(0, default_cwd_name);
     assert(aim == inode_start);
     n_dev_read(now_disk, FM, (char *)&node, aim, sizeof node);
+    // TODO using inode_start for the time being
+    // for it is a directory, so the size for it is meaningless
     default_cwd = add_fte(&node, inode_start);
     NOINTR;
 }
@@ -102,7 +118,7 @@ void init_thread_cwd() {
 /**
   TODO
   1. if it is a directory, not permit to write
-  2. the size in fte is out of dated
+  2. the size of cwd in fte is out-dated
  */
 size_t rw_prepare(Msg *m,
     size_t (*rw_block_file)(inode_t, uint32_t, char *buf, int len)) {
@@ -110,7 +126,7 @@ size_t rw_prepare(Msg *m,
     char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
     int fd = m->dev_id;
     if (is_invalid_fd(&aim->fd_table[fd])) {
-        m.ret = NO_SUCH;
+        m->ret = NO_SUCH;
         return 0;
     }
     // if not specify the list name,

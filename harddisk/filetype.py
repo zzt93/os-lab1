@@ -4,6 +4,6 @@ __author__ = 'zzt'
 
 
 class FileType(Enum):
-    NO_BLOCK = 0
-    DIR = 1
-    FILE = 2
+    DIR = 0
+    FILE = 1
+    NO_BLOCK = 2

@@ -32,7 +32,7 @@ int open_file(Msg *m) {
     FTE *fte = add_fte(&node, node_off);
     // add a FDE in process fd table
     int j = first_fd(aim, INVALID_FD);
-    assign_fte(aim->fd_table[j].ft_entry, fte);
+    assign_fte(&aim->fd_table[j], fte);
     m->ret = SUCC;
     return j;
 }

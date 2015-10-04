@@ -33,7 +33,7 @@ const char *const default_cwd_name = "/";
 static inode_t contain_file(inode_t node_off, char *name) {
     iNode node;
     n_dev_read(now_disk, FM, &node, node_off, sizeof node);
-    if (node.type != DIR) {
+    if (node.type != NODE_DIR) {
         return NOT_DIR;
     }
     int size = node.size;
@@ -146,7 +146,7 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
             name[last_slash] = '\0';
             if (name[last_slash + 1] == '\0') {
                 // e.g. /media/
-                if (type == PLAIN) {
+                if (type == NODE_PLAIN) {
                     return FAIL;
                 }
                 // re-find a meaningful '/';
@@ -208,7 +208,7 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
 static inline
 int make_plain_file(const char *name, PCB *aim) {
     inode_t i;
-    return make_empty_file(PLAIN, name, aim, &i);
+    return make_empty_file(NODE_PLAIN, name, aim, &i);
 }
 
 int create_file(Msg *m) {
@@ -233,7 +233,7 @@ int make_dir(Msg *m) {
     }
     inode_t dir_off;
     // the node offset of new directory
-    int new = make_empty_file(DIR, name, aim, &dir_off);
+    int new = make_empty_file(NODE_DIR, name, aim, &dir_off);
     if (!file_exist(new)) {
         m->ret = new;
         return new;
@@ -260,7 +260,7 @@ int delete_a_file(inode_t father, inode_t this) {
     iNode this_node;
     n_dev_read(now_disk, FM,
         &this_node, this, sizeof this_node);
-    if (this_node.type == DIR) {
+    if (this_node.type == NODE_DIR) {
         int num_files = this_node.size / sizeof(Dir_entry);
         assert(this_node.size % sizeof(Dir_entry) == 0);
         Dir_entry dirs[num_files];
@@ -375,7 +375,7 @@ int list_dir(Msg *m) {
     }
     size_t read = 0;
     m->ret = SUCC;
-    if (node.type == DIR) {
+    if (node.type == NODE_DIR) {
         // if name is NULL, it has to be go this branch
         // read the content of file by node info
         read = read_block_file(node_off, 0, buf, R_LAST_BYTE);

@@ -82,3 +82,4 @@ dynamic allocated bit map( using kmalloc)
 - if fail to allocate some resources when allocating a serial of resources,  
 	remember to free already allocated resources.
 
+- avoid using `void *` for it may hide some bugs because the implicit conversion of different type of pointers.

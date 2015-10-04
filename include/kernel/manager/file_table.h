@@ -4,14 +4,16 @@
 #include "kernel/manager/inode.h"
 
 typedef enum {
+    FT_DIR,
+    FT_PLAIN,
+    // following has no inode
     PIPE,
     DEV,
-    // upper has no inode
-    REG,
 } Node_e;
 
 /**
    if type == DEV, node_off, filesize is meaningless
+   if type == FT_DIR, filesize if meaningless
 */
 typedef struct {
     // node offset in ramdisk/disk relative to region node
