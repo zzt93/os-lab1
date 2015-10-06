@@ -3,7 +3,7 @@
 
 // the error must correspond to the order of err in message.h
 // e.g. err[- NO_SUCH] == "No such file or directory"
-// @see set_error_msg()
+// @see set_error_msg(), message.h
 const char *const err[] = {
     "Unknown/Unclassified error",
     "File error",

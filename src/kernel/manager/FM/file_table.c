@@ -17,15 +17,17 @@ BIT_MAP(MAX_FILE)
 static FTE file_table[MAX_FILE];
 
 void fill_fte(FTE *fte, iNode *node, uint32_t offset) {
-    fte->node_off = offset;
+    // TODO offset for a device is meaningless??
     fte->offset = 0;
     fte->dev_id = node->dev_id;
     fte->ref_count = 0;
     // TODO no block means a device?
     if (node->type == NO_BLOCK) {
         fte->type = DEV;
+        fte->node_off = -1;
     } else {
         fte->type = node->type;
+        fte->node_off = offset;
     }
     switch(fte->type) {
         case FT_DIR:
@@ -116,9 +118,9 @@ void init_thread_cwd() {
 }
 
 /**
-  TODO
-  1. if it is a directory, not permit to write
-  2. the size of cwd in fte is out-dated
+  1. if it is a directory, not permit to write -- add check
+  2. the size of cwd in fte is out-dated -- never read size of
+  directory in fte for its size is already set invalid
  */
 size_t rw_prepare(Msg *m,
     size_t (*rw_block_file)(inode_t, uint32_t, char *buf, int len)) {
@@ -132,6 +134,11 @@ size_t rw_prepare(Msg *m,
     // if not specify the list name,
     // using default file path -- current working directory node_off
     FTE *fte = ((FTE *)aim->fd_table[fd].ft_entry);
+    if (fte->type == DEV) {
+        m.ret = IS_DIR;
+        return 0;
+    }
+
     inode_t nodeoff = fte->node_off;
     int offset = fte->offset;
     assert(nodeoff >= inode_start);
