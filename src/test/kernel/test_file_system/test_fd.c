@@ -71,8 +71,12 @@ static int set_fd_msg(int fd, int (*f)(Msg *)) {
     m.ret = FM_ERR;
     m.buf = current;
     m.dev_id = fd;
-    f(&m);
+    int res = f(&m);
     test_list(NULL);
+    if (m.ret == SUCC) {
+        return res;
+    }
+    assert(res == INVALID_FD_I);
     return m.ret;
 }
 
@@ -97,14 +101,39 @@ static int test_close(int fd) {
 void test_open_close() {
     int res;
     int fd = test_open(first_doc);
+    res = test_dup(fd);
+    // close the duplicated file descriptor
+    res = test_close(res);
+    assert(res == SUCC);
     res = test_close(fd);
     assert(res == SUCC);
 }
 
-void test_dup() {
+static int test_dup(int old_fd) {
+    int dup_fd;
+    Msg m;
+    m.ret = FM_ERR;
+    m.buf = current;
+    m.dev_id = (int)old_fd;
+    dup_fd = dup_file(&m);
+    assert(m.ret == SUCC);
+    test_list(NULL);
+
+    return dup_fd;
 }
 
-void test_dup2() {
+void test_dup2(int old_fd, int new_fd) {
+    int dup_fd;
+    Msg m;
+    m.ret = FM_ERR;
+    m.i[2] = current;
+    m.i[0] = (int)old_fd;
+    m.i[1] = (int)new_fd;
+    dup_fd = dup_file(&m);
+    assert(m.ret == SUCC);
+    test_list(NULL);
+
+    return dup_fd;
 }
 
 void test_lseek() {

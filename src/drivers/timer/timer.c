@@ -74,7 +74,13 @@ static void
 update_jiffy(void) {
 	jiffy ++;
 	if (jiffy % HZ == 0) {
-        // TODO change it to more accurate
+        // TODO change it to more accurate -- ie, update_timer() not every 100 times,
+        // less the count, more accurate the timer
+        /*
+          if (jiffy % 10 == 0) {
+          update_timer();
+          }
+         */
         update_timer();
 		rt.second ++;
 		if (rt.second >= 60) { rt.second = 0; rt.minute ++; }

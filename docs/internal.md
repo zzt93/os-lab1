@@ -79,20 +79,20 @@ which is invisible for user.
 
 ## i386 ISA
 1. push -- first minus 2/4 bytes, then store values, ie the esp always point to old value. If it is `push %esp`, it will save the old value before minus which means push original esp value.  
-For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %esp` pushed the pointer of it.
+For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %esp` pushed the pointer of it.  
 
 
 -------------------------
 
 ## user process interrupt stack
-[user process stack state](pic/user_process_stack.jpg)
+[user process stack state](pic/user_process_stack.jpg)  
 
 
 --------------------
 
 ## process communication -- message
 
-- receiver: `T f(Msg *m);` is the recommended form. 
-	- return value is the most important information this function has( e.g. `PCB * create_process(Msg *);`)
-	- `m->ret` can be set in the function body, choose one from the enum in message.h
+- receiver: `T f(Msg *m);` is the recommended form.  
+	- return value is the most important information this function has( e.g. `PCB * create_process(Msg *);`)  
+	- `m->ret` can be set in the function body, choose one from the enum in message.h, which is the state of this operation or detail error message  
 

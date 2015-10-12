@@ -106,8 +106,9 @@ int invalid_block(iNode *node, int index) {
    node's block)
    if that index out of bound, allocate a new block;
 
-   TODO if allocate one block then fail to continue, how to
-   free already allocated disk memory.
+   if allocate one block then fail to continue, how to
+   free already allocated disk memory. -- solved by
+   using macro ALLOC_CHECK
  */
 uint32_t get_block(iNode *node, int index) {
     uint32_t res;
@@ -309,9 +310,9 @@ size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
 size_t write_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
     iNode node;
     n_dev_read(now_disk, FM, &node, nodeoff, sizeof node);
-    // TODO temporary assert
-    assert((node.size % sizeof(Dir_entry)) == 0);
-    assert(len % sizeof(Dir_entry) == 0);
+    // TODO temporary assert for testing make/delete dir
+    //assert((node.size % sizeof(Dir_entry)) == 0);
+    //assert(len % sizeof(Dir_entry) == 0);
     if (offset == W_LAST_BYTE) {
         offset = node.size;
     }

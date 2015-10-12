@@ -86,12 +86,12 @@ void init_file_table() {
     NOINTR;
     // set to a directory -- now is root
     // read it from disk
+    // TODO using "/" as default cwd for the time being
     inode_t aim = file_path(0, default_cwd_name);
     assert(aim == inode_start);
     n_dev_read(now_disk, FM, (char *)&node, aim, sizeof node);
-    // TODO using inode_start for the time being
     // for it is a directory, so the size for it is meaningless
-    default_cwd = add_fte(&node, inode_start);
+    default_cwd = add_fte(&node, aim);
     NOINTR;
 }
 

@@ -75,7 +75,7 @@ dynamic allocated bit map( using kmalloc)
 - using macro when need different type(Tree<>)
 - using special name convention when implement data structure, e.g. `_bitmap_array`
 
-- design an error return system between 'client' and 'server'(in os is 'os user' and 'os kernel')
+- design an error return system between 'client' and 'server'(in os is 'application programmer' and 'os kernel programmer')
 	- `enum`: not a simple `FAIL` and `SUCC` but `no such directory or file`, `Segmentation fault`.
 	- `struct`: a int indicate state, and a string indicate error message.
 

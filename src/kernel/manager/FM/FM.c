@@ -7,6 +7,7 @@
 #include "kernel/manager/file_table.h"
 #include "drivers/hal.h"
 
+
 int FM;
 
 int now_disk;
@@ -28,6 +29,7 @@ static void FM_job() {
         pid_t dest = m.src;
         int type = m.type;
         m.ret = FM_ERR;
+        int res;
         switch(type) {
             case FM_read:
                 read_file(&m);
@@ -37,7 +39,8 @@ static void FM_job() {
                 write_file(&m);
                 break;
             case FM_open:
-                open_file(&m);
+                res = open_file(&m);
+                SET_IF_SUCC(&m, res);
                 break;
             case FM_close:
                 close_file(&m);
@@ -92,8 +95,8 @@ void init_file_system() {
        before init_file_table(); for file_table will use inode_start
     */
     init_file_table();
-    // for many thread is already initialized with `0`, so
-    // re-init them
+    // for many already initialized thread is initialized with `0`, so
+    // re-init cwd for them, @see init_proc.c:create_kthread();
     init_thread_cwd();
 }
 

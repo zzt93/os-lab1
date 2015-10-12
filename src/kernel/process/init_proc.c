@@ -122,10 +122,11 @@ create_kthread(void *fun) {
     pcb->tf = frame;
 
     /**
-       TODO may initialize it again
+       have to initialize it again:
        for most kernel process are initialized before
        file_system was loaded, in which default_cwd is
        setted, so for kernel thread, cwd is all invalid
+       -- @see file_table.c:init_thread_cwd();
      */
     init_pcb_content(pcb, get_kcr3()->val, KERNEL, default_cwd);
     return pcb;

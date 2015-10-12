@@ -86,7 +86,7 @@ inode_t file_path(inode_t cwd, const char * const name) {
         path[len - 2] = '\0';
     }
 
-    // TODO split "/afd/asd/"
+    // split "/afd/asd/" -- tested by test_file.c:name5, name6, name7
     int parts = split(path, '/', save);
     assert(parts <= MAX_DIR_DEPTH);
     int i;
@@ -412,7 +412,9 @@ int ch_dir(Msg *m) {
 }
 
 /* TODO need a write_to_file specify name && off_in_file??
-   how to get offset???
+   1. how to get offset???
+   2. too much arguments: char *content_buf, int write_len,
+   char *file_name, int off_in_file, PCB *aim,
 size_t rw_prepare(Msg *m,
     size_t (*rw_block_file)(inode_t, uint32_t, char *buf, int len)) {
     PCB *aim = (PCB *)m->req_pid;

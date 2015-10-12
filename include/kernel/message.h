@@ -60,4 +60,10 @@ typedef enum {
     NO_MORE_MEMORY,
 } Msg_res;
 
+#define SET_IF_SUCC(m, info) {                  \
+        if (m->ret == SUCC) {                   \
+            m->ret = info;                      \
+        }                                       \
+    }                                           \
+
 #endif /* __MESSAGE_H__ */

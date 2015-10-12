@@ -5114,6 +5114,12 @@ void init_ram() {
 }
 
 
+/**
+   Notice:
+   For now, read_ram() can only be used between kernel
+   thread, for it use m->buf directly rather than
+   using get_pa()
+ */
 int read_ram(Msg* m) {
     uint32_t i;
     uint8_t data;
