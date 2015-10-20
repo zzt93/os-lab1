@@ -40,12 +40,23 @@ PCB idle = {
 };
 PCB *current = &idle;
 
+/**
+   using different choose_process for different schedule algorithm
+ */
 static PCB* choose_process() {
     if (wake_is_empty()) {
         return &idle;
     }
     PCB* tmp = wake_dequeue();
     return tmp;
+}
+
+/**
+   TODO
+   implement DNF algorithm to schedule task -- process
+ */
+PCB* DNF() {
+    return NULL;
 }
 
 

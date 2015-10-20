@@ -134,8 +134,11 @@ size_t rw_prepare(Msg *m,
     // if not specify the list name,
     // using default file path -- current working directory node_off
     FTE *fte = ((FTE *)aim->fd_table[fd].ft_entry);
+    // read and write directory should not through this method
+    // write: user can't write to directory
+    // read: user should call list_dir
     if (fte->type == DEV) {
-        m.ret = IS_DIR;
+        m->ret = IS_DIR;
         return 0;
     }
 

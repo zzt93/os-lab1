@@ -18,7 +18,14 @@ typedef uint32_t block_t;
 #define SEC_INDIRECT (FIRST_INDIRECT + 1)
 #define THI_INDIRECT (SEC_INDIRECT + 1)
 
-
+/**
+   Notice:
+   if you add more members to Dir_entry
+   remember that check whether the sizeof(Dir_entry) is
+   still 2**n;
+   @see inode.c: assert_iNode_size
+   @see harddisk/makeimg.py
+ */
 struct INODE{
 	//char filename[32];
     // file size in bytes

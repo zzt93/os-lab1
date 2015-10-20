@@ -5,6 +5,14 @@
 
 #include "inode.h"
 
+/**
+   Notice:
+   if you add more members to Dir_entry
+   remember that check whether the sizeof(Dir_entry) is
+   still 2**n;
+   @see file_syscall.c: test_sizeof_Dir_entry
+   @see harddisk/makeimg.py
+ */
 typedef struct {
 	char filename[MAX_FILENAME_LEN];
     // inode offset

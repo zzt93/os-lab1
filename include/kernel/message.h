@@ -60,9 +60,14 @@ typedef enum {
     NO_MORE_MEMORY,
 } Msg_res;
 
+/**
+   In order to return more useful information
+   if succ: return what this function have
+   if fail: return failure code -- in m.ret
+ */
 #define SET_IF_SUCC(m, info) {                  \
-        if (m->ret == SUCC) {                   \
-            m->ret = info;                      \
+        if (m.ret == SUCC) {                    \
+            m.ret = info;                       \
         }                                       \
     }                                           \
 

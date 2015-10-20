@@ -70,7 +70,13 @@ int block_free(uint32_t offset) {
 
 void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size);
 
-const uint32_t super_start = 1400832;
+/**
+   Notice:
+   not change the following line
+   @see harddisk/update_super_block.sh
+ */
+const uint32_t super_start = 1403904;
+
 #define SUPER_BUF 512
 void load_super_block() {
     char buf[SUPER_BUF];

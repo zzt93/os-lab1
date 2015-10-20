@@ -411,10 +411,16 @@ int ch_dir(Msg *m) {
     return off;
 }
 
-/* TODO need a write_to_file specify name && off_in_file??
+/* need a write_to_file specify name && off_in_file??
    1. how to get offset???
    2. too much arguments: char *content_buf, int write_len,
    char *file_name, int off_in_file, PCB *aim,
+
+   TODO maybe a version of write file to create a file
+   i.e. create a plain file, open file, no offset,
+   write content to it
+   and return fd
+
 size_t rw_prepare(Msg *m,
     size_t (*rw_block_file)(inode_t, uint32_t, char *buf, int len)) {
     PCB *aim = (PCB *)m->req_pid;

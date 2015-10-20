@@ -17,6 +17,11 @@ FDE * get_fde(PCB *aim, int i) {
 }
 
 
+/**
+   - find file by name
+   - add entry to system opened file table
+   - add entry to process fd table
+ */
 int open_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     char *name = (char *)get_pa(&aim->pdir, m->dev_id);
@@ -37,6 +42,10 @@ int open_file(Msg *m) {
     return j;
 }
 
+/**
+   - free that process fd
+   - free system opened file if necessary
+ */
 int close_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     int i =  m->dev_id;

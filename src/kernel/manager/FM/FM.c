@@ -40,7 +40,7 @@ static void FM_job() {
                 break;
             case FM_open:
                 res = open_file(&m);
-                SET_IF_SUCC(&m, res);
+                SET_IF_SUCC(m, res);
                 break;
             case FM_close:
                 close_file(&m);
