@@ -18,7 +18,7 @@ debug: hardDisk
 	$(QEMU) -serial stdio -s -S harddisk/harddisk.img
 
 hardDisk: disk.img
-	@cd harddisk; make
+	@cd harddisk; make run
 
 disk.img: kernel
 	@cd boot; make

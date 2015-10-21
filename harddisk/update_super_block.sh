@@ -1,13 +1,19 @@
 #!/bin/bash
 
 aim='const uint32_t super_start = '
-block='./src/kernel/manager/FM/block.c'
+block='../src/kernel/manager/FM/block.c'
 
-new_block_start=$(read)
+read new_block_start
 
-old_block_start=$(echo $block | egrep '$aim[0-9]+' | sed 's/[^0-9]*//g')
+line=$(egrep "$aim[0-9]+" $block)
+old_block_start=$(echo "$line" | egrep -o '(^[1-9][0-9]*)|( [1-9][0-9]*)' | sed 's/[^0-9]//g')
+
+#old_block_start=$(egrep '$aim[0-9]+' $block | egrep '(^[1-9][0-9]*)|( [1-9][0-9])')
 
 if [ "$new_block_start" != "$old_block_start" ];then
-	sed 's/$aim$old_block_start/$aim$new_block_start/g' $block
-	make run
+	sed "s/$aim$old_block_start/$aim$new_block_start/g" "$block" > "$block"
+	cd ..; make disk.img
+	cd harddisk; make newimg
 fi
+make catimg
+

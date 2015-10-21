@@ -150,16 +150,19 @@ class MkImg:
         # init root directory
         # write '.' '..' in block, ie a dir
         inode_o, block_o = self.make_file(FileType.DIR, disk_sz)
+
         buf1 = bytearray(sizeof(DirEntry))
         current = DirEntry.from_buffer(buf1)
         current.filename = b'.'
         current.inode_off = inode_o + disk_sz
         self.write_to_file(inode_o, block_o, buf1)
+
         buf2 = bytearray(sizeof(DirEntry))
         father = DirEntry.from_buffer(buf2)
         father.filename = b'..'
         father.inode_off = inode_o + disk_sz
         self.write_to_file(inode_o, block_o + sizeof(current), buf2)
+
         with open('./hard_disk', 'wb') as img:
             img.write(bytearray(self.buf))
 
