@@ -10,8 +10,8 @@ Try to learn os by lab
 
 
 ## Running requirement
-- make
-- qemu( I am using `qemu-system-i386` in makefile)
+- make  
+- qemu( I am using `qemu-system-i386` in makefile)  
 - gcc  
 `
 ----------------------
@@ -25,29 +25,35 @@ kmalloc -- malloc in kernel -- using next-fit algorithm
 the key press interrupt handler  
 a simple maze game running without os  
 the context switch between threads  
-the creation of thread  
+the creation of kernel thread  
 the schedule of thread -- now using Round-Robin algorithm  
 the sleep and wake_up of thread  
 the semaphore(P&V) and lock(cli&sti) to slove critical section  
-the send and receive between threads  -- send it asynchronized and will always succeed; receive is synchronized and may be blocked   
+the send and receive message between threads  -- send it asynchronized and will always succeed; receive is synchronized and may be blocked   
 add timer-- clock diver, ide-- hard disk driver, tty -- terminal driver  
-very very simple file system  
-user process  
-using page allocation  -- using bit-map algorithm  
+very very simple file system -- name is number, size is fixed  
+create user process  
+using page dynamic allocation  -- using bit-map algorithm  
 add page protection  
 put user in ring3  
 wait(int second) -- system call  
 random number  
+
 fork a process  
 exec a command  
 exit a user process  
 waitpid  
+a simple shell  
+
+upgrade file system: change file system name to string; size is variable  
 create a file  
 make a directory  
 delete a file  
 delete a directory  
 change current working directory  
 list current working directory  
+open a file  
+close a file  
 
 
 

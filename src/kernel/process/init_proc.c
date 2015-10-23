@@ -161,21 +161,15 @@ PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListH
 
 /**
    NOTICE: when creating a kernel thread which doesn't
-   need stack switch, ie the real trapFrame to be recovered
+   need stack switch, i.e. the real trapFrame to be recovered
    doesn't contain `esp0` and `ss`.
  */
-// TODO try finish it
+// TODO test
 PCB* create_kthread_with_args(void* fun, int arg) {
-    PCB* pcb = kmalloc(PCB_SIZE);
-    // the address which out of boundary
-    void *last = (char*)(pcb->kstack) + KSTACK_SIZE;
-    // move back 32bits to fit a int
-    *((int *)last - 1) = arg;
-    TrapFrame *frame = (TrapFrame*)(last - sizeof(TrapFrame) - sizeof(arg));
-    init_kernel_tf(frame, fun);
-    pcb->tf = frame;
+    PCB* pcb = create_kthread(fun);
+    TrapFrame *frame = pcb->tf;
 
-    init_pcb_content(pcb, get_kcr3()->val, KERNEL, default_cwd);
+    frame->esp = arg;
     return pcb;
 }
 

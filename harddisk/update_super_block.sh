@@ -11,7 +11,7 @@ old_block_start=$(echo "$line" | egrep -o '(^[1-9][0-9]*)|( [1-9][0-9]*)' | sed 
 #old_block_start=$(egrep '$aim[0-9]+' $block | egrep '(^[1-9][0-9]*)|( [1-9][0-9])')
 
 if [ "$new_block_start" != "$old_block_start" ];then
-	sed "s/$aim$old_block_start/$aim$new_block_start/g" "$block" > "$block"
+	sed -i "s/$aim$old_block_start/$aim$new_block_start/g" "$block"
 	cd ..; make disk.img
 	cd harddisk; make newimg
 fi

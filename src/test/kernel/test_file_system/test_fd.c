@@ -120,6 +120,7 @@ void test_read(int fd) {
 }
 
 void test_write(int fd) {
+    // read from ram then write to shell.out, exit.out
 }
 
 void test_open_close() {
