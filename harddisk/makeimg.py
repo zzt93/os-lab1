@@ -142,6 +142,7 @@ class MkImg:
         disk_sz = os.path.getsize(self.disk)
         # although it is append at end, for they are all zero, so it's same
         super_gap = self.fill_gap(disk_sz)
+        print(super_gap, disk_sz)
         print(super_gap + disk_sz)
         self.init_super(super_gap, disk_sz)
         # it is done in __init__

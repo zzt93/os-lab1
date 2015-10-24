@@ -53,9 +53,9 @@ static PCB* choose_process() {
 
 /**
    TODO
-   implement DNF algorithm to schedule task -- process
+   implement EDF algorithm to schedule task -- process
  */
-PCB* DNF() {
+PCB* EDF() {
     return NULL;
 }
 

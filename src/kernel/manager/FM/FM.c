@@ -95,7 +95,8 @@ void init_file_system() {
        before init_file_table(); for file_table will use inode_start
     */
     init_file_table();
-    // for many already initialized thread is initialized with `0`, so
+    // for many already initialized thread is initialized with
+    // uinitialized default_cwd -- `0`, so
     // re-init cwd for them, @see init_proc.c:create_kthread();
     init_thread_cwd();
 }

@@ -74,6 +74,8 @@ typedef struct {
     ListHead waitpid;
     // file descriptor table
     struct file_descriptor_entry fd_table[PROCESS_MAX_FD];
+    // process priority -- used when schedule process
+    int priority;
 } PCB;
 
 extern PCB *current;
@@ -108,6 +110,12 @@ static inline void * get_pdir_addr(PCB *p) {
 #define ANY -1
 
 extern Sem wake_lock, sleeped_lock;
+
+// for priority
+#define KERNEL_PRI 100
+#define USER_PRI 10
+
+
 
 #include "init_proc.h"
 #endif

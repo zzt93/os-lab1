@@ -17,6 +17,7 @@ static void s_copy(PCB* src, PCB* dest) {
     for (i = 0; i < PROCESS_MAX_FD; i++) {
         assign_fd(dest->fd_table + i, src->fd_table + i);
     }
+    dest->priority = src->priority;
 }
 
 /**
@@ -128,7 +129,7 @@ void copy_user_stack(PCB *father, PCB *child) {
 PCB * kfork(Msg* m) {
     PCB *father = m->buf;
     PCB *child = kmalloc(PCB_SIZE);
-    // shallow copy: privilege, sign, pid
+    // shallow copy: privilege, sign, pid, fd_table
     s_copy(father, child);
     // deep copy ptable, page, set page directory
     // except kernel image, including user stack

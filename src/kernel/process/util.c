@@ -92,13 +92,20 @@ void init_test_proc() {
     add2wake(create_kthread(user_process));
 }
 
-// init_idle() part two
 void init_idle() {
-    //current->count_of_lock = 1; -- move to main.c:os_init_cont
-    init_fd_table(current, default_cwd);
+    // to make it NOINTR
+    current->count_of_lock = 1;
+    // make it can receive the message so that it can help initialize
+    // file system
+    list_init(&current->mes);
+    // make it can put into waiting queue when waiting receiving
+    // message
+    current->pdir.val = get_kcr3()->val;
+    current->priority = KERNEL_PRI;
 }
 
-
+/*
 void init_proc() {
     init_idle();
 }
+*/

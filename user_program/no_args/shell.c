@@ -4,7 +4,8 @@
 
 
 #define BUF_SZ 256
-#define MAX_PARAMETER_NR 10
+// one for command itself
+#define MAX_PARAMETER_NR (10 + 1)
 
 
 int entry() {

@@ -94,6 +94,8 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
     // initialize wait pid list
     list_init(&pcb->waitpid);
     init_fd_table(pcb, cwd);
+
+    pcb->priority = (type == KERNEL) ? KERNEL_PRI : USER_PRI;
 }
 
 

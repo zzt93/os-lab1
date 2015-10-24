@@ -27,6 +27,7 @@ class Img:
         # although it is append at end, for they are all zero, so it's same
         super_gap = self.cal_gap(disk_sz)
         print(super_gap + disk_sz)
+        print(super_gap, disk_sz)
 
 
 

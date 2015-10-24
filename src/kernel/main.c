@@ -14,7 +14,7 @@ void init_serial(void);
 void init_segment(void);
 void init_idt(void);
 void init_intr(void);
-void init_proc(void);
+void init_idle(void);
 void init_driver();
 void welcome(void);
 
@@ -58,12 +58,8 @@ os_init_cont(void) {
     //The Intel 8259 is a Programmable Interrupt Controller (PIC)
     init_intr();
 
-    // ------init_idle() part one
-    // to make it NOINTR
-    current->count_of_lock = 1;
-    list_init(&current->mes);
-    current->pdir.val = get_kcr3()->val;
-    // ------init_idle() part two is in kernel/process/util.c
+    // make it NOINTR, can receive msg, can schedule
+    init_idle();
     /**
        initialize kmalloc -- have to initialize it before process,
     // for using it in allocating memory for PCB
