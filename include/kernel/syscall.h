@@ -7,6 +7,11 @@
 int syscall(int, ...);
 void do_syscall(TrapFrame*);
 
+/**
+   Add new type system call may need to make clean
+   the user program and update with new enum number
+   of system call id.
+ */
 enum {
     SYS_create,
     SYS_make,
@@ -28,6 +33,8 @@ enum {
     SYS_exec,
     SYS_getpid,
     SYS_waitpid,
+    SYS_set_priority,
+    SYS_get_priority,
     // Miscellaneous
     MIS,
     // print in serial terminal
@@ -38,6 +45,8 @@ enum {
     SYS_read_line,
     // wait in seconds now
     SYS_wait,
+    SYS_timer_start,
+    SYS_timer_finished,
     // put prompt -- user name/ prompt
     SYS_prompt,
     // for int 0x80 in sleep method
@@ -52,6 +61,8 @@ int exit();
 int getpid();
 int waitpid(int wait);
 int wait(int time);
+int set_priority(Pri_t priority);
+int get_priority();
 
 int prompt();
 
@@ -72,5 +83,8 @@ int deldir(const char *name);
 // name(with path)
 int listdir(const char *name, char *buf);
 int chdir(const char *name);
+
+int timer_start(int seconds);
+int timer_finished();
 
 #endif /* __SYSCALL_H__ */

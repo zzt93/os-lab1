@@ -6,14 +6,18 @@
 // @see set_error_msg(), message.h
 const char *const err[] = {
     "Unknown/Unclassified error",
+    // FM related error message
     "File error",
     "No such file or directory",
     "is a directory",
     "File or directory already exist",
     "No more disk storage",
     "Parameter buffer is too small",
+    // PM related error message
     "Process related error",
     "Segmentation fault",
+    "Invalid priority for user process",
+    // MM related error message
     "Memory error",
     "NO more memory to allocate",
 };

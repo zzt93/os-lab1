@@ -12,7 +12,7 @@ enum {
     NEW_TIMER,
 };
 
-inline long get_jiffy();
+long get_jiffy();
 
 void get_time(Time *tm);
 
@@ -31,6 +31,12 @@ void set_timer(Timer *t, int time, int pid);
 int kwait(Msg *m);
 void update_timer();
 
+
+int kstart_non_block_timer(int seconds);
+int knon_block_timer_finished();
+void update_non_block_timer();
+
+// drver id of timer
 extern int d_timer;
 
 #endif

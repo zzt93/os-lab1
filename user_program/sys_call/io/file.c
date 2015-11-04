@@ -17,7 +17,7 @@ int deldir(const char *name) {
 }
 
 int listdir(const char *name, char *buf) {
-    return syscall(SYS_listdir, name, buf);
+    return syscall(SYS_lsdir, name, buf);
 }
 
 int chdir(const char *name) {

@@ -19,7 +19,7 @@ int entry() {
         read_line(cmd, BUF_SZ);
         memcpy(copy, cmd, BUF_SZ);
         count = split(copy, ' ', save);
-        assert(MAX_PARAMETER_NR >= count);
+        user_assert(MAX_PARAMETER_NR >= count);
         if (count <= 1) {
             printf("Unknown command: %s\n", cmd);
             continue;

@@ -167,13 +167,14 @@ welcome(void) {
     test_tree();
     test_page_alloc();
     test_bit_map();
-    test_heap();
     test_random();
     test_string();
 
     test_map();
     test_d_bit_map();
     */
+    test_heap();
+    
     test_list(NULL);
     test_mkdir();
     //test_deldir();

@@ -5,9 +5,9 @@
 
 #define KOFFSET 0xC0000000
 
-inline CR3* get_kcr3();
-inline PDE* get_kpdir();
-inline PTE* get_kptable();
+CR3* get_kcr3();
+PDE* get_kpdir();
+PTE* get_kptable();
 
 void make_invalid_pde(PDE *);
 void make_invalid_pte(PTE *);

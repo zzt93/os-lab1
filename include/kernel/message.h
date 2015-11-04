@@ -54,8 +54,11 @@ typedef enum {
     FILE_EXIST,
     NO_MORE_DISK,
     BUF_OF,
+    // PM related error
     PM_ERR,
     SEGMENTATION,
+    INVALID_PRI,
+    // MM related error
     MM_ERR,
     NO_MORE_MEMORY,
 } Msg_res;

@@ -15,4 +15,6 @@ typedef          int   pid_t;
 typedef          uint32_t   size_t;
 typedef          int   off_t;
 
+#define Pri_t int
+
 #endif

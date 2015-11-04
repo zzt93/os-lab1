@@ -9,7 +9,7 @@ LDFLAGS = -melf_i386 -e _start2
 CFILES  = $(shell find ./ -maxdepth 1 -name "*.c")
 SFILES  = $(shell find ./ -maxdepth 1 -name "*.S")
 SYS		= $(shell find ../sys_call/ -name "*.o")
-LIB     = ../../src/lib/string_out.o ../start2.o
+LIB     = ../../src/lib/string_out.o ../../src/lib/math.o ../start2.o
 OBJS    = $(CFILES:.c=.out) $(SFILES:.S=.out)
 ARRAYS  = $(OBJS:.out=.ar)
 

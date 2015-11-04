@@ -48,4 +48,20 @@ void set_cwd(PCB *pcb, FTE *fte) {
 
 void init_fd_table(PCB *pcb, FTE *cwd);
 
+static inline
+int priority_in_range(Pri_t priority) {
+    return priority >= 0 && priority < 65536;
+}
+
+static inline
+void kset_priority(PCB *p, Pri_t priority) {
+    assert(priority_in_range(priority));
+    p->priority = priority;
+}
+
+static inline
+Pri_t kget_priority(PCB *p) {
+    return p->priority;
+}
+
 #endif /* __TRAPFRAME_H__ */

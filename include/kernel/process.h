@@ -21,6 +21,7 @@ typedef enum {
 
 #define PROCESS_MAX_FD 8
 
+
 /*
   for the stack is grow to small address,
   the first item on the stack, should be the
@@ -75,7 +76,7 @@ typedef struct {
     // file descriptor table
     struct file_descriptor_entry fd_table[PROCESS_MAX_FD];
     // process priority -- used when schedule process
-    int priority;
+    Pri_t priority;
 } PCB;
 
 extern PCB *current;

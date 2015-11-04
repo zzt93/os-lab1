@@ -6,7 +6,7 @@
 #include "drivers/hal.h"
 #include "drivers/tty/tty4.h"
 
-
+#include "kernel/init_proc.h"
 /*
 int __attribute__((__noinline__))
 syscall(int id, ...) {
@@ -154,6 +154,17 @@ void do_syscall(TrapFrame *tf) {
                 m.i[0] = tf->ebx;
                 m.buf = current;
                 break;
+            case SYS_set_priority:
+                if (priority_in_range(tf->ebx)) {
+                    kset_priority(current, tf->ebx);
+                    tf->eax = SUCC;
+                } else {
+                    tf->eax = INVALID_PRI;
+                }
+                return;
+            case SYS_get_priority:
+                tf->eax = kget_priority(current);
+                return;
             default:
                 printk(RED"no such system call %d "RESET, id);
                 assert(0);
@@ -184,6 +195,12 @@ void do_syscall(TrapFrame *tf) {
                 m.i[1] = current->pid;
                 send(TIMER, &m);
                 receive(TIMER, &m);
+                break;
+            case SYS_timer_start:
+                tf->eax = kstart_non_block_timer(tf->ebx);
+                break;
+            case SYS_timer_finished:
+                tf->eax = knon_block_timer_finished();
                 break;
             case SYS_prompt:
                 m.type = PROMPT;

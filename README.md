@@ -79,13 +79,16 @@ dynamic allocated bit map( using kmalloc)
 
 - put the original global variable to parameter can better re-use some data structure.(ListHead)
 - using macro when need different type(Tree<>)
-- using special name convention when implement data structure, e.g. `_bitmap_array`
+- using special name convention when implement data structure, e.g. `_bitmap_array` to avoid name collision  
+- using `name##_adt` can better reuse adt  
 
 - design an error return system between 'client' and 'server'(in os is 'application programmer' and 'os kernel programmer')
 	- `enum`: not a simple `FAIL` and `SUCC` but `no such directory or file`, `Segmentation fault`.
 	- `struct`: a int indicate state, and a string indicate error message.
 
 - if fail to allocate some resources when allocating a serial of resources,  
-	remember to free already allocated resources.
+	remember to free already allocated resources.  
 
-- avoid using `void *` for it may hide some bugs because the implicit conversion of different type of pointers.
+- avoid using `void *` for it may hide some bugs because the implicit conversion of different type of pointers.  
+
+- if not sure what type should use, may use macro called like `xxx_t` to make it easy to change  

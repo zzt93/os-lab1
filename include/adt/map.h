@@ -61,7 +61,7 @@
         TNode_##name* e = find_fa(&name##_aim);             \
         if (e == NULL) {                                    \
             printk(RED"no such key"RESET);                  \
-            return NULL;                                    \
+            return (V)NULL;                                 \
         }                                                   \
         Entry* le = NULL;                                   \
         if (left(e)) {                                      \
@@ -78,23 +78,31 @@
             return ri->v;                                   \
         }                                                   \
         printk(RED"no such key "RESET);                     \
-        return NULL;                                        \
+        return (V)NULL;                                     \
     }                                                       \
                                                             \
-    void name##_put(K k, V v) {                             \
-    Entry* e = kmalloc(sizeof(Entry));                      \
-    name##_init_entry(e, k, v);                             \
-    lock();                                                 \
-    if (name##_has(e)) {                                    \
-        TNode_##name* t = name##_get_node(e);               \
-        assert(t != NULL);                                  \
-        assert((t->t)->k = k);                              \
-        t->t = e;                                           \
-    } else {                                                \
-        map_size++;                                         \
-        name##_add(e);                                      \
+    int name##_put(K k, V v) {                              \
+        Entry* e = kmalloc(sizeof(Entry));                  \
+        if(e == NULL) {                                     \
+            return 0;                                       \
+        }                                                   \
+        name##_init_entry(e, k, v);                         \
+        lock();                                             \
+        if (name##_has(e)) {                                \
+            TNode_##name* t = name##_get_node(e);           \
+            assert(t != NULL);                              \
+            assert((t->t)->k = k);                          \
+            t->t = e;                                       \
+        } else {                                            \
+            map_size++;                                     \
+            name##_add(e);                                  \
+        }                                                   \
+        unlock();                                           \
+        return 1;                                           \
     }                                                       \
-    unlock();                                               \
+                                                            \
+    int name##_update(K k, V v) {                           \
+        return name##_put(k, v);                            \
     }                                                       \
                                                             \
     int name##_remove(K k) {                                \
@@ -111,6 +119,7 @@
                                                             \
     static int values_container_c;                          \
     static V *values_container;                             \
+    /*method for in order traversal call back*/             \
     static                                                  \
     void adder(Entry *e) {                                  \
         values_container_c --;                              \

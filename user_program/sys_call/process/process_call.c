@@ -25,3 +25,19 @@ int waitpid(int wait) {
 int wait(int time) {
     return syscall(SYS_wait, time);
 }
+
+int set_priority(Pri_t priority) {
+    return syscall(SYS_set_priority, priority);
+}
+
+int get_priority() {
+    return syscall(SYS_get_priority);
+}
+
+int timer_start(int seconds) {
+    return syscall(SYS_timer_start, seconds);
+}
+
+int timer_finished() {
+    return syscall(SYS_timer_finished);
+}

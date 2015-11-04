@@ -3,6 +3,8 @@
 #include "kernel/process.h"
 #include "drivers/time.h"
 
+#include "lib/malloc.h"
+
 extern PCB* current;
 
 void set_timer(Timer *t, int time, int pid) {
@@ -19,27 +21,31 @@ static int cmp(Timer *t1, Timer *t2) {
     return 0;
 }
 
-HEAP(Timer, 10, cmp)
+HEAP(Timer*, 10, cmp, block_timer)
 
 int kwait(Msg *m) {
-    Timer t;
-    set_timer(&t, m->i[0], m->i[1]);
-    add(t);
+    Timer *t = kmalloc(sizeof(Timer));
+    if (t == NULL) {
+        return 0;
+    }
+    set_timer(t, m->i[0], m->i[1]);
+    block_timer_add(t);
     return 1;
 }
 
 void update_timer() {
     // check if any timer is finished
-    if (empty()) {
+    if (block_timer_empty()) {
         return;
     }
-    Timer t;
+    Timer *t;
     Msg m;
     // using current->pid is wrong, for current is not fixed
     m.src = TIMER;
-    while (!empty() && (t = max()).time == 1) {
-        pop_max();
-        send(t.pid, &m);
+    while (!block_timer_empty() && (t = block_timer_max())->time == 1) {
+        block_timer_pop_max();
+        send(t->pid, &m);
+        kfree(t);
     }
     int i = 0;
     Timer *tmp;
@@ -47,3 +53,4 @@ void update_timer() {
         tmp->time --;
     }
 }
+

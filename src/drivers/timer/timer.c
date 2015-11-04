@@ -24,7 +24,7 @@ static void timer_driver_thread(void);
 
 /**
    设置时钟中断的频率(100Hz)
-   初始化系统时间(选做题, 若不完成, 系统时间将会从2000/01/01 00:00:00开始, 但不会影响系统的正常运行)
+   初始化系统时间(系统时间将会从2000/01/01 00:00:00开始, 但不会影响系统的正常运行)
    注册顶半处理update_jiffy(), 每次时钟中断到来时会更新变量jiffy的值, 这个变量记录了距离系统初始化结束期间时钟中断到来的次数
    创建TIMER主线程
    注册设备"timer"
@@ -73,6 +73,8 @@ md(int year, int month) {
 static void
 update_jiffy(void) {
 	jiffy ++;
+
+    update_non_block_timer();
 	if (jiffy % HZ == 0) {
         // TODO change it to more accurate -- ie, update_timer() not every 100 times,
         // less the count, more accurate the timer
@@ -109,7 +111,7 @@ init_rt(void) {
 
 /**
    get time by counting times of timer interrupt
-   100Hz, ie 1s = 10 interrupts
+   100Hz, ie 1s = 100 interrupts
  */
 void
 get_time(Time *tm) {
