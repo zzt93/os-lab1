@@ -35,7 +35,7 @@
     } Entry;                                                \
                                                             \
     static Entry name##_aim;                                \
-    static int map_size = 0;                                \
+    static int _name##_map_size = 0;                        \
                                                             \
     void name##_init_entry(Entry* e, K k, V v) {            \
         e->k = k;                                           \
@@ -94,7 +94,7 @@
             assert((t->t)->k = k);                          \
             t->t = e;                                       \
         } else {                                            \
-            map_size++;                                     \
+            _name##_map_size++;                             \
             name##_add(e);                                  \
         }                                                   \
         unlock();                                           \
@@ -114,25 +114,51 @@
     }                                                       \
                                                             \
     int name##_get_map_size() {                             \
-        return map_size;                                    \
+        return _name##_map_size;                            \
     }                                                       \
                                                             \
     static int values_container_c;                          \
     static V *values_container;                             \
-    /*method for in order traversal call back*/             \
+    /*method for in-order traversal call back*/             \
     static                                                  \
-    void adder(Entry *e) {                                  \
-        values_container_c --;                              \
+    void values_adder(Entry *e) {                           \
         values_container[values_container_c] = e->v;        \
+        values_container_c ++;                              \
     }                                                       \
                                                             \
-    /* !!the content is put reversed in container */        \
-    void name##_values(V *v, int *capacity) {               \
+    static int keySet_container_c;                          \
+    static K *keySet_container;                             \
+    /*method for in order-traversal call back*/             \
+    static                                                  \
+    void keySet_adder(Entry *e) {                           \
+        keySet_container[keySet_container_c] = e->k;        \
+        keySet_container_c ++;                              \
+    }                                                       \
+                                                            \
+    /*static Sem name##_values_mutex, name##_key_mutex; */  \
+    /* TODO change to mutex and PV*/                        \
+    /* @return how many values are returned in v*/          \
+    int name##_values(V *v, int capacity) {                 \
         lock();                                             \
         values_container = v;                               \
-        values_container_c = *capacity;                     \
-        name##_in_order(adder, capacity);                   \
+        values_container_c = 0;                             \
+        int save_c = capacity;                              \
+        name##_in_order(values_adder, &save_c);             \
         unlock();                                           \
+        return (capacity >= _name##_map_size)               \
+            ? _name##_map_size : capacity;                  \
+    }                                                       \
+                                                            \
+    /* @return how many values are stored in k*/            \
+    int name##_keySet(K *k, int capacity) {                 \
+        lock();                                             \
+        keySet_container = k;                               \
+        keySet_container_c = 0;                             \
+        int save_c = capacity;                              \
+        name##_in_order(keySet_adder, &save_c);             \
+        unlock();                                           \
+        return (capacity >= _name##_map_size)               \
+            ? _name##_map_size : capacity;                  \
     }                                                       \
 
 

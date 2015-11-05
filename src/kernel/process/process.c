@@ -16,14 +16,10 @@ PCB* fetch_pcb(pid_t id) {
 
 /**
    write as more as possible pcb's pointer into `pcbs`.
-   if the array of pcb is not enough to contain all,
-   it will return the number of pcbs which are left.
-   i.e. return capacity - map_contain
+     @return how many pcbs are fetched
  */
 int fetch_all_pcb(PCB **pcbs, int capacity) {
-    int c = capacity;
-    all_values(pcbs, &c);
-    return c;
+    return all_values(pcbs, capacity);
 }
 
 size_t pcb_size() {

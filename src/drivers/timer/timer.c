@@ -70,6 +70,9 @@ md(int year, int month) {
 	return tab[month] + (leap && month == 2);
 }
 
+// @see edf.c
+void to_ddl_each_update();
+
 static void
 update_jiffy(void) {
 	jiffy ++;
@@ -84,6 +87,7 @@ update_jiffy(void) {
           }
          */
         update_timer();
+        to_ddl_each_update();
 		rt.second ++;
 		if (rt.second >= 60) { rt.second = 0; rt.minute ++; }
 		if (rt.minute >= 60) { rt.minute = 0; rt.hour ++; }
@@ -111,7 +115,7 @@ init_rt(void) {
 
 /**
    get time by counting times of timer interrupt
-   100Hz, ie 1s = 100 interrupts
+   100Hz, i.e. 1s = 100 interrupts
  */
 void
 get_time(Time *tm) {

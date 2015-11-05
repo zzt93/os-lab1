@@ -36,7 +36,7 @@ int kstart_non_block_timer(int seconds);
 int knon_block_timer_finished();
 void update_non_block_timer();
 
-// drver id of timer
+// driver id of timer
 extern int d_timer;
 
 #endif

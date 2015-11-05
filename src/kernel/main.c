@@ -170,10 +170,10 @@ welcome(void) {
     test_random();
     test_string();
 
-    test_map();
     test_d_bit_map();
     */
     test_heap();
+    test_map();
     
     test_list(NULL);
     test_mkdir();

@@ -51,31 +51,6 @@ static PCB* choose_process() {
     return tmp;
 }
 
-/*
-   implement EDF algorithm to schedule task -- process
-
-   - change wake_dequeue to use priority queue;
-   - how to get the period? -- update in task not in here
-   - how to find if it is finished
-*/
-#include "adt/heap.h"
-
-HEAP(PCB*, 256, cmp_pid, process_pri);
-
-PCB* EDF() {
-    /*
-      for each thread, update priority by deadline -- done by
-      task itself
-      choose the highest wake thread -- done by priority queue
-      may be need a call back method for every process
-    */
-    int i;
-    PCB *p;
-    heap_each(i, p) {
-        kset_priority(p, -1);
-    }
-    return process_pri_max();
-}
 
 void print_tree(TNode_sleeped* root) {
     if (root == NULL) {

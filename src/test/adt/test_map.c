@@ -44,12 +44,11 @@ void test_map() {
     //assert(one == NULL && two == NULL && thr == NULL);
 
     int count = 5;
-    int c = count;
     char *numbers[count];
-    num_values(numbers, &count);
-    assert(c - 3 == count);
+    int res = num_values(numbers, count);
+    assert(res == 3);
     int i;
-    for (i = c - 1; i >= c - count - 1; i--) {
+    for (i = 0; i < count ; i++) {
         printk("%s ", numbers[i]);
     }
 }

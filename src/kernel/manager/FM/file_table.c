@@ -111,7 +111,7 @@ void init_thread_cwd() {
     int i, thread_num = pcb_size();
     PCB *pcbs[thread_num];
     int res = fetch_all_pcb(pcbs, thread_num);
-    assert(res == 0);
+    assert(res == thread_num);
     for (i = 0; i < thread_num; i++) {
         init_fd_table(pcbs[i], default_cwd);
     }

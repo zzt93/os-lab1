@@ -28,8 +28,8 @@
         NodeLink link;                                      \
     } TNode_##name;                                         \
                                                             \
-    static TNode_##name h;                                  \
-    static TNode_##name* name##_head = &h;                  \
+    static TNode_##name name##_h;                           \
+    static TNode_##name* name##_head = &name##_h;           \
                                                             \
     static inline                                           \
     TNode_##name* left(TNode_##name* t) {                   \
@@ -306,8 +306,11 @@
         }                                                               \
         tree_in_order(left(root), consumer, capacity);                  \
         (*capacity) --;                                                 \
+                                                                        \
         if (*capacity >= 0) {                                           \
             consumer(root->t);                                          \
+        } else {                                                        \
+            return;                                                     \
         }                                                               \
         tree_in_order(right(root), consumer, capacity);                 \
     }                                                                   \

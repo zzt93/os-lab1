@@ -17,6 +17,7 @@ void task(const char *name, int exe_time, int period) {
         while (!timer_finished()) {
         }
         printf("%s execute #%d second(s)\n", name, exe_time);
+        update_task_ddl(period);
         wait(period);
     }
 }
