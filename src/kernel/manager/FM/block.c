@@ -75,7 +75,7 @@ void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size);
    not change the following line
    @see harddisk/update_super_block.sh
  */
-const uint32_t super_start = 1444352;
+const uint32_t super_start = 1444864;
 
 #define SUPER_BUF 512
 void load_super_block() {

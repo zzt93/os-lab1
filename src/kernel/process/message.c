@@ -89,7 +89,8 @@ void send(pid_t dest, Msg *m) {
     NOINTR;
     PCB* de = fetch_pcb(dest);
     NOINTR;
-    printk("sd %d:-------#%d send to #%d------\n", current->pid, m->src, dest);
+    // message source not always equal to current
+    printk("#%d sd:-------#%d send to #%d------\n", current->pid, m->src, dest);
     assert(de != NULL && dest == de->pid);
     NOINTR;
     //Sem* s = &(de->mes_lock);
@@ -105,9 +106,9 @@ void send(pid_t dest, Msg *m) {
 }
 
 void receive(pid_t src, Msg *m) {
-    printk("rcv %d:--------receive from %d----------\n", current->pid, src);
+    printk("#%d rcv:--------receive from %d----------\n", current->pid, src);
     lock();
-    printk("Msg number %d; ", list_size(&(current->mes)) );
+    printk("Msg count: %d; ", list_size(&(current->mes)) );
     NOINTR;
     while (!has_message(current, src)) {// no such message
         // go to sleep

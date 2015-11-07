@@ -10,6 +10,8 @@ void init(Stack_t s, char c) {
     s->c = c;
 }
 
+// TODO lock here or outside where using it?
+// or using Sem -- be careful not using it when in irq
 void push(int c) {
     lock();
     if (stack_pointer == NULL) {

@@ -74,8 +74,9 @@ dynamic allocated bit map( using kmalloc)
 -----------------
 
 ## NOTICE in the future:
-- the adt itself not must to be synchronized, the user choose whether to synchronize.  
+- the adt itself may not to be synchronized, the user choose whether to synchronize it, like `Vector and ArrayList`?  
 - can add NOINTR to make sure user add synchronization if necessary  
+- the adt seems should not using semaphore and P&V for concurrent use, for it may used in irq which may cause deadlock  
 
 - put the original global variable to parameter can better re-use some data structure.(ListHead)
 - using macro when need different type(Tree<>)
@@ -92,3 +93,10 @@ dynamic allocated bit map( using kmalloc)
 - avoid using `void *` for it may hide some bugs because the implicit conversion of different type of pointers.  
 
 - if not sure what type should use, may use macro called like `xxx_t` to make it easy to change  
+
+
+## Debug
+- minimize the code where bug might in by comment other parts
+- rational analysis about who can change it
+- gdb: watch and breakpoint
+- print more if bug is related to interrupt and not so easy to repeat

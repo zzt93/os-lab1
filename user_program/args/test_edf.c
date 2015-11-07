@@ -51,7 +51,9 @@ int entry(char *args) {
     char copy[BUF_SZ];
     memcpy(copy, args, BUF_SZ);
     count = split(copy, ' ', save);
-    user_assert(count == NUM_TASKS * 2);
+    if (count == NUM_TASKS * 2) {
+        printf("to few arguments, should be %d arguments", NUM_TASKS * 2);
+    }
     int i;
     int i_arg[count];
     for (i = 0; i < count; i++) {

@@ -61,6 +61,7 @@
         TNode_##name* e = find_fa(&name##_aim);             \
         if (e == NULL) {                                    \
             printk(RED"no such key"RESET);                  \
+            unlock();                                       \
             return (V)NULL;                                 \
         }                                                   \
         Entry* le = NULL;                                   \
@@ -85,9 +86,9 @@
         Entry e1;                                           \
         name##_init_entry(&e1, k, v);                       \
         lock();                                             \
-        if (name##_has(e1)) {                                \
+        if (name##_has(&e1)) {                              \
             /*update original one if has this entry*/       \
-            TNode_##name* treenode = name##_get_node(e);    \
+            TNode_##name* treenode = name##_get_node(&e1);  \
             assert(treenode != NULL);                       \
             assert((treenode->t)->k = k);                   \
             /*just set new value for this entry*/           \
