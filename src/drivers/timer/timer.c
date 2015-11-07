@@ -79,7 +79,7 @@ update_jiffy(void) {
 
     update_non_block_timer();
 	if (jiffy % HZ == 0) {
-        // TODO change it to more accurate -- ie, update_timer() not every 100 times,
+        // TODO change it to more accurate -- i.e. update_timer() not every 100 times,
         // less the count, more accurate the timer
         /*
           if (jiffy % 10 == 0) {

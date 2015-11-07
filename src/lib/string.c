@@ -59,16 +59,6 @@ int itoh_s(int a, char *s, int limit) {
 }
 
 
-/**
-   @NOTICE: Not include null character '\0'
-   str = "abc" -- len = 3
- */
-size_t strlen(const char *str) {
-	int len = 0;
-	while (*str ++) len ++;
-	return len;
-}
-
 void strcpy(char *d, const char *s) {
 	memcpy(d, s, strlen(s) + 1);
 }

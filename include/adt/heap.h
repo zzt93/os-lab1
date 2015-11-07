@@ -74,6 +74,10 @@
         return _heap_size == 0;                     \
     }                                               \
                                                     \
+    static inline int name##_heap_size() {          \
+        return _heap_size;                          \
+    }                                               \
+                                                    \
     T name##_max() {                                \
         if (name##_empty()) {                       \
             assert(0);                              \
@@ -101,6 +105,9 @@
     }                                               \
                                                     \
     void name##_update(int i, T t) {                \
+        if (i >= _heap_size) {                      \
+            return;                                 \
+        }                                           \
         lock();                                     \
         int res = f(_heap[i], t);                   \
         _heap[i] = t;                               \
@@ -109,6 +116,7 @@
         } else if (res < 0){                        \
             percolate_up(i);                        \
         }                                           \
+        unlock();                                   \
     }                                               \
 
 #define heap_each(i, t)                                             \

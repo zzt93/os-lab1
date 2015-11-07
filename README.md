@@ -100,3 +100,4 @@ dynamic allocated bit map( using kmalloc)
 - rational analysis about who can change it
 - gdb: watch and breakpoint
 - print more if bug is related to interrupt and not so easy to repeat
+- exceptions like 14, 13: 1. printed stack info 2. error code with i386 manual

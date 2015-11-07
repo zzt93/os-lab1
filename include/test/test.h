@@ -6,6 +6,8 @@
 #include "test_queue.h"
 #include "test_lock.h"
 #include "test_file.h"
+#include "test_math.h"
+
 
 void test_list_entry();
 void test_tree();
@@ -22,5 +24,7 @@ void test_page_alloc();
 void init_test_proc();
 
 void test_random();
+
+void test_nb_timer();
 
 #endif /* __TEST_H__ */

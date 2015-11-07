@@ -58,3 +58,13 @@ void memset(void *dest, uint8_t data, size_t size) {
 void memcpy(void *dest, const void *src, size_t size) {
 	asm volatile ("cld; rep movsb" : : "c"(size), "S"(src), "D"(dest));
 }
+
+/**
+   @NOTICE: Not include null character '\0'
+   str = "abc" -- len = 3
+ */
+size_t strlen(const char *str) {
+	int len = 0;
+	while (*str ++) len ++;
+	return len;
+}

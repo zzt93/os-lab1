@@ -171,9 +171,11 @@ welcome(void) {
     test_string();
 
     test_d_bit_map();
+    test_map();
+    test_LCM();
+    test_nb_timer();
     */
     test_heap();
-    test_map();
     
     test_list(NULL);
     test_mkdir();

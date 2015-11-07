@@ -171,6 +171,6 @@ class MkImg:
 if __name__ == '__main__':
     assert (sizeof(DirEntry) % 32 == 0)
     assert (sizeof(Inode) % 128 == 0)
-    sys.path.extend(['/media/zzt/01CEC27C454731B01/recent/os/ics/os/os-lab1/harddisk'])
+    #sys.path.extend(['/media/zzt/01CEC27C454731B01/recent/os/ics/os/os-lab1/harddisk'])
     a = MkImg('../disk.img', 2 ** 12, 2 ** 10, 1)
     a.make_img()

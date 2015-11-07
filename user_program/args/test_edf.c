@@ -46,13 +46,15 @@ int can_edf(int *arg) {
    2 1 3 2 4 3 5
  */
 int entry(char *args) {
+    int len = strlen(args);
     int count;
     char *save[NUM_TASKS * 2] = {0};
     char copy[BUF_SZ];
-    memcpy(copy, args, BUF_SZ);
+    memcpy(copy, args, len);
     count = split(copy, ' ', save);
-    if (count == NUM_TASKS * 2) {
-        printf("to few arguments, should be %d arguments", NUM_TASKS * 2);
+    if (count != NUM_TASKS * 2) {
+        printf("wrong number of arguments, should be %d arguments\n", NUM_TASKS * 2);
+        return 0;
     }
     int i;
     int i_arg[count];
