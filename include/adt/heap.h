@@ -99,6 +99,17 @@
         unlock();                                   \
         percolate_up(_heap_size - 1);               \
     }                                               \
+                                                    \
+    void name##_update(int i, T t) {                \
+        lock();                                     \
+        int res = f(_heap[i], t);                   \
+        _heap[i] = t;                               \
+        if(res > 0) {                               \
+            percolate_down(i);                      \
+        } else if (res < 0){                        \
+            percolate_up(i);                        \
+        }                                           \
+    }                                               \
 
 #define heap_each(i, t)                                             \
     for (i = 0, t = _heap[i]; i < _heap_size; i++, t = _heap[i])

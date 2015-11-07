@@ -59,7 +59,7 @@ void print_tree(TNode_sleeped* root) {
     assert(root != left(root));
     assert(root != right(root));
     print_tree(left(root));
-    printk("t is %d ", root->t->pid);
+    printk("node is %d ", root->t->pid);
     print_tree(right(root));
 }
 

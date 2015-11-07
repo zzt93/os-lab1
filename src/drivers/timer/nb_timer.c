@@ -25,5 +25,8 @@ int knon_block_timer_finished() {
 void update_non_block_timer() {
     // only need to update the current running process
     int inter_num = nb_timers_get(current);
+    if (inter_num == 0) {
+        return;
+    }
     nb_timers_update(current, inter_num - 1);
 }

@@ -34,3 +34,6 @@ int get_priority() {
     return syscall(SYS_get_priority);
 }
 
+int update_task_ddl(int period) {
+    return syscall(SYS_update_task_ddl, period);
+}

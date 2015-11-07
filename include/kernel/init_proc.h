@@ -53,11 +53,7 @@ int priority_in_range(Pri_t priority) {
     return priority >= 0 && priority < 65536;
 }
 
-static inline
-void kset_priority(PCB *p, Pri_t priority) {
-    assert(priority_in_range(priority));
-    p->priority = priority;
-}
+void kset_priority(PCB *p, Pri_t priority);
 
 static inline
 Pri_t kget_priority(PCB *p) {

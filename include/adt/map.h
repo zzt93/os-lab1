@@ -82,18 +82,22 @@
     }                                                       \
                                                             \
     int name##_put(K k, V v) {                              \
-        Entry* e = kmalloc(sizeof(Entry));                  \
-        if(e == NULL) {                                     \
-            return 0;                                       \
-        }                                                   \
-        name##_init_entry(e, k, v);                         \
+        Entry e1;                                           \
+        name##_init_entry(&e1, k, v);                       \
         lock();                                             \
-        if (name##_has(e)) {                                \
-            TNode_##name* t = name##_get_node(e);           \
-            assert(t != NULL);                              \
-            assert((t->t)->k = k);                          \
-            t->t = e;                                       \
+        if (name##_has(e1)) {                                \
+            /*update original one if has this entry*/       \
+            TNode_##name* treenode = name##_get_node(e);    \
+            assert(treenode != NULL);                       \
+            assert((treenode->t)->k = k);                   \
+            /*just set new value for this entry*/           \
+            treenode->t->v = v;                             \
         } else {                                            \
+            Entry* e = kmalloc(sizeof(Entry));              \
+            if(e == NULL) {                                 \
+                return 0;                                   \
+            }                                               \
+            name##_init_entry(e, k, v);                     \
             _name##_map_size++;                             \
             name##_add(e);                                  \
         }                                                   \

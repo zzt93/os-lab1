@@ -7,20 +7,16 @@
 #include "drivers/tty/tty4.h"
 
 #include "kernel/init_proc.h"
-/*
-int __attribute__((__noinline__))
-syscall(int id, ...) {
-	int ret;
-	int *args = &id;
-	asm volatile("int $0x80": "=a"(ret) : "a"(args[0]), "b"(args[1]), "c"(args[2]), "d"(args[3]));
-	return ret;
-}
-*/
 
+
+
+int to_ddl_get(int pid);
+int to_ddl_update(int pid, int to_ddl);
 /**
    NOTICE:
    if the parameters contains address, may be you need
-   physical address -- but not convert it now,
+   physical address to make cross-process exchange message
+   -- but not convert it now,
    convert it after receiving message
    ie, in the target process/server
  */
@@ -164,6 +160,10 @@ void do_syscall(TrapFrame *tf) {
                 return;
             case SYS_get_priority:
                 tf->eax = kget_priority(current);
+                return;
+            case SYS_update_task_ddl:
+                tf->eax = to_ddl_update(current->pid,
+                    to_ddl_get(current->pid) + tf->ebx);
                 return;
             default:
                 printk(RED"no such system call %d "RESET, id);
