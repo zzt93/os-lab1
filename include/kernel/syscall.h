@@ -36,6 +36,7 @@ enum {
     SYS_set_priority,
     SYS_get_priority,
     SYS_update_task_ddl,
+    SYS_using_edf,
     // Miscellaneous
     MIS,
     // print in serial terminal
@@ -65,6 +66,7 @@ int wait(int time);
 int set_priority(Pri_t priority);
 int get_priority();
 int update_task_ddl(int period);
+int using_edf();
 
 int prompt();
 

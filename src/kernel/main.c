@@ -83,12 +83,12 @@ os_init_cont(void) {
 
     //more_frequent();
 
+    init_proc_test();
 
-    // to initialize shell process, which must later
+    // here is to initialize shell process, which must later
     // than init_manager -- for it will send message to
     // managers
-    // @checked: move from locked state to unlocked state
-    init_test_proc();
+    user_process();
 
     // @checked: move from locked state to unlocked state
     init_file_system();
@@ -174,9 +174,13 @@ welcome(void) {
     test_map();
     test_LCM();
     test_nb_timer();
-    */
     test_heap();
-    
+    */
+    /**
+       Using the idle thread to create some files and folders,
+       make idle change state to sleeped when waiting for a
+       message, may cause some bugs.
+    */
     test_list(NULL);
     test_mkdir();
     //test_deldir();

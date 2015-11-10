@@ -5,6 +5,8 @@
 
 #include "kernel/syscall.h"
 
+#include "kernel/edf.h"
+
 Sem wake_lock, sleeped_lock;
 /**
    NOTICE:
@@ -45,6 +47,11 @@ PCB *current = &idle;
  */
 static PCB* choose_process() {
     if (wake_is_empty()) {
+        // for the process using wake_queue are kernel process
+        // so has higher priority
+        if (!process_heap_empty()) {
+            return edf();
+        }
         return &idle;
     }
     PCB* tmp = wake_dequeue();
@@ -83,6 +90,9 @@ schedule(void) {
         case SLEEPED:
             sleeped_add(current);
             printk("add %d to tree\n", current->pid);
+            break;
+        case EDF:
+            process_pri_add(current);
             break;
         default:
             assert(false);

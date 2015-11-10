@@ -162,8 +162,14 @@ void do_syscall(TrapFrame *tf) {
                 tf->eax = kget_priority(current);
                 return;
             case SYS_update_task_ddl:
+                // notice:
+                // this method is also used to put initial ddl
+                // to map
                 tf->eax = to_ddl_update(current->pid,
                     to_ddl_get(current->pid) + tf->ebx);
+                return;
+            case SYS_using_edf:
+                tf->eax = kusing_edf();
                 return;
             default:
                 printk(RED"no such system call %d "RESET, id);

@@ -12,13 +12,15 @@ int init_p;
 
 static
 void task(const char *name, int exe_time, int period) {
+    put_task_ddl(period);
     while (1) {
+        set_timer()
         timer_start(exe_time);
         while (!timer_finished()) {
         }
         printf("%s execute #%d second(s)\n", name, exe_time);
         update_task_ddl(period);
-        wait(period);
+        wait(period - );
     }
 }
 
@@ -65,17 +67,20 @@ int entry(char *args) {
         return 0;
     }
 
-    init_p = get_priority();
+    // make it move from wake_queue to process_pri_heap
+    using_edf();
+    //init_p = get_priority();
     int pid;
     if ((pid = fork()) == 0) {
-        set_priority(init_p - i_arg[1]);
+        // set to_ddl will update priority automatically
+        //set_priority(init_p - i_arg[1]);
         task("a", i_arg[0], i_arg[1]);
     } else {
         if ((pid = fork()) == 0) {
-            set_priority(init_p - i_arg[3]);
+            //set_priority(init_p - i_arg[3]);
             task("b", i_arg[2], i_arg[3]);
         } else {
-            set_priority(init_p - i_arg[5]);
+            //set_priority(init_p - i_arg[5]);
             task("c", i_arg[4], i_arg[5]);
         }
     }

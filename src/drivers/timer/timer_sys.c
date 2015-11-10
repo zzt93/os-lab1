@@ -5,6 +5,15 @@
 
 #include "lib/malloc.h"
 
+/**
+   Notice:
+   if you send timer a message, but not using receive to
+   wait for it(i.e. you want your process to block to wait
+   some time), it can still work for timer will send a
+   reply message and put it in the message box for your process
+   to receive later, but time is not accurate any more.
+   So had better receive() before your time run out
+ */
 extern PCB* current;
 
 void set_timer(Timer *t, int time, int pid) {

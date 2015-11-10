@@ -54,7 +54,8 @@ void init_proc() {
 */
 
 /**
-   thread to create first user process -- shell
+   This thread is aim to
+   create first user process -- shell
  */
 void user_process() {
     Msg m;
@@ -64,9 +65,13 @@ void user_process() {
         0, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
     send(PM, &m);
     receive(PM, &m);
+    // used when run as a separate thread
+    /*
+    current->state = SLEEPED;
     while (true) {
         wait_intr();
     }
+    */
 }
 
 void init_driver_test() {
@@ -74,7 +79,7 @@ void init_driver_test() {
     //add2wake(create_kthread(read_FM));
 }
 
-void init_test_proc() {
+void init_proc_test() {
     //init_driver_test();
 
     /* test for lock and semaphore
@@ -89,7 +94,7 @@ void init_test_proc() {
     add2wake(create_kthread(E));
     */
 
-    add2wake(create_kthread(user_process));
+    //add2wake(create_kthread(user_process));
 }
 
 void init_idle() {

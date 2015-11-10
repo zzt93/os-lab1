@@ -21,7 +21,8 @@ void test_string();
 void test_page_alloc();
 
 // implemented in util.c
-void init_test_proc();
+void init_proc_test();
+void user_process();
 
 void test_random();
 

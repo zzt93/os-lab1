@@ -55,6 +55,8 @@ list current working directory
 open a file  
 close a file  
 
+non-blocked timer -- used to make a process run specific seconds  
+LCM and GCD  
 
 
 

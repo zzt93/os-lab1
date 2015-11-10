@@ -18,7 +18,7 @@ MAP(int, int, to_ddl);
    - how to get the period? -- update in task not in here
    - how to find if it is finished
 */
-PCB* EDF() {
+PCB* edf() {
     /*
       for each thread, update priority by deadline -- done by
       task itself
@@ -34,7 +34,7 @@ PCB* EDF() {
         p->priority = USER_PRI - to_ddl;
         process_pri_update(i, p);
     }
-    return process_pri_max();
+    return process_pri_pop_max();
 }
 
 // invoke every second to decrease to_ddl
@@ -62,4 +62,8 @@ void kset_priority(PCB *p, Pri_t priority) {
             return;
         }
     }
+}
+
+int process_heap_empty() {
+    return process_pri_empty();
 }

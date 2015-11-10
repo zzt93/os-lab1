@@ -4,7 +4,8 @@ Aug 8 2015 update:
 
 ## Thread and it's pid:  
 ANY -- (-1) used by server like FM, MM, PM  
-idle -- 0  -- running when no other thread ready  
+idle -- 0  -- running when no other thread ready; init and run test;
+send PM to make shell running; init file system;  
 Timer -- 1  -- deal with time-related system call and interrupt  
 TTY -- 2  -- deal with keyboard input and screen update  
 getty -- 3-5  -- change input to upper case  
@@ -13,8 +14,8 @@ RAMDISK -- 7  -- disk in RAM
 FM -- 8  -- deal with file related system call  
 PM -- 9  -- deal with process related system call  
 MM -- 10  -- deal with memory management  
-user process invoker -- 11  
-first user process -- 12  -- shell program -- bound to tty4, ie read from/write to it  
+~~user process invoker -- 11~~  
+first user process -- 11  -- shell program -- bound to tty4, ie read from/write to it  
   - user process start from shell -- 13 -- now the file 1 is a `timer` , `exit()` and `args` test. input example: `1 asdf`  
 
 -------------

@@ -11,6 +11,7 @@
 
 typedef enum {
     IDLE, SLEEPED, WAKED,
+    EDF,
 } PROCESS_STATE;
 
 typedef enum {
@@ -102,6 +103,11 @@ static inline void * get_pdir_addr(PCB *p) {
     return (void *)(p->pdir.page_directory_base << 12);
 }
 
+static inline
+int kusing_edf() {
+    current->state = EDF;
+    return 1;
+}
 
 #define IDLE_ID 0
 #define START_ID (IDLE_ID+1)
