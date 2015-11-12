@@ -56,7 +56,12 @@ static void PM_job() {
             {
                 PCB * new = kfork(&m);
                 assert(new != NULL);
-                add2wake(new);
+                assert(new->state > NOT_SLEEPED);
+                new->state -= SLEEPED;
+                lock();
+                put_by_state(new);
+                add_process(new);
+                unlock();
                 pid_t child = new->pid;
                 // reply to father
                 m.ret = child;

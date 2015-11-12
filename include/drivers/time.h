@@ -23,7 +23,7 @@ typedef struct {
     int pid;
 } Timer;
 
-void set_timer(Timer *t, int time, int pid);
+//void set_timer(Timer *t, int time, int pid);
 // implemented in timer_sys.c
 
 #include "kernel/message.h"

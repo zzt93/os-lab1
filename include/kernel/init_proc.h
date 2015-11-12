@@ -53,11 +53,14 @@ int priority_in_range(Pri_t priority) {
     return priority >= 0 && priority < 65536;
 }
 
-void kset_priority(PCB *p, Pri_t priority);
+void kset_edf_priority(PCB *p, Pri_t priority);
 
 static inline
 Pri_t kget_priority(PCB *p) {
     return p->priority;
 }
+
+
+#define DEFAULT_STATE WAKED
 
 #endif /* __TRAPFRAME_H__ */

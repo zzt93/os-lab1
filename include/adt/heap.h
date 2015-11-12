@@ -106,6 +106,7 @@
                                                     \
     void name##_update(int i, T t) {                \
         if (i >= _heap_size) {                      \
+            assert(0);                              \
             return;                                 \
         }                                           \
         lock();                                     \

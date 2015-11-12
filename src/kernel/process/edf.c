@@ -1,10 +1,18 @@
 #include "kernel/process.h"
 #include "adt/heap.h"
 
-int cmp_pid(PCB* a, PCB* b);
+static
+int cmp_pri(PCB* a, PCB* b) {
+	if (a->priority < b->priority) {
+        return -1;
+    } else if (a->priority > b->priority) {
+        return 1;
+    }
+    return 0;
+}
 
 // TODO add to heap at add_process
-HEAP(PCB*, 256, cmp_pid, process_pri);
+HEAP(PCB*, 256, cmp_pri, process_pri);
 
 #include "adt/map.h"
 // TODO add initial to_ddl at add_process
@@ -25,15 +33,6 @@ PCB* edf() {
       choose the highest wake thread -- done by priority queue
       may be need a call back method for every process
     */
-    int i;
-    PCB *p;
-    int to_ddl;
-    heap_each(i, p) {
-        to_ddl = to_ddl_get(p->pid);
-        assert(priority_in_range(USER_PRI - to_ddl));
-        p->priority = USER_PRI - to_ddl;
-        process_pri_update(i, p);
-    }
     return process_pri_pop_max();
 }
 
@@ -42,16 +41,17 @@ void to_ddl_each_update() {
     int n = 32;
     int pids[n];
     int res = to_ddl_keySet(pids, n);
-    int i;
+    int i, old;
     for (i = 0; i < res; i++) {
-        to_ddl_update(pids[i], to_ddl_get(pids[i]) - 1);
+        old = to_ddl_get(pids[i]);
+        to_ddl_update(pids[i],  old - 1);
     }
 }
 
 /**
    set priority and update the position in the heap
  */
-void kset_priority(PCB *p, Pri_t priority) {
+void kset_edf_priority(PCB *p, Pri_t priority) {
     assert(priority_in_range(priority));
     p->priority = priority;
     int i;

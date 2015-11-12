@@ -152,7 +152,7 @@ void do_syscall(TrapFrame *tf) {
                 break;
             case SYS_set_priority:
                 if (priority_in_range(tf->ebx)) {
-                    kset_priority(current, tf->ebx);
+                    kset_edf_priority(current, tf->ebx);
                     tf->eax = SUCC;
                 } else {
                     tf->eax = INVALID_PRI;
@@ -161,13 +161,16 @@ void do_syscall(TrapFrame *tf) {
             case SYS_get_priority:
                 tf->eax = kget_priority(current);
                 return;
-            case SYS_update_task_ddl:
+            case SYS_add_task_ddl:
                 // notice:
                 // this method is also used to put initial ddl
                 // to map
-                tf->eax = to_ddl_update(current->pid,
-                    to_ddl_get(current->pid) + tf->ebx);
+            {
+                int new_ddl = to_ddl_get(current->pid) + tf->ebx;
+                tf->eax = to_ddl_update(current->pid, new_ddl);
+                kset_edf_priority(current, USER_PRI - new_ddl);
                 return;
+            }
             case SYS_using_edf:
                 tf->eax = kusing_edf();
                 return;
@@ -200,6 +203,15 @@ void do_syscall(TrapFrame *tf) {
                 m.i[0] = tf->ebx;
                 m.i[1] = current->pid;
                 send(TIMER, &m);
+                receive(TIMER, &m);
+                break;
+            case SYS_set_timer:
+                m.type = NEW_TIMER;
+                m.i[0] = tf->ebx;
+                m.i[1] = current->pid;
+                send(TIMER, &m);
+                break;
+            case SYS_wait_timer:
                 receive(TIMER, &m);
                 break;
             case SYS_timer_start:

@@ -35,7 +35,7 @@ enum {
     SYS_waitpid,
     SYS_set_priority,
     SYS_get_priority,
-    SYS_update_task_ddl,
+    SYS_add_task_ddl,
     SYS_using_edf,
     // Miscellaneous
     MIS,
@@ -47,6 +47,8 @@ enum {
     SYS_read_line,
     // wait in seconds now
     SYS_wait,
+    SYS_set_timer,
+    SYS_wait_timer,
     SYS_timer_start,
     SYS_timer_finished,
     // put prompt -- user name/ prompt
@@ -65,7 +67,8 @@ int waitpid(int wait);
 int wait(int time);
 int set_priority(Pri_t priority);
 int get_priority();
-int update_task_ddl(int period);
+int add_task_ddl(int period);
+int put_task_ddl(int period);
 int using_edf();
 
 int prompt();
@@ -90,5 +93,7 @@ int chdir(const char *name);
 
 int timer_start(int seconds);
 int timer_finished();
+int set_timer(int seconds);
+int wait_timer();
 
 #endif /* __SYSCALL_H__ */

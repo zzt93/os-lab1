@@ -23,6 +23,7 @@ Sem wake_lock, sleeped_lock;
 
 //void vecsys();
 
+static
 int cmp_pid(PCB* a, PCB* b) {
     if (a->pid < b->pid) {
         return -1;
@@ -71,6 +72,33 @@ void print_tree(TNode_sleeped* root) {
 }
 
 /**
+   should use with lock
+ */
+void put_by_state(PCB *p) {
+    NOINTR;
+    int s = p->state;
+    switch(s) {
+        // sleeped state is not same with other state
+        // for other can participate schedule, but sleep can't
+        /*
+          case SLEEPED:
+          sleeped_add(current);
+          printk("add %d to tree\n", current->pid);
+          break; */
+        // ---------------------------------//
+        case IDLE:
+            //        case SLEEPED:
+        case WAKED:
+            wake_enqueue(p);
+            break;
+        case EDF:
+            process_pri_add(p);
+            break;
+        default:
+            assert(false);
+    }
+}
+/**
    关于页目录, 它是通过CR3寄存器寻找到的.
    由于每个进程都拥有自己的页目录, 所以在进行上下文切换的时候,
    我们必须将被调度进程的页目录基地址载入CR3寄存器, 否则被调度进程将会运行在其它进程的地址空间上, 从而产生错误.
@@ -80,27 +108,18 @@ schedule(void) {
 	/* implement process/thread schedule here */
     NOINTR;
     PROCESS_STATE s = current->state;
-    switch(s) {
-        case IDLE:
-            //        case SLEEPED:
-            break;
-        case WAKED:
-            wake_enqueue(current);
-            break;
-        case SLEEPED:
-            sleeped_add(current);
-            printk("add %d to tree\n", current->pid);
-            break;
-        case EDF:
-            process_pri_add(current);
-            break;
-        default:
-            assert(false);
+    if (s >= SLEEPED) { // i.e. go to sleep now
+        sleeped_add(current);
+        printk("add %d to tree\n", current->pid);
+    } else if (s < NOT_SLEEPED) {
+        put_by_state(current);
+    } else {
+        assert(0);
     }
-    // to balance the lock in do_irq
-    current->count_of_lock--;
+
     //printk("#%d count of lock %d\n", current->pid, current->count_of_lock);
     current = choose_process();
+    NOINTR;
     // load this process's cr3寄存器 when user -> kernel
     // or kernel -> user
     //assert(get_kcr3()->val == current->pdir.val); -- it is
@@ -131,7 +150,12 @@ schedule(void) {
     //print_tree(left(sleeped_head));
     printk("Now: current is #%d\n", current->pid);
     NOINTR;
+    // to balance the lock in do_irq
+    // can't use unlock, for interrupt procedure is not finished!!!
+    //unlock();
+    current->count_of_lock--;
 }
+
 
 void add2wake(PCB* p) {
     lock();
@@ -142,7 +166,8 @@ void add2wake(PCB* p) {
 }
 void add2sleeped(PCB* p) {
     lock();
-    p->state = SLEEPED;
+    assert(p->state < NOT_SLEEPED);
+    p->state += SLEEPED;
     sleeped_add(p);
     add_process(p);
     unlock();
@@ -167,7 +192,7 @@ void add2sleeped(PCB* p) {
 void sleep_to(ListHead* l,
     void (*enqueue)(ListHead*, PCB*)) {
     //print_tree(left(sleeped_head));
-    current->state = SLEEPED;
+    current->state += SLEEPED;
     enqueue(l, current);
     // no need to wait_intr(); for int $0x80
     //wait_intr();
@@ -182,7 +207,7 @@ void sleep() {
     //print_tree(left(sleeped_head));
     //printk("#%d in sleep\n", current->pid);
     NOINTR;
-    current->state = SLEEPED;
+    current->state += SLEEPED;
     //    sleeped_add(current);
     //print_tree(left(sleeped_head));
     unlock();
@@ -200,8 +225,8 @@ void wake_up_from(ListHead* l, PCB* (*dequeue)(ListHead* l)) {
         printk(RED"Invalid wake up"RESET"\n");
         return;
     }
-    wake->state = WAKED;
-    wake_enqueue(wake);
+    wake->state -= SLEEPED;
+    put_by_state(wake);
 }
 
 /**
@@ -222,11 +247,10 @@ void wake_up(PCB* p) {
     //printk("#%d in wake\n", current->pid);
     print_tree(left(sleeped_head));
     if (sleeped_delete(p)) {
-        p->state = WAKED;
-        //printk("wake up %d\n", p->pid);
-        //print_tree(left(sleeped_head));
-        // add to wake queue
-        wake_enqueue(p);
+        // TODO not always is waked any more
+        // where to save the thread original state
+        p->state -= SLEEPED;
+        put_by_state(p);
         NOINTR;
     }
     unlock();

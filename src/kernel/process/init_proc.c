@@ -82,9 +82,9 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
     list_init(&(pcb->link));
     list_init(&(pcb->mes));
     //create_sem(&(pcb->mes_lock), 1);
-    // default state is no lock, which is different from
-    // the first idle process
-    pcb->count_of_lock = 0;
+    // default state has a lock, which is used for the initial
+    // wake up from schedule();
+    pcb->count_of_lock = 1;
     // initialize the page directory address
     set_pdir(pcb, val);
     // kernel thread or user process
@@ -96,6 +96,8 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
     init_fd_table(pcb, cwd);
 
     pcb->priority = (type == KERNEL) ? KERNEL_PRI : USER_PRI;
+
+    pcb->state = DEFAULT_STATE;
 }
 
 

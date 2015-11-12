@@ -141,6 +141,7 @@ class MkImg:
     def make_img(self):
         disk_sz = os.path.getsize(self.disk)
         # although it is append at end, for they are all zero, so it's same
+        # TODO produce padding file and disk separately
         super_gap = self.fill_gap(disk_sz)
         print(super_gap, disk_sz)
         print(super_gap + disk_sz)

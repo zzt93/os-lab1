@@ -112,7 +112,7 @@ os_init_cont(void) {
     welcome();
     // set idle not to using cpu time
     // for it is originally set to sleep when send message
-    current->state = IDLE;
+    current->state = SLEEPED;
 
 
     /* This context now becomes the idle process. */

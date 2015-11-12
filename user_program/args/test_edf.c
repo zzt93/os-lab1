@@ -12,15 +12,17 @@ int init_p;
 
 static
 void task(const char *name, int exe_time, int period) {
-    put_task_ddl(period);
+    //put_task_ddl(period);
     while (1) {
-        set_timer()
+        // this timer count the overall time
+        set_timer(period);
+        // this timer count the timer this process using
         timer_start(exe_time);
         while (!timer_finished()) {
         }
         printf("%s execute #%d second(s)\n", name, exe_time);
-        update_task_ddl(period);
-        wait(period - );
+        add_task_ddl(period);
+        wait_timer();
     }
 }
 
@@ -64,23 +66,28 @@ int entry(char *args) {
         i_arg[i] = to_int(save[i]);
     }
     if(!can_edf(i_arg)) {
+        printf("wrong arguments: can't make a edf schedule\n");
         return 0;
     }
 
     // make it move from wake_queue to process_pri_heap
     using_edf();
+
     //init_p = get_priority();
     int pid;
     if ((pid = fork()) == 0) {
         // set to_ddl will update priority automatically
         //set_priority(init_p - i_arg[1]);
+        put_task_ddl(i_arg[1]);
         task("a", i_arg[0], i_arg[1]);
     } else {
         if ((pid = fork()) == 0) {
             //set_priority(init_p - i_arg[3]);
+            put_task_ddl(i_arg[3]);
             task("b", i_arg[2], i_arg[3]);
         } else {
             //set_priority(init_p - i_arg[5]);
+            put_task_ddl(i_arg[5]);
             task("c", i_arg[4], i_arg[5]);
         }
     }

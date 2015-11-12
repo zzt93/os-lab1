@@ -16,6 +16,7 @@
  */
 extern PCB* current;
 
+static
 void set_timer(Timer *t, int time, int pid) {
     t->time = time;
     t->pid = pid;

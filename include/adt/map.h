@@ -54,7 +54,7 @@
     BI_TREE(Entry*, cmp_k, name);                           \
                                                             \
                                                             \
-    /*get a node using the funciton when init as criteria*/ \
+    /*get a node using the function when init as criteria*/ \
     V name##_get(K k) {                                     \
         lock();                                             \
         name##_aim.k = k;                                   \

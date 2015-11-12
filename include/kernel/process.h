@@ -10,8 +10,12 @@
 #define PCB_SIZE (sizeof (PCB))
 
 typedef enum {
-    IDLE, SLEEPED, WAKED,
+    IDLE, WAKED,
     EDF,
+    // add new state before this
+    NOT_SLEEPED,
+    // always be the last
+    SLEEPED = 100,
 } PROCESS_STATE;
 
 typedef enum {
@@ -123,6 +127,7 @@ extern Sem wake_lock, sleeped_lock;
 #define USER_PRI 10
 
 
+void put_by_state(PCB *);
 
 #include "init_proc.h"
 #endif

@@ -67,7 +67,7 @@ void user_process() {
     receive(PM, &m);
     // used when run as a separate thread
     /*
-    current->state = SLEEPED;
+      // should not make it sleeped, for is may make no thread wake
     while (true) {
         wait_intr();
     }
@@ -77,6 +77,20 @@ void user_process() {
 void init_driver_test() {
     //add2wake(create_kthread(read_MBR));
     //add2wake(create_kthread(read_FM));
+}
+
+/**
+   This process is used to prevent the deadlocks
+   happened when idle sends message to other thread
+   to init os and all thread go to sleep
+ */
+static
+void empty() {
+    current->state = EDF;
+	current->priority = 0;
+    while(true) {
+        wait_intr();
+    }
 }
 
 void init_proc_test() {
@@ -95,6 +109,7 @@ void init_proc_test() {
     */
 
     //add2wake(create_kthread(user_process));
+    add2wake(create_kthread(empty));
 }
 
 void init_idle() {

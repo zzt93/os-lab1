@@ -7,6 +7,10 @@ extern PCB *current;
 MAP(PCB *, int, nb_timers);
 
 /**
+   A non-block timer actual just calculate the time
+   this process running. On the other hand, plain timer
+   count the real time, all time every process shared.
+   
    Now every process can only apply for one non-block
    count-down timer at the same time
    repeat application will override the older timer
