@@ -51,9 +51,11 @@ make a directory
 delete a file  
 delete a directory  
 change current working directory  
-list current working directory  
+list files under a folder  
 open a file  
 close a file  
+read a file  
+write a file  
 
 non-blocked timer -- used to make a process run specific seconds  
 LCM and GCD  

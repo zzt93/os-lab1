@@ -30,6 +30,7 @@ void test_create() {
       1. it seems have something to do with number of file
       in a directory
       2. problem may in make_empty_file
+      FIXED: for the bug in test_list
      */
     res = set_name_msg(first_doc, create_file);
     assert(res == SUCC);
@@ -43,6 +44,9 @@ void test_create() {
     assert(res == SUCC);
 }
 
+/**
+   @tested
+ */
 void test_delfile() {
     int res;
     res = set_name_msg(first_doc, delete_file);
@@ -57,6 +61,10 @@ void test_delfile() {
     assert(res == SUCC);
 }
 
+/**
+   @tested: test whether system will crash when create and
+   delete again and again, which may reveal some bugs
+ */
 void test_create_del() {
     int count = 100000;
     int i;
@@ -116,13 +124,51 @@ static int test_dup2(int old_fd, int new_fd) {
 void test_lseek(int fd) {
 }
 
-void test_read(int fd) {
+#define LEN 64
+
+static
+void set_rw_msg(Msg *m, int fd, char *buffer) {
+    m->ret = FM_ERR;
+    m->i[0] = (pid_t)current;
+    m->i[1] = fd;
+    m->i[2] = (int)buffer;
+    m->i[4] = LEN;
 }
 
-void test_write(int fd) {
-    // read from ram then write to shell.out, exit.out
+/**
+   TODO read from ram then write to shell.out, exit.out
+*/
+static
+void test_write_read(int fd) {
+    // TODO DEC 29 2015 re-start from here
+    Msg m;
+    char buffer[LEN] = {"I am a student"};
+    char read_buffer[LEN];
+    set_rw_msg(&m, fd, buffer);
+    size_t w = write_file(&m);
+    assert(w == LEN);
+    assert(m.ret == SUCC);
+    set_rw_msg(&m, fd, read_buffer);
+    size_t r = n_read_file(&m);
+    assert(r == w);
+    assert(m.ret == SUCC);
+    assert(strcmp(buffer, read_buffer) == 0);
 }
 
+/**
+   @tested: open file, write file, read file, close_file
+*/
+void test_read_write() {
+    // open a file and get fd
+    int fd = test_open(first_doc);
+    test_write_read(fd);
+    int res = test_close(fd);
+    assert(res == fd);
+}
+
+/**
+   @tested: open file, dup_file, dup2_file, close_file
+*/
 void test_open_close() {
     int dup_fd;
     int fd = test_open(first_doc);

@@ -15,7 +15,7 @@
  */
 typedef struct {
 	char filename[MAX_FILENAME_LEN];
-    // inode offset
+    // inode offset relative to very beginning of hard disk
 	inode_t inode_off;
 } Dir_entry;
 

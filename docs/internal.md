@@ -5,18 +5,21 @@ Aug 8 2015 update:
 ## Thread and it's pid:  
 ANY -- (-1) used by server like FM, MM, PM  
 idle -- 0  -- running when no other thread ready; init and run test;
-send PM to make shell running; init file system;  
+send message to PM to make shell running; init file system;  
 Timer -- 1  -- deal with time-related system call and interrupt  
 TTY -- 2  -- deal with keyboard input and screen update  
-getty -- 3-5  -- change input to upper case  
-IDE -- 6  -- about hard disk  
-RAMDISK -- 7  -- disk in RAM  
+getty -- 3-5  -- change input to upper case -- a test process for TTY  
+IDE -- 6  -- deal with hard disk read/write  
+RAMDISK -- 7  -- disk in RAM -- for test  
 FM -- 8  -- deal with file related system call  
 PM -- 9  -- deal with process related system call  
 MM -- 10  -- deal with memory management  
-~~user process invoker -- 11~~  
+~~user process invoker -- 11~~ -- change to idle to invoke it  
 first user process -- 11  -- shell program -- bound to tty4, ie read from/write to it  
-  - user process start from shell -- 13 -- now the file 1 is a `timer` , `exit()` and `args` test. input example: `1 asdf`  
+empty -- 12 -- do nothing but waiting for interrupt, used for avoiding deadlock @see src/kernel/process/util.c
+- user process start from shell -- 13
+-- now the file 1 is a `timer` , `exit()` and `args` test. input example: `1 asdf`  
+-- file 2 is a test for `edf schedule method test`
 
 -------------
 
@@ -59,16 +62,16 @@ doesn't take care of kernel which is simplified compared with reality(see follow
 ```
 size: sectors
 0        1        A        A+1      A+256+1       A+1+256+1024
------------------------------------------------------------------------
+-------------------------------------------------------------------------------
          |        |        |        |            |           | user 
-   MBR   | kernel | super  | iNode  |   block    |   iNode   | disk
+   MBR   | kernel | super  | iNode  |   block    |   iNode   | disk -- blocks
          |        | block  | bitmap |   bitmap   |           | space
------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 sizeof(iNode) == 128B
 sizeof(block) == 1KB
 ```
 - super block contains: inode map start, block map start, inode size, inode start, block size, block start, 
-- ie, now inode number is 2^12--4096, block number is 2^20
+- i.e., now inode number is 2^12--4096, block number is 2^20
 - operations to file system by `n_dev_read & n_dev_write` will add an offset of that section's start  
 which is invisible for user.
 - for most kernel process(pid [1-11] for the time being) are initialized before  
@@ -97,4 +100,5 @@ For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %es
 - receiver: `T f(Msg *m);` is the recommended form.  
 	- return value is the most important information this function has( e.g. `PCB * create_process(Msg *);`)  
 	- `m->ret` can be set in the function body, choose one from the enum in message.h, which is the state of this operation or detail error message  
+    - if `m->ret` is `SUCC`, then `m->ret` can be set to `T`
 

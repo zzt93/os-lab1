@@ -190,6 +190,7 @@ welcome(void) {
     //test_delfile();
     //test_create_del();
     test_open_close();
+    test_read_write();
 }
 
 void init_error_msg() {

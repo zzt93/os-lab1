@@ -9,7 +9,7 @@
 
 #define SZ 512
 /**
-   test the initial state of hard-disk
+   test the state of hard-disk by list file name
  */
 void test_list(char *name) {
     Msg m;

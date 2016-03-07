@@ -24,11 +24,14 @@ static int file_check(Msg *m) {
     return SUCC;
 }
 
-void read_file(Msg* m) {
+size_t read_file(Msg* m) {
+    size_t res = 0;
     if (file_check(m)) {
-        m->ret = do_read(m->buf, m->offset + m->dev_id * NR_FILE_SIZE, m->len);
+        res = do_read(m->buf, m->offset + m->dev_id * NR_FILE_SIZE, m->len);
+        m->ret = SUCC;
     } else {
         m->ret = FAIL;
     }
+    return res;
 }
 

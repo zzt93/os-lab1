@@ -59,7 +59,7 @@ uint32_t get_block(iNode *node, int index);
 //size_t read_block_file(char *buf, iNode *node, uint32_t offset, int len);
 size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len);
 
-// write to current file cursor
+// write to current file cursor's position
 size_t write_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len);
 size_t del_block_file_dir(inode_t fileoff, inode_t aim);
 

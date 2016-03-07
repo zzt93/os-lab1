@@ -20,4 +20,6 @@ void test_dup();
 void test_dup2();
 void test_lseek();
 
+void test_read_write();
+
 #endif /* __TEST_FILE_H__ */

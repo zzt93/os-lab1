@@ -168,7 +168,9 @@ void do_syscall(TrapFrame *tf) {
             {
                 int new_ddl = to_ddl_get(current->pid) + tf->ebx;
                 tf->eax = to_ddl_update(current->pid, new_ddl);
-                kset_edf_priority(current, USER_PRI - new_ddl);
+				current->priority = USER_PRI - new_ddl;
+				// no need to find it in the heap for it not in the heap when running
+//                kset_edf_priority(current, USER_PRI - new_ddl);
                 return;
             }
             case SYS_using_edf:

@@ -118,7 +118,7 @@ void init_thread_cwd() {
 }
 
 /**
-  1. if it is a directory, not permit to write -- add check
+  1. if it is a directory, not permit to write -- already add check
   2. the size of cwd in fte is out-dated -- never read size of
   directory in fte for its size is already set invalid
  */
@@ -145,6 +145,7 @@ size_t rw_prepare(Msg *m,
     inode_t nodeoff = fte->node_off;
     int offset = fte->offset;
     assert(nodeoff >= inode_start);
+    m->ret = SUCC;
     return rw_block_file(nodeoff, offset, buf, m->len);
 }
 

@@ -54,7 +54,7 @@ void init_proc() {
 */
 
 /**
-   This thread is aim to
+   This method is aim to
    create first user process -- shell
  */
 void user_process() {
@@ -63,6 +63,7 @@ void user_process() {
         current->pid,
         PM_CREATE,
         0, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
+    // 0 is the name of shell binary file
     send(PM, &m);
     receive(PM, &m);
     // used when run as a separate thread
@@ -81,8 +82,9 @@ void init_driver_test() {
 
 /**
    This process is used to prevent the deadlocks
-   happened when idle sends message to other thread
-   to init os and all thread go to sleep
+   happened when idle sends message to other thread( so it will
+   go to sleep waiting for response)
+   to init os and all threads go to sleep
  */
 static
 void empty() {

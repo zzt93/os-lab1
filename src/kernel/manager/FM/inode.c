@@ -242,8 +242,9 @@ uint32_t get_block(iNode *node, int index) {
    Only update the block area(may be block map area if necessary)
    so, for write, have to update inode yourself.
 
-   offset -- the offset relative to file start, for offset relative
-   to the start of whole image is meaning less for a file.
+   offset -- the offset in bytes relative to file start,
+   for example, read a.txt from the 3 byte of it.
+   node -- it store the position for hard disk to read/write
  */
 static
 size_t rw_file_block(char *buf, iNode *node, uint32_t offset, int len,
@@ -277,7 +278,7 @@ size_t rw_file_block(char *buf, iNode *node, uint32_t offset, int len,
    if `offset` is invalid( > size of file),
    return error message
 
-   - len can be -1 which refer to as R_LAST_BYTE
+   - len can be -1 which refer to as R_LAST_BYTE, means read to last byte
    - len <= len(buf)
  */
 size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {

@@ -20,7 +20,7 @@ enum {
 };
 
 void init_FM();
-void read_file(Msg*);
+size_t read_file(Msg*);
 void init_file_system();
 
 extern int FM;

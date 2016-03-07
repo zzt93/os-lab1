@@ -28,6 +28,8 @@ static void FM_job() {
         receive(ANY, &m);
         pid_t dest = m.src;
         int type = m.type;
+        // default to be error, can be specified with
+        // a detailed error or become a succ
         m.ret = FM_ERR;
         int res;
         switch(type) {
