@@ -138,6 +138,16 @@ void set_rw_msg(Msg *m, int fd, char *buffer) {
 /**
    TODO read from ram then write to shell.out, exit.out
 */
+static char shell[] = "shell.out";
+static char exit[] = "exit.out";
+void read_ram_write_disk() {
+    int res;
+    res = set_name_msg(shell, create_file);
+    assert(res == SUCC);
+    res = set_name_msg(exit, create_file);
+    assert(res == SUCC);
+}
+
 static
 void test_write_read(int fd) {
     // TODO DEC 29 2015 re-start from here
@@ -150,6 +160,15 @@ void test_write_read(int fd) {
     assert(m.ret == SUCC);
     set_rw_msg(&m, fd, read_buffer);
     size_t r = n_read_file(&m);
+    assert(r == w);
+    assert(m.ret == SUCC);
+    assert(strcmp(buffer, read_buffer) == 0);
+
+    // test special parameter case
+    char read_buffer2[LEN];
+    set_rw_msg(&m, fd, read_buffer2);
+    m.len = -1;
+    r = n_read_file(&m);
     assert(r == w);
     assert(m.ret == SUCC);
     assert(strcmp(buffer, read_buffer) == 0);

@@ -119,7 +119,7 @@ const int default_file_block = 1;
    - default only allocate a block for a newly-created file
    - write to father directory
 
-   - this function change the content of name, may be changed later
+   - FIXED: this function change the content of name, may be changed later
  */
 static
 int make_empty_file(File_e type, const char *fname, PCB *aim,
@@ -215,7 +215,7 @@ int create_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
     if (invalid_filename(name)) {
-        return FAIL;
+        return INVALID_FILENAME;
     }
     inode_t res = make_plain_file(name, aim);
     m->ret = res;

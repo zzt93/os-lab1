@@ -42,8 +42,8 @@ void init_msg(
 #define NOT_DIR 1
 
 // the error must correspond to the order of err in error.c
-// e.g. err[- NO_SUCH] == "No such file or directory"
-// @see set_error_msg()
+// e.g. err[NO_SUCH] == "No such file or directory"
+// @see set_error_msg(), error.c
 typedef enum {
     SUCC = -1,
     FAIL = 0,
@@ -54,6 +54,7 @@ typedef enum {
     FILE_EXIST,
     NO_MORE_DISK,
     BUF_OF,
+    INVALID_FILENAME,
     // PM related error
     PM_ERR,
     SEGMENTATION,

@@ -103,7 +103,7 @@ void init_PM() {
 
 // initialize the va for stack
 // set the page directory, page table for user stack
-// and allocate page
+// and allocate physical page is necessary
 void create_va_stack(PDE* pdir, uint32_t *ss, uint32_t *esp) {
     unsigned char *va = (unsigned char*)USER_STACK_POINTER;
     assert(va == (unsigned char*)0xbffff000);
@@ -111,7 +111,10 @@ void create_va_stack(PDE* pdir, uint32_t *ss, uint32_t *esp) {
     init_msg(&m,
         current->pid,
         NEW_PAGE,
-        INVALID_ID, INVALID_ID, pdir, (int)va, USER_STACK_SIZE);
+        INVALID_ID,
+        // make a user writable page
+        (USER_PAGE_ENTRY << 2) | (PAGE_W << 1),
+        pdir, (int)va, USER_STACK_SIZE);
 
     send(MM, &m);
     receive(MM, &m);
@@ -184,7 +187,7 @@ PCB *create_process(Msg* m) {
 		/* allocate pages starting from va, with memory size no less than ph->memsz */
         /*
           flags: RWE is the lowest three bits
-          TODO: is always user?
+          TODO: is always user? i.e. always use USER_PAGE_ENTRY?
          */
         init_msg(m,
             current->pid,

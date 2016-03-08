@@ -2,7 +2,7 @@
 #include "macro.h"
 
 // the error must correspond to the order of err in message.h
-// e.g. err[- NO_SUCH] == "No such file or directory"
+// e.g. err[NO_SUCH] == "No such file or directory"
 // @see set_error_msg(), message.h
 const char *const err[] = {
     "Unknown/Unclassified error",
@@ -13,6 +13,7 @@ const char *const err[] = {
     "File or directory already exist",
     "No more disk storage",
     "Parameter buffer is too small",
+    "Invalid file name for this operation",
     // PM related error message
     "Process related error",
     "Segmentation fault",

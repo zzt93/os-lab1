@@ -7,10 +7,11 @@ int MM;
 /**
    The message sent to MM should specify:
    m->type == NEW_PAGE:
+      m->i[0] -- not used
+      m->i[1] -- the flag of page entry
       m->buf -- the address of page directory
       m->offset -- allocate pages from this offset
       m->len -- allocate no less than this len
-      m->i[1] -- the flag of page entry
 
       @return: The message send from MM specify:
       m->buf -- the allocated pages' starting physical address
