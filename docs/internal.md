@@ -80,6 +80,14 @@ which is invisible for user.
 - for a system call about change the content of a file(write related)  
   have to notice all the four areas(inode bitmap, block bitmap, inode, block).
 
+### Implementation Problem
+
+- @see file_table.h: FTE, file_syscall.c: contain_file(...);
+When needing to open a file in the very deep directory, I need reading many directories inot memory.  
+If I add every directory in the File Table(@see file_table.h), this would occupy much memory.  
+But if I don't add it to file table, adding file to this directory making the file_size in the FTE out-dated.
+-- may be I can add the last directory to file table, which maybe changed for adding/deleing directory.  
+
 ------------
 
 ## i386 ISA

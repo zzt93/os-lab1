@@ -121,9 +121,6 @@ static int test_dup2(int old_fd, int new_fd) {
     return dup_fd;
 }
 
-void test_lseek(int fd) {
-}
-
 #define LEN 64
 
 static
@@ -146,6 +143,23 @@ void read_ram_write_disk() {
     assert(res == SUCC);
     res = set_name_msg(exit, create_file);
     assert(res == SUCC);
+    int fd = test_open(shell);
+
+    Msg m;
+    char buf[LEN];
+    set_rw_msg(&m, fd, buf);
+
+}
+
+static
+void set_lseek_msg(Msg *m, int fd) {
+    m->dev_id = fd;
+    m->offset = 0;
+    m->buf = current;
+    m->len = SEEK_SET;
+    int res = lseek_file(m);
+    assert(res != -1);
+    assert(m->ret == SUCC);
 }
 
 static
@@ -158,14 +172,26 @@ void test_write_read(int fd) {
     size_t w = write_file(&m);
     assert(w == LEN);
     assert(m.ret == SUCC);
+    // test lseek by the way
+    // first move cursor back
+    set_lseek_msg(&m, fd);
+
     set_rw_msg(&m, fd, read_buffer);
     size_t r = n_read_file(&m);
     assert(r == w);
     assert(m.ret == SUCC);
     assert(strcmp(buffer, read_buffer) == 0);
 
-    // test special parameter case
     char read_buffer2[LEN];
+    // now the cursor is at the end of file, so read should fail
+    set_rw_msg(&m, fd, read_buffer2);
+    m.len = -1;
+    r = n_read_file(&m);
+    assert(r == 0);
+
+    set_lseek_msg(&m, fd);
+
+    // test special parameter case
     set_rw_msg(&m, fd, read_buffer2);
     m.len = -1;
     r = n_read_file(&m);

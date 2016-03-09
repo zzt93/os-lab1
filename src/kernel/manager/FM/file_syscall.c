@@ -119,7 +119,7 @@ const int default_file_block = 1;
    - default only allocate a block for a newly-created file
    - write to father directory
 
-   - FIXED: this function change the content of name, may be changed later
+   - FIXED -- add `const char *` and `memcpy`: this function change the content of name, may be changed later
  */
 static
 int make_empty_file(File_e type, const char *fname, PCB *aim,
@@ -145,7 +145,7 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
             // by adding a '\0' between them
             name[last_slash] = '\0';
             if (name[last_slash + 1] == '\0') {
-                // e.g. /media/
+                // e.g. make a directory: /media/
                 if (type == NODE_PLAIN) {
                     return FAIL;
                 }
@@ -229,7 +229,7 @@ int make_dir(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
     if (name == NULL) {
-        return FM_ERR;
+        return INVALID_FILENAME;
     }
     inode_t dir_off;
     // the node offset of new directory
@@ -241,7 +241,7 @@ int make_dir(Msg *m) {
     m->ret = SUCC;
 
     Dir_entry dir[2];
-    // copy "."
+    // copy "." to new directory
     memcpy(dir[0].filename, current_dir, 2);
     dir[0].inode_off = new;
     // copy ".."

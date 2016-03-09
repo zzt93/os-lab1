@@ -146,7 +146,10 @@ size_t rw_prepare(Msg *m,
     int offset = fte->offset;
     assert(nodeoff >= inode_start);
     m->ret = SUCC;
-    return rw_block_file(nodeoff, offset, buf, m->len);
+    // update cursor offset in the file table entry after reading/writing
+    int rw_byte = rw_block_file(nodeoff, offset, buf, m->len);
+    fte->offset += rw_byte;
+    return rw_byte;
 }
 
 size_t write_file(Msg *m) {

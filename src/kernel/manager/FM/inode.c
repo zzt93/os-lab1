@@ -310,6 +310,7 @@ size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
  */
 size_t write_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
     iNode node;
+    // TODO replace now_disk with dev_id in fte
     n_dev_read(now_disk, FM, &node, nodeoff, sizeof node);
     // temporary assert for testing make/delete dir
     //assert((node.size % sizeof(Dir_entry)) == 0);

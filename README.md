@@ -56,6 +56,7 @@ open a file
 close a file  
 read a file  
 write a file  
+lseek a file: i.e. change the cursor for reading/writing  
 
 non-blocked timer -- used to make a process run specific seconds  
 LCM and GCD  
