@@ -82,6 +82,7 @@ ttyd(void) {
 					send(dest, &m);
 					break;
                 case PROMPT:
+                    // TODO combine it with writing
 					m.src = current->pid;
                     m.ret = put_prompt(terminal);
                     send(dest, &m);

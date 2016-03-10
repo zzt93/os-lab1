@@ -16,23 +16,17 @@ BIT_MAP(MAX_FILE)
 
 static FTE file_table[MAX_FILE];
 
-void fill_fte(FTE *fte, iNode *node, uint32_t offset) {
-    // TODO offset for a device is meaningless??
+static
+void add_node_to_fte(FTE *fte, iNode *node, uint32_t offset) {
     fte->offset = 0;
     fte->dev_id = node->dev_id;
     fte->ref_count = 0;
-    // TODO no block means a device?
-    if (node->type == NO_BLOCK) {
-        fte->type = DEV;
-        fte->node_off = -1;
-    } else {
-        fte->type = node->type;
-        fte->node_off = offset;
-    }
+    assert(node->type != NOT_INODE);
+    fte->type = node->type;
+    fte->node_off = offset;
     switch(fte->type) {
         case FT_DIR:
-        case DEV:
-            fte->filesize = -1;
+            // TODO add file size for directory here?
             break;
         case FT_PLAIN:
             fte->filesize = node->size;
@@ -51,11 +45,36 @@ FTE * add_fte(iNode *node, uint32_t offset) {
     }
     // initialize fte
     FTE *aim = file_table + i;
-    fill_fte(aim, node, offset);
+    add_node_to_fte(aim, node, offset);
     set_val(i, USED);
     unlock();
     return aim;
 }
+
+/**
+   Add file type: fifo -- pipe, socket, character device, block device
+ */
+FTE * add_special_file_to_fte(uint32_t offset, int dev_id, Node_e type) {
+    // find the first free
+    lock();
+    int i = first_val(FREE);
+    if (i == INVALID) {
+        return NULL;
+    }
+    // initialize fte
+    FTE *fte = file_table + i;
+    fte->node_off = -1;
+    fte->offset = offset;
+    fte->dev_id = dev_id;
+    fte->ref_count = 0;
+    fte->type = type;
+    fte->filesize = -1;
+
+    set_val(i, USED);
+    unlock();
+    return fte;
+}
+
 
 int free_fte(void *p) {
     assert(p != NULL);
@@ -74,21 +93,18 @@ FTE * get_fte(PCB *aim, int fd) {
 }
 
 void init_file_table() {
-    iNode node;
-    node.size = -1;
-    node.dev_id = d_ttyi[NOW_TERMINAL];
-    memset(node.index, 0, sizeof(uint32_t) * FILE_LINK_NUM);
-    node.link_count = 0;
-    node.type = NO_BLOCK;
-    stdin = add_fte(&node, -1);
-    stdout = add_fte(&node, -1);
-    stderr = add_fte(&node, -1);
+    int dev_id = d_ttyi[NOW_TERMINAL];
+    // offset for a device is meaningless? -- no, at least for tty it's meaningful
+    stdin = add_special_file_to_fte(-1, dev_id, CHAR_DEV);
+    stdout = add_special_file_to_fte(-1, dev_id, CHAR_DEV);
+    stderr = add_special_file_to_fte(-1, dev_id, CHAR_DEV);
     NOINTR;
     // set to a directory -- now is root
     // read it from disk
     // TODO using "/" as default cwd for the time being
     inode_t aim = file_path(0, default_cwd_name);
     assert(aim == inode_start);
+    iNode node;
     n_dev_read(now_disk, FM, (char *)&node, aim, sizeof node);
     // for it is a directory, so the size for it is meaningless
     default_cwd = add_fte(&node, aim);
@@ -123,7 +139,7 @@ void init_thread_cwd() {
   directory in fte for its size is already set invalid
  */
 size_t rw_prepare(Msg *m,
-    size_t (*rw_block_file)(inode_t, uint32_t, char *buf, int len)) {
+    size_t (*rw_block_file)(int, inode_t, uint32_t, char *buf, int len)) {
     PCB *aim = (PCB *)m->req_pid;
     char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
     int fd = m->dev_id;
@@ -137,7 +153,7 @@ size_t rw_prepare(Msg *m,
     // read and write directory should not through this method
     // write: user can't write to directory
     // read: user should call list_dir
-    if (fte->type == DEV) {
+    if (fte->type == FT_DIR) {
         m->ret = IS_DIR;
         return 0;
     }
@@ -147,7 +163,7 @@ size_t rw_prepare(Msg *m,
     assert(nodeoff >= inode_start);
     m->ret = SUCC;
     // update cursor offset in the file table entry after reading/writing
-    int rw_byte = rw_block_file(nodeoff, offset, buf, m->len);
+    int rw_byte = rw_block_file(fte->dev_id, nodeoff, offset, buf, m->len);
     fte->offset += rw_byte;
     return rw_byte;
 }

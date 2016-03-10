@@ -8,11 +8,11 @@ typedef enum {
     FT_PLAIN,
     // following has no inode
     PIPE,
-    DEV,
+    CHAR_DEV,
 } Node_e;
 
 /**
-   if type == DEV, node_off, filesize is meaningless
+   if type == CHAR_DEV, node_off, filesize is meaningless
    if type == FT_DIR, filesize if meaningless
 */
 typedef struct {

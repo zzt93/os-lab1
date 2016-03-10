@@ -86,7 +86,9 @@ dev_rw(Dev *dev, int type, pid_t reqst_pid, void *buf, off_t offset, size_t len)
     //unlock();
     //printk("%x ", dev);
 	assert(dev != NULL);
-    assert(offset >= 0);
+    if (dev->dev_id > d_ttyi[NR_TTY - 1] || dev->dev_id < d_ttyi[0]) {
+        assert(offset >= 0);
+    }
     //printk("%d %s %x ", dev->pid, dev_name, dev);
 
     /**

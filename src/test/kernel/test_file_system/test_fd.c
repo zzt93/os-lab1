@@ -164,7 +164,6 @@ void set_lseek_msg(Msg *m, int fd) {
 
 static
 void test_write_read(int fd) {
-    // TODO DEC 29 2015 re-start from here
     Msg m;
     char buffer[LEN] = {"I am a student"};
     char read_buffer[LEN];
@@ -200,6 +199,21 @@ void test_write_read(int fd) {
     assert(strcmp(buffer, read_buffer) == 0);
 }
 
+void test_std_rw() {
+    assert(current->fd_table[STDIN_FILENO].ft_entry != 0);
+    assert(current->fd_table[STDOUT_FILENO].ft_entry != 0);
+    assert(current->fd_table[STDERR_FILENO].ft_entry != 0);
+    // write to stdout
+    int fd = STDOUT_FILENO;
+    Msg m;
+    char buffer[LEN] = {"I am a student"};
+    //char read_buffer[LEN];
+    set_rw_msg(&m, fd, buffer);
+    size_t w = write_file(&m);
+    assert(w == LEN);
+    assert(m.ret == SUCC);
+}
+
 /**
    @tested: open file, write file, read file, close_file
 */
@@ -209,7 +223,9 @@ void test_read_write() {
     test_write_read(fd);
     int res = test_close(fd);
     assert(res == fd);
+    test_std_rw();
 }
+
 
 /**
    @tested: open file, dup_file, dup2_file, close_file

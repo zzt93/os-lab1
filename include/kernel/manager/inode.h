@@ -6,7 +6,7 @@
 typedef enum {
     NODE_DIR,
     NODE_PLAIN,
-    NO_BLOCK,
+    NOT_INODE,
 } File_e;
 
 typedef uint32_t block_t;
@@ -57,10 +57,10 @@ uint32_t get_block(iNode *node, int index);
 // this one is metaphor for `=` assignment, but for unify read
 // and write change it to write like
 //size_t read_block_file(char *buf, iNode *node, uint32_t offset, int len);
-size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len);
+size_t read_block_file(int dev_id, inode_t nodeoff, uint32_t offset, char *buf, int len);
 
 // write to current file cursor's position
-size_t write_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len);
+size_t write_block_file(int dev_id, inode_t nodeoff, uint32_t offset, char *buf, int len);
 size_t del_block_file_dir(inode_t fileoff, inode_t aim);
 
 uint32_t inode_alloc();

@@ -195,7 +195,7 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
     Dir_entry dir_content;
     memcpy(dir_content.filename, filename, strlen(filename) + 1);
     dir_content.inode_off = new;
-    int len = write_block_file(dir, W_LAST_BYTE, (char *)&dir_content, sizeof(Dir_entry));
+    int len = write_block_file(now_disk, dir, W_LAST_BYTE, (char *)&dir_content, sizeof(Dir_entry));
     if (len != sizeof(Dir_entry)) {
         return NO_MORE_DISK;
     }
@@ -247,7 +247,7 @@ int make_dir(Msg *m) {
     // copy ".."
     memcpy(dir[1].filename, father_dir, 3);
     dir[1].inode_off = dir_off;
-    write_block_file(new, W_LAST_BYTE, (char *)&dir, 2 * sizeof(Dir_entry));
+    write_block_file(now_disk, new, W_LAST_BYTE, (char *)&dir, 2 * sizeof(Dir_entry));
 
     return new;
 }
@@ -264,7 +264,8 @@ int delete_a_file(inode_t father, inode_t this) {
         int num_files = this_node.size / sizeof(Dir_entry);
         assert(this_node.size % sizeof(Dir_entry) == 0);
         Dir_entry dirs[num_files];
-        read_block_file(this, 0, (char *)dirs, R_LAST_BYTE);
+        // TESTED test add now_disk
+        read_block_file(now_disk, this, 0, (char *)dirs, R_LAST_BYTE);
         assert(strcmp(dirs[0].filename, current_dir) == 0);
         assert(strcmp(dirs[1].filename, father_dir) == 0);
         int i;
@@ -378,7 +379,7 @@ int list_dir(Msg *m) {
     if (node.type == NODE_DIR) {
         // if name is NULL, it has to be go this branch
         // read the content of file by node info
-        read = read_block_file(node_off, 0, buf, R_LAST_BYTE);
+        read = read_block_file(now_disk, node_off, 0, buf, R_LAST_BYTE);
         return read / sizeof(Dir_entry);
     } else {
         // not a directory, so just return it's parameter
@@ -416,7 +417,7 @@ int ch_dir(Msg *m) {
    2. too much arguments: char *content_buf, int write_len,
    char *file_name, int off_in_file, PCB *aim,
 
-   TODO maybe a version of write file to create a file
+   maybe a version of writing file to create a file
    i.e. create a plain file, open file, no offset,
    write content to it
    and return fd

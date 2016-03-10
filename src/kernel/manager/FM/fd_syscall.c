@@ -18,6 +18,8 @@ FDE * get_fde(PCB *aim, int i) {
 
 
 /**
+   TODO how to handle link file:
+
    - find file by name
    - add entry to system opened file table
    - add entry to process fd table
@@ -34,6 +36,8 @@ int open_file(Msg *m) {
     n_dev_read(now_disk, FM,
         &node, node_off, sizeof node);
     // add an entry in system opened file table
+    // TODO only adding link target to file table; for reading
+    // and writing to it become convenient(no more change)
     FTE *fte = add_fte(&node, node_off);
     // add a FDE in process fd table
     int j = first_fd(aim, INVALID_FD);

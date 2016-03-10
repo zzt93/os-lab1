@@ -281,9 +281,10 @@ size_t rw_file_block(char *buf, iNode *node, uint32_t offset, int len,
    - len can be -1 which refer to as R_LAST_BYTE, means read to last byte
    - len <= len(buf)
  */
-size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
+size_t read_block_file(int dev_id, inode_t nodeoff, uint32_t offset, char *buf, int len) {
     iNode node;
-    n_dev_read(now_disk, FM, &node, nodeoff, sizeof node);
+    // TESTED test change to dev_id -- assert(dev_id == now_disk);
+    n_dev_read(dev_id, FM, &node, nodeoff, sizeof node);
     if (len == R_LAST_BYTE) {
         len = node.size;
     }
@@ -308,10 +309,9 @@ size_t read_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
    - block area -- write content
    - block map area(may be need to extend)
  */
-size_t write_block_file(inode_t nodeoff, uint32_t offset, char *buf, int len) {
+size_t write_block_file(int dev_id, inode_t nodeoff, uint32_t offset, char *buf, int len) {
     iNode node;
-    // TODO replace now_disk with dev_id in fte
-    n_dev_read(now_disk, FM, &node, nodeoff, sizeof node);
+    n_dev_read(dev_id, FM, &node, nodeoff, sizeof node);
     // temporary assert for testing make/delete dir
     //assert((node.size % sizeof(Dir_entry)) == 0);
     //assert(len % sizeof(Dir_entry) == 0);

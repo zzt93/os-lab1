@@ -11,11 +11,11 @@ int cmp_pri(PCB* a, PCB* b) {
     return 0;
 }
 
-// TODO add to heap at add_process
+// add to heap at schedule()
 HEAP(PCB*, 256, cmp_pri, process_pri);
 
 #include "adt/map.h"
-// TODO add initial to_ddl at add_process
+// add initial to_ddl by put_task_ddl()
 // pid -> to_ddl
 MAP(int, int, to_ddl);
 
