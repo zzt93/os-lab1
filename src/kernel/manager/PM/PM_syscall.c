@@ -235,6 +235,9 @@ int save_args(Msg *m, char *buf) {
 
             */
         {
+            // for kernel can read the address of user process,
+            // so just read it in user memory and not copy it to
+            // kernel
             char *src = get_pa(&((PCB *)m->i[1])->pdir, (uint32_t)m->buf);
             // just take a place of address, not real address
             *(uint32_t *)buf = 0;
@@ -256,7 +259,8 @@ int save_args(Msg *m, char *buf) {
 
 /**
    In my current implementation, pid is not necessarily the
-   same -- TODO add lock if necessary
+   same for the process before exec and after it
+   -- TODO add lock if necessary
  */
 PCB * kexec(Msg *m) {
     char args[BUF_SZ] = {0};

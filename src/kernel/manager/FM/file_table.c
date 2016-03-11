@@ -2,6 +2,7 @@
 #include "kernel/manager/fd.h"
 #include "kernel/manager/f_dir.h"
 #include "kernel/manager/manager.h"
+#include "kernel/manager/dev_file.h"
 
 #include "lib/string.h"
 #include "kernel/process.h"
@@ -153,11 +154,20 @@ size_t rw_prepare(Msg *m,
     // read and write directory should not through this method
     // write: user can't write to directory
     // read: user should call list_dir
-    if (fte->type == FT_DIR) {
-        m->ret = IS_DIR;
-        return 0;
+    if (fte->type != FT_PLAIN) {
+        switch(fte->type) {
+            case FT_DIR:
+                m->ret = IS_DIR;
+                return 0;
+            case CHAR_DEV:
+                m->ret = SUCC;
+                return write_char_dev_file(fte->dev_id, buf, m->len);
+            default:
+                // not implement yet
+                assert(0);
+        }
     }
-
+    // just a plain file
     inode_t nodeoff = fte->node_off;
     int offset = fte->offset;
     assert(nodeoff >= inode_start);
@@ -165,6 +175,11 @@ size_t rw_prepare(Msg *m,
     // update cursor offset in the file table entry after reading/writing
     int rw_byte = rw_block_file(fte->dev_id, nodeoff, offset, buf, m->len);
     fte->offset += rw_byte;
+    // TODO @see update cached file of file table
+    if (rw_block_file == write_block_file) {
+        fte->filesize += rw_byte;
+    }
+
     return rw_byte;
 }
 

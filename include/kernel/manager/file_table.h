@@ -3,11 +3,17 @@
 
 #include "kernel/manager/inode.h"
 
+/**
+   @see inode.h: File_e
+ */
 typedef enum {
     FT_DIR,
     FT_PLAIN,
+    FT_SOFT_LINK,
     // following has no inode
     PIPE,
+    SOCKET,
+    BLOCK_DEV,
     CHAR_DEV,
 } Node_e;
 

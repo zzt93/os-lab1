@@ -109,4 +109,5 @@ For example, in `do_irq.S`, `%esp` point to the start of TrapFrame and `push %es
 	- return value is the most important information this function has( e.g. `PCB * create_process(Msg *);`)  
 	- `m->ret` can be set in the function body, choose one from the enum in message.h, which is the state of this operation or detail error message  
     - if `m->ret` is `SUCC`, then `m->ret` can be set to `T`
+    - If this method is the system call for user process, have to handle the address of buffer by get_pa, because the virtual address transformation between user process address space and kernel address space.(kernel address space is one-to-one mapped to physical address, so I can use get_pa to get the address of its va in kernel)
 

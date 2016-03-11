@@ -264,6 +264,8 @@ size_t rw_file_block(char *buf, iNode *node, uint32_t offset, int len,
         // to_rw = MIN(len, block_size - block_inner_off) -- make sure block_inner_off
         // become `0` or len == rw, i.e. read/write is over
         block_inner_off = 0;
+        // FM as request pid, which should be
+        // the owner of buffer
         rw += n_dev_rw(now_disk, FM, buf + rw, block_off, to_rw);
         block_i ++;
         to_rw = MIN(len - rw, block_size);
@@ -325,6 +327,7 @@ size_t write_block_file(int dev_id, inode_t nodeoff, uint32_t offset, char *buf,
     if (write == 0) {
         return write;
     }
+    // TODO not just adding write
     node.size += write;
     n_dev_write(now_disk, FM,
         &node, nodeoff, sizeof(iNode));

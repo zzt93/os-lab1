@@ -3,9 +3,13 @@
 
 #include "common.h"
 
+/**
+   @see file_table.h: Node_e
+ */
 typedef enum {
     NODE_DIR,
     NODE_PLAIN,
+    NODE_SOFT_LINK,
     NOT_INODE,
 } File_e;
 

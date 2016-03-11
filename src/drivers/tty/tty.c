@@ -1,9 +1,10 @@
 #include "kernel/kernel.h"
+#include "kernel/manager/MM_util.h"
 #include "kernel/message.h"
 #include "drivers/hal.h"
 #include "drivers/tty/tty.h"
 #include "drivers/tty/tty4.h"
-#include "lib/kcpy.h"
+//#include "lib/kcpy.h"
 
 pid_t TTY;
 
@@ -64,12 +65,14 @@ ttyd(void) {
 					break;
 				case DEV_WRITE:
 					if (m.dev_id >= tty_start && m.dev_id < NR_TTY + tty_start) {
-						//char c;
+                        PCB *req_pcb = fetch_pcb(m.req_pid);
+                        assert(req_pcb != NULL);
+                        char *src = get_pa(&(req_pcb->pdir), (uint32_t)m.buf);
 						int i;
                         // copy from the message buffer one by one
 						for (i = 0; i < m.len; i ++) {
-							//copy_to_kernel(fetch_pcb(m.req_pid), &c, (char*)m.buf + i, 1);
-							consl_writec(&ttys[m.dev_id - tty_start], *((char *)m.buf + i));
+                            // FIXED: m.buf may need change to physical address
+							consl_writec(&ttys[m.dev_id - tty_start], *(src + i));
 						}
 						consl_sync(&ttys[m.dev_id]);
 					}
