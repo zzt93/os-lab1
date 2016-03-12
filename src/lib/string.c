@@ -70,14 +70,6 @@ void print_str(void (*printer)(char), char *str) {
     }
 }
 
-int strcmp(const char* f, const char* s) {
-    int i = 0;
-    while(f[i] == s[i] && f[i] != '\0') {
-        i++;
-    }
-    return f[i] - s[i];
-}
-
 char to_upper(char c) {
     if (is_letter(c)) {
         return c & 0xdf;

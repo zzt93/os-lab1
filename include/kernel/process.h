@@ -82,6 +82,8 @@ typedef struct {
     struct file_descriptor_entry fd_table[PROCESS_MAX_FD];
     // process priority -- used when schedule process
     Pri_t priority;
+    // cwd path for user process
+    char *cwd_path;
 } PCB;
 
 extern PCB *current;
@@ -128,6 +130,8 @@ extern Sem wake_lock, sleeped_lock;
 
 
 void put_by_state(PCB *);
+
+//#define CWD_PATH_LENGTH 32
 
 #include "init_proc.h"
 #endif

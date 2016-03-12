@@ -46,8 +46,8 @@ waitpid
 a simple shell  
 
 upgrade file system: change file system name to string; size is variable  
-create a file  
-make a directory  
+create a file(file name max is 28 bytes @see f_dir.h)  
+make a directory(directory depth max is 16 @see f_dir.h)  
 delete a file  
 delete a directory  
 change current working directory  

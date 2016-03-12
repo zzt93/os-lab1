@@ -61,6 +61,11 @@ Pri_t kget_priority(PCB *p) {
 }
 
 
+void set_cwd_path(PCB *pcb, const char *name);
+void append_cwd_path(PCB *pcb, const char *name);
+void free_cwd_path(PCB *pcb);
+
+
 #define DEFAULT_STATE WAKED
 
 #endif /* __TRAPFRAME_H__ */

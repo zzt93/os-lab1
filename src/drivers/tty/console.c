@@ -15,7 +15,7 @@ Console *current_consl;
 static const char *ttynames[NR_TTY] = {"tty1", "tty2", "tty3", TTY4};
 
 // for tty4
-Console *terminal = ttys + NR_TTY - 1;
+//Console *terminal = ttys + NR_TTY - 1;
 extern char * user_name;
 
 // real memory of screen
@@ -213,13 +213,43 @@ read_request(Msg *m) {
     }
 }
 
-int put_prompt(Console *c) {
-    char *str = user_name;
-    while(*str != '\0') {
-        consl_writec(c, *str);
-        str++;
+size_t handle_write_request(Msg *m) {
+    size_t i;
+    if (m->dev_id >= tty_start && m->dev_id < NR_TTY + tty_start) {
+        PCB *req_pcb = fetch_pcb(m->req_pid);
+        assert(req_pcb != NULL);
+        char *src = get_pa(&(req_pcb->pdir), (uint32_t)m->buf);
+        // copy from the message buffer one by one
+        for (i = 0; i < m->len; i ++) {
+            // FIXED: m->buf need changing to physical address
+            consl_writec(&ttys[m->dev_id - tty_start], *(src + i));
+        }
+        consl_sync(&ttys[m->dev_id]);
     }
-    return str - user_name;
+    else {
+        assert(0);
+    }
+    return i;
+}
+
+
+int put_prompt(Msg *m) {
+    m->dev_id = d_ttyi[NOW_TERMINAL];
+    m->req_pid = current->pid;
+    PCB *req_pcb = (PCB *)m->buf;
+    char *str = user_name;
+    int len1 = strlen(str);
+    int len2 = strlen(req_pcb->cwd_path);
+    // add 3 for "$ \0"
+    m->len = len1 + len2 + 3;
+    char prompt[m->len];
+    memcpy(prompt, str, len1);
+    memcpy(prompt + len1, req_pcb->cwd_path, len2);
+    prompt[len1 + len2] = '$';
+    prompt[len1 + len2 + 1] = ' ';
+    prompt[len1 + len2 + 2] = '\0';
+    m->buf = prompt;
+    return handle_write_request(m);
 }
 
 

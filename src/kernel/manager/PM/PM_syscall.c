@@ -162,6 +162,9 @@ PCB * kfork(Msg* m) {
     list_init(&(child->vir_mem));
     list_copy(&(father->vir_mem), Seg_info, link, &child->vir_mem);
 
+    // copy cwd_path
+    child->cwd_path = NULL;
+    set_cwd_path(child, father->cwd_path);
     return child;
 }
 
@@ -180,6 +183,9 @@ int free_process(PCB *aim) {
     list_free(&(aim->vir_mem), Seg_info, link);
     // free waiting list
     list_free(&(aim->waitpid), Waiting, link);
+    // free cwd_path
+    free_cwd_path(aim);
+
     // before invalidate the reference of PCB, release the reference
     // in the sleeped_tree -- for process call `exit` and `exec` are
     // are sleeping on waiting PM's message
@@ -267,9 +273,13 @@ PCB * kexec(Msg *m) {
     PCB *aim = (PCB *)m->i[1];
     // save arguments
     size_t len = save_args(m, args);
-    // save the resources to inherit: pid, file descriptor
+    // save the resources to inherit: pid, file descriptor, cwd_path
     FDE tmp[PROCESS_MAX_FD];
     memcpy(tmp, aim->fd_table, sizeof(FDE) * PROCESS_MAX_FD);
+    int path_len = strlen(aim->cwd_path) + 1;
+    char tmp_path[path_len];
+    memcpy(tmp_path, aim->cwd_path, path_len);
+
     // free process
     free_process(aim);
     // create a new one
@@ -278,6 +288,7 @@ PCB * kexec(Msg *m) {
         return NULL;
     }
     memcpy(new->fd_table, tmp, sizeof(FDE) * PROCESS_MAX_FD);
+    set_cwd_path(new, tmp_path);
     // prepare args on the stack
     // push args *
     memcpy(user_stack_pa(new, USER_STACK_BASE - len), args, len);

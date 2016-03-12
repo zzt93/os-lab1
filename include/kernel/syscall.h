@@ -82,7 +82,7 @@ int lseek(int fd, int offset, int whence);
 int dup(int oldfd);
 int dup2(int oldfd, int newfd);
 
-// hierachy file system call
+// hierarchy file system call
 int createfile(const char *name);
 int makedir(const char *name);
 int delfile(const char *name);

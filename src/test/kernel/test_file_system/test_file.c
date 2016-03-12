@@ -30,6 +30,8 @@ void test_list(char *name) {
     assert(strcmp(entry[1].filename, "..") == 0);
     int i;
 
+    assert(current->cwd_path != NULL);
+    printk("---------%s:-------", current->cwd_path);
     for (i = 0; i < size; i++) {
         printk("%s, ", entry[i].filename);
     }

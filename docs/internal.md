@@ -1,6 +1,6 @@
 -----------------------------
 
-Aug 8 2015 update:
+Mar 2016 update:
 
 ## Thread and it's pid:  
 ANY -- (-1) used by server like FM, MM, PM  
@@ -14,9 +14,9 @@ RAMDISK -- 7  -- disk in RAM -- for test
 FM -- 8  -- deal with file related system call  
 PM -- 9  -- deal with process related system call  
 MM -- 10  -- deal with memory management  
+empty -- 11 -- do nothing but waiting for interrupt, used for avoiding deadlock @see src/kernel/process/util.c
 ~~user process invoker -- 11~~ -- change to idle to invoke it  
-first user process -- 11  -- shell program -- bound to tty4, ie read from/write to it  
-empty -- 12 -- do nothing but waiting for interrupt, used for avoiding deadlock @see src/kernel/process/util.c
+first user process -- 12  -- shell program -- bound to tty4, ie read from/write to it  
 - user process start from shell -- 13
 -- now the file 1 is a `timer` , `exit()` and `args` test. input example: `1 asdf`  
 -- file 2 is a test for `edf schedule method test`

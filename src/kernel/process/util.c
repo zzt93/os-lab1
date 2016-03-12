@@ -114,6 +114,8 @@ void init_proc_test() {
     add2wake(create_kthread(empty));
 }
 
+extern const char *const default_cwd_name;
+
 void init_idle() {
     // to make it NOINTR
     current->count_of_lock = 1;
@@ -124,10 +126,7 @@ void init_idle() {
     // message
     current->pdir.val = get_kcr3()->val;
     current->priority = KERNEL_PRI;
-}
+    // this is for test_ch_dir and actually not for kernel thread
+    set_cwd_path(current, default_cwd_name);
+ }
 
-/*
-void init_proc() {
-    init_idle();
-}
-*/

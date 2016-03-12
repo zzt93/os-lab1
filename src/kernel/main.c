@@ -58,13 +58,14 @@ os_init_cont(void) {
     //The Intel 8259 is a Programmable Interrupt Controller (PIC)
     init_intr();
 
-    // make it NOINTR, can receive msg, can schedule
-    init_idle();
     /**
-       initialize kmalloc -- have to initialize it before process,
-    // for using it in allocating memory for PCB
+       initialize kmalloc -- have to initialize it before init
+       process, for using it in allocating memory for PCB
     */
     init_kmalloc();
+    // make it NOINTR, can receive msg, can schedule
+    init_idle();
+
     // for it will use malloc
     add_process(current);
 
@@ -82,7 +83,7 @@ os_init_cont(void) {
     // solved by split set count_of_lock out of init_proc();
 
     //more_frequent();
-
+    // init empty thread
     init_proc_test();
 
     // here is to initialize shell process, which must later

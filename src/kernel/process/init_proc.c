@@ -73,6 +73,53 @@ void init_fd_table(PCB *pcb, FTE *cwd) {
     unlock();
 }
 
+void free_cwd_path(PCB *pcb) {
+    assert(pcb->cwd_path != NULL);
+    kfree(pcb->cwd_path);
+    pcb->cwd_path = NULL;
+}
+
+void set_cwd_path(PCB *pcb, const char *name) {
+    int len = strlen(name) + 1;
+    assert(len >= 2);
+    if (name[len - 2] != '/') {
+        // add a '/' if not have
+        len++;
+        pcb->cwd_path = kmalloc(len);
+        memcpy(pcb->cwd_path, name, len);
+        pcb->cwd_path[len - 2] = '/';
+        pcb->cwd_path[len - 1] = '\0';
+    } else {
+        pcb->cwd_path = kmalloc(len);
+        memcpy(pcb->cwd_path, name, len);
+    }
+}
+
+void append_cwd_path(PCB *pcb, const char *name) {
+    assert(pcb->cwd_path != NULL);
+    // add one for '\0'
+    int len1 = strlen(pcb->cwd_path);
+    int len2 = strlen(name) + 1;
+    char *tmp;
+    if (name[len2 - 2] != '/') {
+        len2++;
+        tmp = kmalloc(len1 + len2);
+        memcpy(tmp, pcb->cwd_path, len1);
+        // also copy the last '\0'
+        memcpy(tmp + len1, name, len2);
+        tmp[len1 + len2 - 2] = '/';
+        tmp[len1 + len2 - 1] = '\0';
+    } else {
+        tmp = kmalloc(len1 + len2);
+        memcpy(tmp, pcb->cwd_path, len1);
+        // also copy the last '\0'
+        memcpy(tmp + len1, name, len2);
+    }
+    pcb->cwd_path = tmp;
+}
+
+extern const char *const default_cwd_name;
+
 static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
     //NOINTR;
     lock();
@@ -98,6 +145,12 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
     pcb->priority = (type == KERNEL) ? KERNEL_PRI : USER_PRI;
 
     pcb->state = DEFAULT_STATE;
+    if (type == USER) {
+        set_cwd_path(pcb, default_cwd_name);
+    } else {
+        pcb->cwd_path = NULL;
+    }
+
 }
 
 

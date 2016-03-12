@@ -108,11 +108,13 @@ void do_syscall(TrapFrame *tf) {
                 m.buf = current;
                 // the target buffer
                 m.req_pid = tf->ecx;
+                break;
             case SYS_chdir:
                 m.type = FM_chdir;
                 // name
                 m.dev_id = tf->ebx;
                 m.buf = current;
+                break;
             default:
                 printk(RED"no such system call %d "RESET, id);
                 assert(0);
@@ -224,6 +226,7 @@ void do_syscall(TrapFrame *tf) {
                 break;
             case SYS_prompt:
                 m.type = PROMPT;
+                m.buf = current;
                 send(TTY, &m);
                 receive(TTY, &m);
                 tf->eax = m.ret;

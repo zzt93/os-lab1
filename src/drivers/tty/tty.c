@@ -64,30 +64,15 @@ ttyd(void) {
 					read_request(&m);
 					break;
 				case DEV_WRITE:
-					if (m.dev_id >= tty_start && m.dev_id < NR_TTY + tty_start) {
-                        PCB *req_pcb = fetch_pcb(m.req_pid);
-                        assert(req_pcb != NULL);
-                        char *src = get_pa(&(req_pcb->pdir), (uint32_t)m.buf);
-						int i;
-                        // copy from the message buffer one by one
-						for (i = 0; i < m.len; i ++) {
-                            // FIXED: m.buf may need change to physical address
-							consl_writec(&ttys[m.dev_id - tty_start], *(src + i));
-						}
-						consl_sync(&ttys[m.dev_id]);
-					}
-					else {
-						assert(0);
-					}
-					m.ret = m.len;
+                    m.ret = handle_write_request(&m);
 					m.src = current->pid;
                     // make the sender know it's done
 					send(dest, &m);
 					break;
                 case PROMPT:
-                    // TODO combine it with writing
-					m.src = current->pid;
-                    m.ret = put_prompt(terminal);
+                    // combine it with writing
+                    m.ret = put_prompt(&m);
+                    m.src = current->pid;
                     send(dest, &m);
                     break;
 				default:

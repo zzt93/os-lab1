@@ -95,7 +95,7 @@ FTE * get_fte(PCB *aim, int fd) {
 
 void init_file_table() {
     int dev_id = d_ttyi[NOW_TERMINAL];
-    // offset for a device is meaningless? -- no, at least for tty it's meaningful
+    // offset for a device is meaningless?
     stdin = add_special_file_to_fte(-1, dev_id, CHAR_DEV);
     stdout = add_special_file_to_fte(-1, dev_id, CHAR_DEV);
     stderr = add_special_file_to_fte(-1, dev_id, CHAR_DEV);

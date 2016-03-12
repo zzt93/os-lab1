@@ -19,7 +19,7 @@ typedef enum {
 
 /**
    if type == CHAR_DEV, node_off, filesize is meaningless
-   if type == FT_DIR, filesize if meaningless
+   if type == FT_DIR, filesize if meaningless for the time being
 */
 typedef struct {
     // node offset in ramdisk/disk relative to region node

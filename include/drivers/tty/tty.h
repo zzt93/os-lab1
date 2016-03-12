@@ -45,8 +45,9 @@ void consl_accept(Console *c, char ch);
 void readkey(void);
 void update_banner(void);
 void read_request(Msg *m);
+size_t handle_write_request(Msg *m);
 
-int put_prompt(Console *);
+int put_prompt(Msg *m);
 
 #define TTY4 "tty4"
 // the now main output/input terminal index

@@ -388,6 +388,13 @@ int list_dir(Msg *m) {
     }
 }
 
+int is_absolute_path(const char *path) {
+    if (path[0] == '/') {
+        return true;
+    }
+    return false;
+}
+
 int ch_dir(Msg *m) {
     PCB *aim = (PCB *)m->buf;
     const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
@@ -395,12 +402,20 @@ int ch_dir(Msg *m) {
     // using default file path -- current working directory node_off
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
     inode_t off = cwd;
+    assert(off >= inode_start);
     if (name != NULL) {
         off = file_path(cwd, name);
-    }
-    if (off < inode_start) {
-        m->ret = NO_SUCH;
-        return FAIL;
+        if (off < inode_start) {
+            m->ret = NO_SUCH;
+            return FAIL;
+        }
+        // update cwd_path
+        if (is_absolute_path(name)) {
+            free_cwd_path(aim);
+            set_cwd_path(aim, name);
+        } else {
+            append_cwd_path(aim, name);
+        }
     }
     iNode node;
     n_dev_read(now_disk, FM, &node, off, sizeof node);

@@ -6,7 +6,10 @@
 #define BUF_SZ 256
 // one for command itself
 #define MAX_PARAMETER_NR (10 + 1)
+//#define NAME_LEN 32
 
+const char const * CD = "cd";
+//char *user_name[NAME_LEN] = "zzt@os-lab: ";
 
 int entry() {
     char cmd[BUF_SZ], copy[BUF_SZ];
@@ -24,7 +27,12 @@ int entry() {
             printf("Unknown command: %s\n", cmd);
             continue;
         }
+        if (strcmp(save[0], CD) == 0)  {
+            chdir(save[1]);
+            continue;
+        }
         filename = to_int(save[0]);
+
         // TODO check file existence and whether it is executable -- many be checked by exec
 		// TODO add redirect
         if((pid = fork()) == 0) {

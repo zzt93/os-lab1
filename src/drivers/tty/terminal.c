@@ -4,7 +4,7 @@
 
 #include "kernel/process.h"
 
-char * user_name = "zzt@os_lab: ";
+char * user_name = "zzt@os_lab:";
 
 
 static char buf[BUF_SIZE];

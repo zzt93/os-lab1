@@ -68,3 +68,11 @@ size_t strlen(const char *str) {
 	while (*str ++) len ++;
 	return len;
 }
+
+int strcmp(const char* f, const char* s) {
+    int i = 0;
+    while(f[i] == s[i] && f[i] != '\0') {
+        i++;
+    }
+    return f[i] - s[i];
+}
