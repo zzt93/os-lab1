@@ -6,7 +6,11 @@ int fork() {
     return syscall(SYS_fork);
 }
 
-int exec(int filename, char *args) {
+int ram_exec(int filename, char *args) {
+    return syscall(SYS_ram_exec, filename, args);
+}
+
+int exec(char *filename, char *args) {
     return syscall(SYS_exec, filename, args);
 }
 

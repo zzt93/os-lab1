@@ -26,6 +26,11 @@ typedef enum {
 
 #define PROCESS_MAX_FD 8
 
+static inline
+bool invalid_fd_i(int fd) {
+    return fd > PROCESS_MAX_FD || fd < 0;
+}
+
 
 /*
   for the stack is grow to small address,

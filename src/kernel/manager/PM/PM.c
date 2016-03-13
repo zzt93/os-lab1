@@ -69,6 +69,27 @@ static void PM_job() {
             }
             case PM_exec:
             {
+                Msg open_m;
+                open_m.buf = (PCB *)m.i[1];
+                open_m.dev_id = m.i[0];
+                // set file descriptor
+                m.i[0] = open_file(&open_m);
+                if (invalid_fd_i(m.i[0])) {
+                    m.ret = NOT_EXE;
+                    break;
+                }
+
+                PCB *new = kexec(&m);
+                if (new != NULL) {
+                    // put in queue
+                    add2wake(new);
+                }
+                // for the thread apply exec is now not exist,
+                // so no need to send back
+                continue;
+            }
+            case PM_ram_exec:
+            {
                 PCB *new = kexec(&m);
                 if (new != NULL) {
                     // put in queue
@@ -152,7 +173,7 @@ PCB *create_process(Msg* m) {
 	/* it contains the ELF header and program header table */
     init_msg(m,
         current->pid,
-        FM_read,
+        FM_ram_read,
         INVALID_ID, name, buf, 0, B_SIZE);
 	send(FM, m);
     receive(FM, m);
@@ -206,7 +227,7 @@ PCB *create_process(Msg* m) {
 		/* read ph->filesz bytes starting from offset ph->off from file "0" into pa */
         init_msg(m,
             current->pid,
-            FM_read,
+            FM_ram_read,
             INVALID_ID, name, pa, ph_table->off, ph_table->filesz);
 		send(FM, m);
         receive(FM, m);

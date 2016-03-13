@@ -132,23 +132,37 @@ void set_rw_msg(Msg *m, int fd, char *buffer) {
     m->i[4] = LEN;
 }
 
+static
+void create_read_write(char *name, int ram_id) {
+    int res;
+    // create file
+    res = set_name_msg(name, create_file);
+    assert(res == SUCC);
+    // open
+    int fd = test_open(shell);
+    // read from ram
+    // write to disk
+    Msg m;
+    // get shell.out
+    char *buf = get_a_ram_file(ram_id);
+    set_rw_msg(&m, fd, buf);
+    m.i[4] = ;
+    write_file(&m);
+}
+
 /**
    TODO read from ram then write to shell.out, exit.out
 */
 static char shell[] = "shell.out";
 static char exit[] = "exit.out";
+extern char name[];
 void read_ram_write_disk() {
     int res;
-    res = set_name_msg(shell, create_file);
+    // change directory to /bin/
+    res = set_name_msg(name, ch_dir);
     assert(res == SUCC);
-    res = set_name_msg(exit, create_file);
-    assert(res == SUCC);
-    int fd = test_open(shell);
-
-    Msg m;
-    char buf[LEN];
-    set_rw_msg(&m, fd, buf);
-
+    create_read_write(shell, 0);
+    create_read_write(exit, 2);
 }
 
 static
@@ -190,7 +204,7 @@ void test_write_read(int fd) {
 
     set_lseek_msg(&m, fd);
 
-    // test special parameter case
+    // test special parameter case -1
     set_rw_msg(&m, fd, read_buffer2);
     m.len = -1;
     r = n_read_file(&m);
@@ -212,6 +226,7 @@ void test_std_rw() {
     size_t w = write_file(&m);
     assert(w == LEN);
     assert(m.ret == SUCC);
+    // TODO add read from stdin then write
 }
 
 /**

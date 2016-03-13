@@ -9,13 +9,12 @@
 //#define NAME_LEN 32
 
 const char const * CD = "cd";
-const char const * PWD = "pwd";
 //char *user_name[NAME_LEN] = "zzt@os-lab: ";
 
 int entry() {
     char cmd[BUF_SZ], copy[BUF_SZ];
     char *save[MAX_PARAMETER_NR] = {0};
-    char *filename = NULL;
+    int filename = -1;
     int pid, count, res;
     while(1) {
         prompt();
@@ -24,7 +23,7 @@ int entry() {
         memcpy(copy, cmd, BUF_SZ);
         count = split(copy, ' ', save);
         user_assert(MAX_PARAMETER_NR >= count);
-        if (count < 1) {
+        if (count <= 1) {
             printf("Unknown command: %s\n", cmd);
             continue;
         }
@@ -32,18 +31,11 @@ int entry() {
             chdir(save[1]);
             continue;
         }
-        filename = save[0];
+        filename = to_int(save[0]);
 
-        // TODO check file existence and whether it is executable -- many be checked by exec
-		// TODO add redirect
         if((pid = fork()) == 0) {
 			// no thread will receive the response of exec, so it failure should be known by waitpid
-            int res = exec(filename, save[1] - copy + cmd);
-            // if run to here, means not find the file to replace
-            // the forked process, so just remind.
-            printf("No such file or not executable: %s -- %d",
-                filename,
-                   res);
+            ram_exec(filename, save[1] - copy + cmd);
         }
         else {
 			// if exec fail, waitpid will fail

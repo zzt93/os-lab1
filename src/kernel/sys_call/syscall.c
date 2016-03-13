@@ -60,7 +60,7 @@ void do_syscall(TrapFrame *tf) {
                 // tf->edx -- len
                 init_msg(&m,
                     current->pid,
-                    FM_read,
+                    FM_ram_read,
                     (pid_t)current, tf->ebx, (void *)tf->ecx, 0, tf->edx);
                 break;
             case SYS_write:
@@ -131,6 +131,13 @@ void do_syscall(TrapFrame *tf) {
                 break;
             case SYS_exec:
                 m.type = PM_exec;
+                // file name -- char * -- need get_pa
+                m.i[0] = tf->ebx;
+                m.i[1] = (int)current;
+                m.buf = (void *)tf->ecx;
+                break;
+            case SYS_ram_exec:
+                m.type = PM_ram_exec;
                 // file name -- int
                 m.i[0] = tf->ebx;
                 // current PCB*

@@ -5,6 +5,7 @@
 #include "kernel/message.h"
 
 enum {
+    FM_ram_read,
     FM_read,
     FM_write,
     FM_open,
@@ -20,7 +21,7 @@ enum {
 };
 
 void init_FM();
-size_t read_file(Msg*);
+size_t ram_read_file(Msg*);
 void init_file_system();
 
 extern int FM;

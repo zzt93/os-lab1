@@ -202,7 +202,7 @@ int save_args(Msg *m, char *buf) {
     switch(m->type) {
         case PM_exec:
             /**
-               user stack starting state of:
+               user stack state at the beginning:
                int main(char *args)
 
                ______________KERNEL_VA_START -- 0xc0000000
@@ -271,6 +271,8 @@ int save_args(Msg *m, char *buf) {
 PCB * kexec(Msg *m) {
     char args[BUF_SZ] = {0};
     PCB *aim = (PCB *)m->i[1];
+    // TODO check whether is file is executable before free now process
+    
     // save arguments
     size_t len = save_args(m, args);
     // save the resources to inherit: pid, file descriptor, cwd_path
@@ -282,7 +284,7 @@ PCB * kexec(Msg *m) {
 
     // free process
     free_process(aim);
-    // create a new one
+    // create a new one from file
     PCB *new = create_process(m);
     if (new == NULL) {
         return NULL;

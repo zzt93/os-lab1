@@ -18,6 +18,7 @@ const char *const err[] = {
     "Process related error",
     "Segmentation fault",
     "Invalid priority for user process",
+    "No such file or not executable for exec",
     // MM related error message
     "Memory error",
     "NO more memory to allocate",

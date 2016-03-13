@@ -24,7 +24,7 @@ static int file_check(Msg *m) {
     return SUCC;
 }
 
-size_t read_file(Msg* m) {
+size_t ram_read_file(Msg* m) {
     size_t res = 0;
     if (file_check(m)) {
         res = do_read(m->buf, m->offset + m->dev_id * NR_FILE_SIZE, m->len);

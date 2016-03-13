@@ -13,9 +13,9 @@ int FM;
 int now_disk;
 /**
    The message sent to FM should specify:
-   m->type -- FM_read
+   m->type -- FM_ram_read
         m->buf
-        m->dev_id -- file name
+        m->dev_id -- file name in int
         m->offset
         m->len
         The message send from FM specify:
@@ -33,9 +33,11 @@ static void FM_job() {
         m.ret = FM_ERR;
         int res;
         switch(type) {
+            case FM_ram_read:
+                ram_read_file(&m);
+                break;
             case FM_read:
-                read_file(&m);
-                //n_read_file(&m);
+                n_read_file(&m);
                 break;
             case FM_write:
                 write_file(&m);

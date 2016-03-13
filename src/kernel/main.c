@@ -89,7 +89,7 @@ os_init_cont(void) {
     // here is to initialize shell process, which must later
     // than init_manager -- for it will send message to
     // managers
-    user_process();
+    //TODO shell -- user_process();
 
     // @checked: move from locked state to unlocked state
     init_file_system();
@@ -106,8 +106,6 @@ os_init_cont(void) {
        process for set up right lock num to avoid other
        initialization enable the interrupt and cause problem
     */
-    // @checked: move from locked state to unlocked state
-    //init_proc();
 
     // @checked: move from locked state to unlocked state
     welcome();
@@ -192,6 +190,7 @@ welcome(void) {
     //test_create_del();
     test_open_close();
     test_read_write();
+    read_ram_write_disk();
 }
 
 void init_error_msg() {

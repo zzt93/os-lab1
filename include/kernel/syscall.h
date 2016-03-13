@@ -31,6 +31,8 @@ enum {
     SYS_exit,
     SYS_fork,
     SYS_exec,
+    // file name is int, ramdisk based executable
+    SYS_ram_exec,
     SYS_getpid,
     SYS_waitpid,
     SYS_set_priority,
@@ -60,7 +62,8 @@ enum {
 
 // PM related system call
 int fork();
-int exec(int filename, char *args);
+int ram_exec(int filename, char *args);
+int exec(char *filename, char *args);
 int exit();
 int getpid();
 int waitpid(int wait);

@@ -21,5 +21,6 @@ void test_dup2();
 void test_lseek();
 
 void test_read_write();
+void read_ram_write_disk();
 
 #endif /* __TEST_FILE_H__ */

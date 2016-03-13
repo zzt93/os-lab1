@@ -59,6 +59,7 @@ typedef enum {
     PM_ERR,
     SEGMENTATION,
     INVALID_PRI,
+    NOT_EXE,
     // MM related error
     MM_ERR,
     NO_MORE_MEMORY,

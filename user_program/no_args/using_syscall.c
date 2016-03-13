@@ -7,7 +7,7 @@ int entry() {
         char *cmd = "gcc -o2 test.c";
         int pid;
         if( (pid = fork()) == 0) {
-            exec(filename, cmd);
+            ram_exec(filename, cmd);
             exit();
         } else {
             waitpid(pid);

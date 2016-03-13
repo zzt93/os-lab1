@@ -25,7 +25,7 @@ void read_MBR() {
 }
 
 static void set_mes(Msg* m, char *buf) {
-    m->type = FM_read;
+    m->type = FM_ram_read;
     m->src = current->pid;
     m->dest = FM;
     m->buf = buf;

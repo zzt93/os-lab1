@@ -9,6 +9,7 @@ enum {
     PM_CREATE,
     PM_fork,
     PM_exec,
+    PM_ram_exec,
     PM_exit,
     PM_waitpid,
 };
