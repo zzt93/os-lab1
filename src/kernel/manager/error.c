@@ -9,7 +9,7 @@ const char *const err[] = {
     // FM related error message
     "File error",
     "No such file or directory",
-    "is a directory",
+    "Is a directory",
     "File or directory already exist",
     "No more disk storage",
     "Parameter buffer is too small",

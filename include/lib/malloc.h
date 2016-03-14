@@ -6,6 +6,7 @@ void *kmalloc(unsigned int size);
 void kfree(void *);
 
 void init_kmalloc();
+const int * const allocate_start();
 
 #define ALLOC_SIZE 262144 // 2**20 bytes = 2**18 words
 

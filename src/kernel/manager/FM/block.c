@@ -4,6 +4,8 @@
 #include "drivers/hal.h"
 #include "kernel/manager/FM.h"
 
+#include "lib/math.h"
+
 D_BIT_MAP()
 
 // a block is 1KB now
@@ -31,6 +33,9 @@ static inline int offset_blocki(uint32_t offset) {
 
 int indirect_datalink_nr;
 int block_dir_num;
+#define BLOCK_INDEX_DEEPTH 3
+// add one for the direct block not have index
+int block_index_range[BLOCK_INDEX_DEEPTH + 1];
 void init_block(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) {
     lock();
     block_map_start = mstart;
@@ -39,6 +44,12 @@ void init_block(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) 
     block_start = start;
     block_area_size = size;
     indirect_datalink_nr = block_size / sizeof(int);
+    int i;
+    block_index_range[0] = DATA_LINK_NUM;
+    for (i = 1; i < BLOCK_INDEX_DEEPTH + 1; i++) {
+        block_index_range[i] = block_index_range[i - 1] + pow(indirect_datalink_nr, i);
+    }
+
     unlock();
     // copy from harddisk
     n_dev_read(now_disk, FM, bits(), mstart, msize);
@@ -75,7 +86,7 @@ void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size);
    not change the following line
    @see harddisk/update_super_block.sh
  */
-const uint32_t super_start = 419840;
+const uint32_t super_start = 1470464;
 
 #define SUPER_BUF 512
 void load_super_block() {

@@ -38,7 +38,7 @@ void test_list(char *name) {
 
 }
 
-int set_name_msg(char *name, int (*f)(Msg *)) {
+int set_name_msg(const char *name, int (*f)(Msg *)) {
     Msg m;
     m.ret = FM_ERR;
     m.buf = current;
@@ -48,7 +48,7 @@ int set_name_msg(char *name, int (*f)(Msg *)) {
     return m.ret;
 }
 
-static char name[] = "bin";
+extern const char bin[];
 static char name2[] = "dev";
 static char name3[] = "/home";
 static char name4[] = "./media";
@@ -65,7 +65,7 @@ void test_mkdir() {
     test_list(NULL);
 
     int res;
-    res = set_name_msg(name, make_dir);
+    res = set_name_msg(bin, make_dir);
     assert(res == SUCC);
     res = set_name_msg(name2, make_dir);
     assert(res == SUCC);
@@ -92,9 +92,9 @@ void test_mkdir() {
 
 void test_deldir() {
     int res;
-    res = set_name_msg(name, delete_file);
+    res = set_name_msg(bin, delete_file);
     assert(res == SUCC);
-    res = set_name_msg(name, delete_file);
+    res = set_name_msg(bin, delete_file);
     assert(res == NO_SUCH);
     test_list(NULL);
 }

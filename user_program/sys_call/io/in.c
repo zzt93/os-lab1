@@ -3,7 +3,8 @@
 int read_line(char *str, int capacity) {
     return syscall(SYS_read_line, str, capacity);
 }
- // return file descriptor
+// TODO change open
+// return file descriptor
 int open(int filename) {
     return syscall(SYS_open, filename);
 }

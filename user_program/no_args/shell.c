@@ -1,6 +1,7 @@
 #include "kernel/syscall.h"
 #include "sys_call/io/io.h"
 #include "lib/string.h"
+#include "kernel/message.h"
 
 
 #define BUF_SZ 256
@@ -29,7 +30,10 @@ int entry() {
             continue;
         }
         if (strcmp(save[0], CD) == 0)  {
-            chdir(save[1]);
+            int res = chdir(save[1]);
+            if (res != SUCC) {
+                printf("%s: %s", err[res], save[1]);
+            }
             continue;
         }
         filename = save[0];

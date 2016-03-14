@@ -54,16 +54,17 @@ void init_proc() {
 */
 
 /**
+   @Deprecated
    This method is aim to
-   create first user process -- shell
+   create first user process -- shell -- from ram
  */
-void user_process() {
+void ram_user_process() {
     Msg m;
     init_msg(&m,
         current->pid,
         PM_CREATE,
         0, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
-    // 0 is the name of shell binary file
+    // 0 is the name of shell binary file in ramdisk
     send(PM, &m);
     receive(PM, &m);
     // used when run as a separate thread
@@ -73,6 +74,18 @@ void user_process() {
         wait_intr();
     }
     */
+}
+
+#include "kernel/user_process.h"
+
+void user_process() {
+    Msg m;
+    init_msg(&m,
+        current->pid,
+        PM_CREATE,
+        (int)shell, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
+    send(PM, &m);
+    receive(PM, &m);
 }
 
 void init_driver_test() {
@@ -110,7 +123,7 @@ void init_proc_test() {
     add2wake(create_kthread(E));
     */
 
-    //add2wake(create_kthread(user_process));
+    //add2wake(create_kthread(ram_user_process));
     add2wake(create_kthread(empty));
 }
 

@@ -85,11 +85,12 @@ os_init_cont(void) {
     //more_frequent();
     // init empty thread
     init_proc_test();
-
+    
     // here is to initialize shell process, which must later
     // than init_manager -- for it will send message to
     // managers
-    //TODO shell -- user_process();
+    //ram_user_process();
+
 
     // @checked: move from locked state to unlocked state
     init_file_system();
@@ -177,7 +178,7 @@ welcome(void) {
     */
     /**
        Using the idle thread to create some files and folders,
-       make idle change state to sleeped when waiting for a
+       make idle change state to slept when waiting for a
        message, may cause some bugs.
     */
     test_list(NULL);
@@ -191,6 +192,7 @@ welcome(void) {
     test_open_close();
     test_read_write();
     read_ram_write_disk();
+    user_process();
 }
 
 void init_error_msg() {

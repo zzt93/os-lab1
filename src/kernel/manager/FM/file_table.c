@@ -134,6 +134,7 @@ void init_thread_cwd() {
     }
 }
 
+
 /**
   1. if it is a directory, not permit to write -- already add check
   2. the size of cwd in fte is out-dated -- never read size of
@@ -142,6 +143,7 @@ void init_thread_cwd() {
 size_t rw_prepare(Msg *m,
     size_t (*rw_block_file)(int, inode_t, uint32_t, char *buf, int len)) {
     PCB *aim = (PCB *)m->req_pid;
+    assert(aim >= (PCB *)KOFFSET);
     char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
     int fd = m->dev_id;
     if (is_invalid_fd(&aim->fd_table[fd])) {

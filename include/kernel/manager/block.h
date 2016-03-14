@@ -27,6 +27,7 @@ int block_free(uint32_t offset);
 extern int indirect_datalink_nr;
 // const -- how many directory entry can a block store
 extern int block_dir_num;
+extern int block_index_range[];
 
 #define EMPTY_FREE_STATEMENT
 

@@ -18,11 +18,6 @@ int PM;
 /**
    The message sent to PM should specify:
    m->type
-       @type:PM_CREATE
-       m->i[0] -- the program/file name
-       @return: The message send from PM specify:
-       m->ret -- whether successfully create a user process
-
        @type:PM_fork
        m->buf -- the father's PCB's address
        @return:
@@ -41,8 +36,20 @@ static void PM_job() {
         receive(ANY, &m);
         pid_t dest = m.src;
         switch(m.type) {
+            /**
+               @param m->i[0] -- (int)the program/file fd
+               @return: The message send from PM specify:
+               m->ret -- whether successfully create a user process
+            */
             case PM_CREATE:
             {
+                Msg open_m;
+                open_m.buf = current;
+                open_m.dev_id = m.i[0];
+                // set file descriptor for exec
+                int fd = open_file(&open_m);
+                m.i[0] = fd;
+
                 PCB *p = create_process(&m);
                 if (p == NULL) {
                     m.ret = FAIL;
@@ -70,19 +77,31 @@ static void PM_job() {
             case PM_exec:
             {
                 Msg open_m;
-                open_m.buf = (PCB *)m.i[1];
+                PCB *req_pcb = (PCB *)m.i[1];
+                open_m.buf = req_pcb;
                 open_m.dev_id = m.i[0];
-                // set file descriptor
-                m.i[0] = open_file(&open_m);
+                // set file descriptor for exec
+                int fd = open_file(&open_m);
+                m.i[0] = fd;
                 if (invalid_fd_i(m.i[0])) {
                     m.ret = NOT_EXE;
                     break;
                 }
 
+                /**
+                   @param m->i[0] -- (int) fd
+                   @param m->i[1] -- (PCB *) the process to exec itself
+                   @param m->buf -- args address
+                 */
                 PCB *new = kexec(&m);
-                if (new != NULL) {
+                if (new != NULL) {// mean exec succeed
                     // put in queue
                     add2wake(new);
+                    // close file
+                    Msg close_m;
+                    close_m.buf = req_pcb;
+                    close_m.dev_id = fd;
+                    close_file(&close_m);
                 }
                 // for the thread apply exec is now not exist,
                 // so no need to send back
@@ -154,6 +173,8 @@ void create_va_stack(PDE* pdir, uint32_t *ss, uint32_t *esp) {
 void * user_stack_pa(PCB *p, uint32_t val) {
     return get_pa(&p->pdir, val);
 }
+
+
 /**
    single responsibility:
    just create process,
@@ -166,18 +187,19 @@ PCB *create_process(Msg* m) {
     char buf[B_SIZE];
 
     // create page directory for new process
-    // must using physical address for cr3 should only store pa
+    // must using physical address because cr3 should only store pa
     PDE* pdir = pdir_alloc();
     assert( ((int)pdir&0xfff) == 0);
-    /* read 512 bytes starting from offset 0 from file "name" into buf */
+    /* read 512 bytes starting from offset 0 from file "name"
+       into buf */
 	/* it contains the ELF header and program header table */
     init_msg(m,
         current->pid,
-        FM_ram_read,
-        INVALID_ID, name, buf, 0, B_SIZE);
+        FM_read,
+        (int)current, name, buf, 0, B_SIZE);
 	send(FM, m);
     receive(FM, m);
-    if (m->ret == FAIL) {
+    if (m->ret != SUCC) {
         return NULL;
     }
 
@@ -224,11 +246,20 @@ PCB *create_process(Msg* m) {
         // so have to use physical address directly
         assert(pa >= (unsigned char*)KERNEL_PA_END);
         assert(pa < (unsigned char*)PHY_MEM);
-		/* read ph->filesz bytes starting from offset ph->off from file "0" into pa */
+		/* read ph->filesz bytes starting from offset ph->off from file into pa */
+        // change the offset for disk read -- disk read ignore direct offset parameter
+        m->buf = current;
+        m->dev_id = name;
+        m->len = SEEK_SET;
+        m->offset = ph_table->off;
+        // change offset and read should be atomic
+        lseek_file(m);
         init_msg(m,
             current->pid,
-            FM_ram_read,
-            INVALID_ID, name, pa, ph_table->off, ph_table->filesz);
+            FM_read,
+            (int)current, name, pa, ph_table->off, ph_table->filesz);
+        // old ram way
+        // INVALID_ID, name, pa, ph_table->off, ph_table->filesz);
 		send(FM, m);
         receive(FM, m);
         // initialize the gap between [file_size, memory_size)

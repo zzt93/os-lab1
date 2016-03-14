@@ -53,14 +53,12 @@ void do_syscall(TrapFrame *tf) {
                 m.buf = current;
                 break;
             case SYS_read:
-                // TODO tf->ebx now is fd, but
-                // read_ram() treat it as file name
                 // tf->ebx -- fd
                 // tf->ecx -- buffer
                 // tf->edx -- len
                 init_msg(&m,
                     current->pid,
-                    FM_ram_read,
+                    FM_read,
                     (pid_t)current, tf->ebx, (void *)tf->ecx, 0, tf->edx);
                 break;
             case SYS_write:
@@ -134,6 +132,7 @@ void do_syscall(TrapFrame *tf) {
                 // file name -- char * -- need get_pa
                 m.i[0] = tf->ebx;
                 m.i[1] = (int)current;
+                // arguments address
                 m.buf = (void *)tf->ecx;
                 break;
             case SYS_ram_exec:

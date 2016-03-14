@@ -95,6 +95,8 @@ int invalid_block(iNode *node, int index) {
 }
 
 /**
+   @param index -- The index of a block
+
    NOTICE: try not invoke it directly
 
    assume that if index is out of bound for a single node,
@@ -112,25 +114,26 @@ int invalid_block(iNode *node, int index) {
  */
 uint32_t get_block(iNode *node, int index) {
     uint32_t res;
-    if (index < DATA_LINK_NUM) {// using direct data link
+    if (index < block_index_range[0]) {// using direct data link
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
             ALLOC_CHECK(node->index[index], block_alloc,
                 EMPTY_FREE_STATEMENT);
         }
         res = node->index[index];
     } // one level indirect link -- read once
-    else if (index < DATA_LINK_NUM + indirect_datalink_nr) {
-        uint32_t first_off = (index - DATA_LINK_NUM) * sizeof(uint32_t);
+    else if (index < block_index_range[1]) {
+        uint32_t first_off = (index - block_index_range[0]) * sizeof(uint32_t);
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
             ALLOC_CHECK(res, block_alloc,
                 EMPTY_FREE_STATEMENT);
-            if (first_off == 0) {
+            if (first_off == 0) {// the first time use first-level indirect link
                 ALLOC_CHECK(
                     node->index[FIRST_INDIRECT], block_alloc,
                     block_free(res);
                             );
             }
             block_in_range_check(node->index[FIRST_INDIRECT] + first_off);
+            // write address of content block to index block
             n_dev_write(now_disk, FM, &res,
                 node->index[FIRST_INDIRECT] + first_off, sizeof res);
         } else { // block index in range, just read it
@@ -138,11 +141,13 @@ uint32_t get_block(iNode *node, int index) {
                 node->index[FIRST_INDIRECT] + first_off, sizeof res);
         }
     } // two level indirect link -- read twice
-    else if (index < DATA_LINK_NUM +
-               indirect_datalink_nr * indirect_datalink_nr) {
-        uint32_t more = index - DATA_LINK_NUM - indirect_datalink_nr;
+    else if (index < block_index_range[2]) {
+        uint32_t more = index - block_index_range[1];
+        // offset on first-level index block which has the second-level index block address
         uint32_t first_off = more / indirect_datalink_nr * sizeof(uint32_t);
+        // offset on the second-level index block which has address of content block
         uint32_t second_off = (more % indirect_datalink_nr) * sizeof(uint32_t);
+        // second-level index block starting address
         uint32_t second;
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
             ALLOC_CHECK(res, block_alloc,
@@ -178,11 +183,8 @@ uint32_t get_block(iNode *node, int index) {
                 second + second_off, sizeof res);
         }
     } //three level indirect link -- read three time
-    else if (index < DATA_LINK_NUM +
-               indirect_datalink_nr *
-               indirect_datalink_nr *
-               indirect_datalink_nr) {
-        uint32_t more = index - DATA_LINK_NUM - indirect_datalink_nr * indirect_datalink_nr;
+    else if (index < block_index_range[3]) {
+        uint32_t more = index - block_index_range[2];
         uint32_t first_off = (more / (indirect_datalink_nr * indirect_datalink_nr)) * sizeof(uint32_t);
         uint32_t second_off = (more % (indirect_datalink_nr * indirect_datalink_nr)) / indirect_datalink_nr * sizeof(uint32_t);
         uint32_t thi_off = ((more % (indirect_datalink_nr * indirect_datalink_nr)) % indirect_datalink_nr) * sizeof(uint32_t);
@@ -243,7 +245,7 @@ uint32_t get_block(iNode *node, int index) {
    so, for write, have to update inode yourself.
 
    offset -- the offset in bytes relative to file start,
-   for example, read a.txt from the 3 byte of it.
+   for example, read a.txt from the 3 byte of its beginning.
    node -- it store the position for hard disk to read/write
  */
 static
@@ -327,10 +329,11 @@ size_t write_block_file(int dev_id, inode_t nodeoff, uint32_t offset, char *buf,
     if (write == 0) {
         return write;
     }
-    // TODO not just adding write
-    node.size += write;
-    n_dev_write(now_disk, FM,
-        &node, nodeoff, sizeof(iNode));
+    if (offset + write > node.size) {
+        node.size = offset + write;
+        n_dev_write(now_disk, FM,
+            &node, nodeoff, sizeof(iNode));
+    }
     return write;
 }
 

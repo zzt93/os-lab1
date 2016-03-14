@@ -10,7 +10,7 @@ void read_MBR() {
     char buf[NUM_MBR];
     /**
        why printk will fail when switch then interrupt
-       for I use lock in context switch which change the
+       for I use lock() in context switch which change the
        values of $eax, $edx
      */
     int offset = 0;

@@ -70,7 +70,7 @@ void copy_kstack_full(PCB *father, PCB *child) {
         && (uint32_t)father->tf > (uint32_t)father->kstack);
     // allocate trapframe, and function invoke stack to the end of stack
     void *second_frame = (void *)((char *)(child->kstack) + KSTACK_SIZE - copy_size);
-    // @see user_process_fork.jpg: father's tf is now point to the second TrapFrame
+    // @see ram_user_process_fork.jpg: father's tf is now point to the second TrapFrame
     memcpy(second_frame, father->tf, copy_size);
     child->tf = second_frame;
     // handle the content on the kernel stack, ebp, esp
@@ -271,8 +271,8 @@ int save_args(Msg *m, char *buf) {
 PCB * kexec(Msg *m) {
     char args[BUF_SZ] = {0};
     PCB *aim = (PCB *)m->i[1];
-    // TODO check whether is file is executable before free now process
-    
+    // TODO check whether is file is executable before free current process
+
     // save arguments
     size_t len = save_args(m, args);
     // save the resources to inherit: pid, file descriptor, cwd_path

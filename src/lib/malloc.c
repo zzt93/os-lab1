@@ -11,6 +11,10 @@ static int *space_head() {
     return space;
 }
 
+const int * const allocate_start() {
+    return space;
+}
+
 void init_kmalloc() {
     int *h = space_head();
     *h = ALLOC_SIZE - HEAD_SIZE;

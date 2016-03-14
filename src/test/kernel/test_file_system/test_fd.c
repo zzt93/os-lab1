@@ -8,7 +8,7 @@
 #include "error.h"
 
 void test_list(char *name);
-int set_name_msg(char *name, int (*f)(Msg *));
+int set_name_msg(const char *name, int (*f)(Msg *));
 static char first_doc[] = "test";
 static char second_doc[] = "test2";
 static char thi_doc[] = "test3";
@@ -88,7 +88,7 @@ static int set_fd_msg(int fd, int (*f)(Msg *)) {
     return m.ret;
 }
 
-static int test_open(char *name) {
+static int test_open(const char *name) {
     int fd;
     Msg m;
     m.ret = FM_ERR;
@@ -132,34 +132,48 @@ void set_rw_msg(Msg *m, int fd, char *buffer) {
     m->i[4] = LEN;
 }
 
+const uint8_t *const get_a_ram_file(int i, int *m_size);
+
 static
-void create_read_write(char *name, int ram_id) {
+void create_read_write(const char *name, int ram_id) {
     int res;
     // create file
     res = set_name_msg(name, create_file);
     assert(res == SUCC);
     // open
-    int fd = test_open(shell);
+    int fd = test_open(name);
     // read from ram
     // write to disk
     Msg m;
-    // get shell.out
-    char *buf = get_a_ram_file(ram_id);
+    // get executable file
+    int len = -1;
+    char *buf = (char *)get_a_ram_file(ram_id, &len);
     set_rw_msg(&m, fd, buf);
-    m.i[4] = ;
+    m.i[4] = len;
     write_file(&m);
+    // close file
+    res = test_close(fd);
+    assert(res == fd);
 }
 
 /**
-   TODO read from ram then write to shell.out, exit.out
+   read from ram then write to shell.out, exit.out
+   TEST METHOD:
+   - find the block offset in disk by print inode information
+   - read out and show by `xxd -l file_size -c 4 -s start_offset -i harddisk.img`
+   - compare result with shell.ar/exit.ar
+   TESTED:
+   - shell.ar is same with `xxd` result except the middle indirect index block
+   - indirect index block's content is same with address of content block
+   - indirect index block has 116 address which is the number of written size -- (116 + DATA_LINK_NUM) * 1kb
 */
-static char shell[] = "shell.out";
-static char exit[] = "exit.out";
-extern char name[];
+const char shell[] = "/bin/shell.out";
+const char exit[] = "exit.out";
+const char bin[] = "/bin";
 void read_ram_write_disk() {
     int res;
     // change directory to /bin/
-    res = set_name_msg(name, ch_dir);
+    res = set_name_msg(bin, ch_dir);
     assert(res == SUCC);
     create_read_write(shell, 0);
     create_read_write(exit, 2);
@@ -220,11 +234,13 @@ void test_std_rw() {
     // write to stdout
     int fd = STDOUT_FILENO;
     Msg m;
-    char buffer[LEN] = {"I am a student"};
+    char buffer[] = {"I am a student\n"};
     //char read_buffer[LEN];
     set_rw_msg(&m, fd, buffer);
+    int len = sizeof buffer / sizeof(char);
+    m.len = len;
     size_t w = write_file(&m);
-    assert(w == LEN);
+    assert(w == len);
     assert(m.ret == SUCC);
     // TODO add read from stdin then write
 }

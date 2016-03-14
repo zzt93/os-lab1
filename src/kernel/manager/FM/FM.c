@@ -18,8 +18,15 @@ int now_disk;
         m->dev_id -- file name in int
         m->offset
         m->len
+
         The message send from FM specify:
         m->ret -- len successfully read
+
+   m->type -- FM_read
+        m->req_pid
+        m->dev_id
+        m->buf
+        m->len
  */
 static void FM_job() {
     static Msg m;
@@ -37,16 +44,31 @@ static void FM_job() {
                 ram_read_file(&m);
                 break;
             case FM_read:
+                /**
+                   @param m->req_pid -- (PCB *) request process, i.e. the process has buffer and fd
+                   @param m->dev_id -- (int ) file descriptor
+                   @param m->buf -- (char *) buffer to store read content
+                 */
                 n_read_file(&m);
                 break;
             case FM_write:
                 write_file(&m);
                 break;
             case FM_open:
+                /**
+                   @param m->dev_id -- (char *) the program/file name
+                   @param m->buf -- (PCB *) request PCB pointer
+                   @return -- the fd if succeed
+                */
                 res = open_file(&m);
                 SET_IF_SUCC(m, res);
                 break;
             case FM_close:
+                /**
+                   @param m->buf -- (PCB *) request PCB pointer
+                   @param m->dev_id -- (int) file fd
+                   @return -- the fd
+                 */
                 close_file(&m);
                 break;
             case FM_dup:
@@ -110,5 +132,3 @@ void init_FM() {
     FM = p->pid;
     add2wake(p);
 }
-
-

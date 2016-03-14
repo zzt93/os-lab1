@@ -11,16 +11,20 @@ PTE * get_ptable(CR3 *pdir, uint32_t va) {
     return pte;
 }
 
-void * get_pa(CR3 *pdir, uint32_t va) {
+/**
+   @return: return the address readable for kernel, so get_pa is not so accurate
+ */
+void * get_pa(CR3 *cr3, uint32_t va) {
     uint32_t page_off = va & 0xfff;
-    PTE *pte = get_ptable(pdir, va);
+    PTE *pte = get_ptable(cr3, va);
     assert(pte->present == 1);
     uint32_t page = page_frame_to_address(pte);
     assert((page & 0xfff) == 0);
     uint32_t pa = page | page_off;
-    if (pdir == get_kcr3()) {
-        assert(pa == va);
-        return (void *)va;
+    if (cr3->page_directory_base ==
+        get_kcr3()->page_directory_base) {
+        assert(pa == va - KOFFSET || pa == va);
+        return (void *)pa;
     }
     return (void *)pa;
 }

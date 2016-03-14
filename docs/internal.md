@@ -46,7 +46,7 @@ Aug 2 2015 update:
 ## Virtual address
 The kernel's virtual address space: [0xc000 0000, 0xffff ffff]  
 The user process's virtual address space: [0x0, 0xbfff ffff]  
-
+[paging](docs/pic/paging.png)
 
 -----------------
 
@@ -71,14 +71,24 @@ sizeof(iNode) == 128B
 sizeof(block) == 1KB
 ```
 - super block contains: inode map start, block map start, inode size, inode start, block size, block start, 
-- i.e., now inode number is 2^12--4096, block number is 2^20
+-- i.e., now inode number is 2^12--4096, block number is 2^20
 - operations to file system by `n_dev_read & n_dev_write` will add an offset of that section's start  
 which is invisible for user.
 - for most kernel process(pid [1-11] for the time being) are initialized before  
   file_system was loaded, in which `default_cwd` is setted, so for kernel thread,  
   `current working directory` are invalid for them. So have to reinitialize it again.  
 - for a system call about change the content of a file(write related)  
-  have to notice all the four areas(inode bitmap, block bitmap, inode, block).
+have to notice all the four areas(inode bitmap, block bitmap, inode, block).
+
+### About file table
+####system call that affect file table
+- open: add entry
+- close: may be remove an entry
+- dup, dup2: add reference to a entry
+####system call indirectly affect it
+- exec: will use open, so add an entry
+####system call based on file table
+- read/write
 
 ### Implementation Problem
 
