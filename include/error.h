@@ -9,4 +9,6 @@ extern int err_size[];
 
 void init_error_msg();
 
+#include "kernel/message.h"
+
 #endif /* __ERROR_H__ */

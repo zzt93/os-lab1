@@ -167,16 +167,20 @@ void create_read_write(const char *name, int ram_id) {
    - indirect index block's content is same with address of content block
    - indirect index block has 116 address which is the number of written size -- (116 + DATA_LINK_NUM) * 1kb
 */
-const char shell[] = "/bin/shell.out";
-const char exit[] = "exit.out";
 const char bin[] = "/bin";
+const char shell[] = "/bin/sh";
+const char exit[] = "exit";
+const char echo[] = "echo";
+const char ls[] = "ls";
 void read_ram_write_disk() {
     int res;
     // change directory to /bin/
     res = set_name_msg(bin, ch_dir);
     assert(res == SUCC);
     create_read_write(shell, 0);
+    create_read_write(ls, 1);
     create_read_write(exit, 2);
+    create_read_write(echo, 3);
 }
 
 static
@@ -243,6 +247,15 @@ void test_std_rw() {
     assert(w == len);
     assert(m.ret == SUCC);
     // TODO add read from stdin then write
+    fd = STDIN_FILENO;
+    char read_buf[LEN];
+    set_rw_msg(&m, fd, read_buf);
+    size_t r = n_read_file(&m);
+    assert(m.ret == SUCC);
+    set_rw_msg(&m, STDERR_FILENO, read_buf);
+    m.len = r;
+    w = write_file(&m);
+    assert(r == w);
 }
 
 /**

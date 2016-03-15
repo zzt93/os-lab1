@@ -1,4 +1,4 @@
-#include "assert.h"
+//#include "assert.h"
 
 int GCD(int a, int b) {
     int t = 0;
@@ -15,9 +15,15 @@ int LCM(int a, int b) {
 }
 
 int pow(int a, int p) {
-    assert(p >= 0);
+    //assert(p >= 0);
+    if (p < 0) {
+        return 0;
+    }
+
     if (p == 0) {
-        assert(a != 0);
+        if (a == 0) {
+            return 0;
+        }
         return 1;
     }
     int i;

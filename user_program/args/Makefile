@@ -25,4 +25,4 @@ $(OBJS): %.out : %.o
 	xxd -c 4 -s 0 -i $@ > $(subst out,ar,$@)
 
 clean:
-	rm -f $(OBJS) $(CFILES:.c=.o)
+	rm -f $(OBJS) $(CFILES:.c=.o) $(CFILES:.c=.d)

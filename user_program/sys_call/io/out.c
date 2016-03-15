@@ -1,7 +1,11 @@
 #include "kernel/syscall.h"
 
-int puts(const char *ctl) {
+int print_serial(const char *ctl) {
 	return syscall(SYS_print_serial, ctl);
+}
+
+int puts(const char *ctl) {
+	return syscall(SYS_printf, ctl, NULL);
 }
 
 int printf(const char *format, ...) {

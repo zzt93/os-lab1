@@ -1,7 +1,7 @@
 #include "kernel/syscall.h"
 #include "sys_call/io/io.h"
 #include "lib/string.h"
-#include "kernel/message.h"
+#include "error.h"
 
 
 #define BUF_SZ 256
@@ -12,6 +12,18 @@
 const char const * CD = "cd";
 const char const * PWD = "pwd";
 //char *user_name[NAME_LEN] = "zzt@os-lab: ";
+
+bool check_args_num(int real, int target) {
+    if (real == target) {
+        return 1;
+    } else if (real > target) {
+        puts("too many arguments");
+        return 0;
+    }
+    puts("too few arguments");
+    return 0;
+
+}
 
 int entry() {
     char cmd[BUF_SZ], copy[BUF_SZ];
@@ -30,10 +42,19 @@ int entry() {
             continue;
         }
         if (strcmp(save[0], CD) == 0)  {
+            if (!check_args_num(count, 2)) {
+                continue;
+            }
             int res = chdir(save[1]);
             if (res != SUCC) {
-                printf("%s: %s", err[res], save[1]);
+                printf("%s: %s\n", err[res], save[1]);
             }
+            continue;
+        } else if (strcmp(save[0], PWD) == 0) {
+            if (!check_args_num(count, 1)) {
+                continue;
+            }
+            print_cwd_path();
             continue;
         }
         filename = save[0];

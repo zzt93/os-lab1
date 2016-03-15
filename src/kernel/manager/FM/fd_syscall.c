@@ -32,6 +32,11 @@ int open_file(Msg *m) {
     }
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
     uint32_t node_off = file_path(cwd, name);
+    if (node_off < inode_start) {
+        m->ret = node_off;
+        return FAIL;
+    }
+
     iNode node;
     n_dev_read(now_disk, FM,
         &node, node_off, sizeof node);

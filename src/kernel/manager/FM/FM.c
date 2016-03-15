@@ -90,6 +90,11 @@ static void FM_job() {
                 delete_file(&m);
                 break;
             case FM_lsdir:
+                /**
+                   @param m->req_pid -- (char *) buffer to store ls result
+                   @param m->dev_id -- (char *) file name to list
+                   @param m->buf -- (PCB *) process own above buffer
+                 */
                 list_dir(&m);
                 break;
             case FM_chdir:

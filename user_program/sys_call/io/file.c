@@ -23,3 +23,7 @@ int listdir(const char *name, char *buf) {
 int chdir(const char *name) {
     return syscall(SYS_chdir, name);
 }
+
+int print_cwd_path() {
+    return syscall(SYS_pwd);
+}

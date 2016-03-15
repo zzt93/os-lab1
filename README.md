@@ -39,12 +39,14 @@ put user in ring3
 wait(int second) -- system call  
 random number  
 
+### process
 fork a process  
 exec a command  
 exit a user process  
 waitpid  
 a simple shell  
 
+### file system
 upgrade file system: change file system name to string; size is variable  
 create a file(file name max is 28 bytes @see f_dir.h)  
 make a directory(directory depth max is 16 @see f_dir.h)  
@@ -61,6 +63,12 @@ lseek a file: i.e. change the cursor for reading/writing
 non-blocked timer -- used to make a process run specific seconds  
 LCM and GCD  
 
+###shell utility:
+- cd
+- pwd
+- ls
+- echo
+- echo arguments and wait 5 seconds
 
 
 ###Implement some ADT:  

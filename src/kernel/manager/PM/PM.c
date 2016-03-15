@@ -48,6 +48,7 @@ static void PM_job() {
                 open_m.dev_id = m.i[0];
                 // set file descriptor for exec
                 int fd = open_file(&open_m);
+                assert(fd > CWD && fd < PROCESS_MAX_FD);
                 m.i[0] = fd;
 
                 PCB *p = create_process(&m);
@@ -91,7 +92,7 @@ static void PM_job() {
                 /**
                    @param m->i[0] -- (int) fd
                    @param m->i[1] -- (PCB *) the process to exec itself
-                   @param m->buf -- args address
+                   @param m->buf -- (char *)args address
                  */
                 PCB *new = kexec(&m);
                 if (new != NULL) {// mean exec succeed

@@ -26,4 +26,4 @@ $(OBJS): %.out : %.o
 
 
 clean:
-	rm -f $(OBJS) $(CFILES:.c=.o)
+	rm -f $(OBJS) $(CFILES:.c=.o) $(CFILES:.c=.d)

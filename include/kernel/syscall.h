@@ -25,6 +25,7 @@ enum {
     SYS_dup2,
     SYS_lsdir,
     SYS_chdir,
+    SYS_pwd,
     // FM and PM delimiter
     FM_PM,
     // process related system call
@@ -93,6 +94,7 @@ int deldir(const char *name);
 // name(with path)
 int listdir(const char *name, char *buf);
 int chdir(const char *name);
+int print_cwd_path();
 
 int timer_start(int seconds);
 int timer_finished();

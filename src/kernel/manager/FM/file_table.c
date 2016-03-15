@@ -18,13 +18,13 @@ BIT_MAP(MAX_FILE)
 static FTE file_table[MAX_FILE];
 
 static
-void add_node_to_fte(FTE *fte, iNode *node, uint32_t offset) {
+void add_node_to_fte(FTE *fte, iNode *node, uint32_t node_off) {
     fte->offset = 0;
     fte->dev_id = node->dev_id;
     fte->ref_count = 0;
     assert(node->type != NOT_INODE);
     fte->type = node->type;
-    fte->node_off = offset;
+    fte->node_off = node_off;
     switch(fte->type) {
         case FT_DIR:
             // TODO add file size for directory here?
@@ -37,7 +37,7 @@ void add_node_to_fte(FTE *fte, iNode *node, uint32_t offset) {
     }
 }
 
-FTE * add_fte(iNode *node, uint32_t offset) {
+FTE * add_fte(iNode *node, uint32_t node_off) {
     // find the first free
     lock();
     int i = first_val(FREE);
@@ -46,7 +46,7 @@ FTE * add_fte(iNode *node, uint32_t offset) {
     }
     // initialize fte
     FTE *aim = file_table + i;
-    add_node_to_fte(aim, node, offset);
+    add_node_to_fte(aim, node, node_off);
     set_val(i, USED);
     unlock();
     return aim;
@@ -141,7 +141,8 @@ void init_thread_cwd() {
   directory in fte for its size is already set invalid
  */
 size_t rw_prepare(Msg *m,
-    size_t (*rw_block_file)(int, inode_t, uint32_t, char *buf, int len)) {
+    size_t (*rw_block_file)(int, inode_t, uint32_t, char *buf, int len),
+    size_t (*rw_char_dev_file)(int dev_id, char *buf, int len)) {
     PCB *aim = (PCB *)m->req_pid;
     assert(aim >= (PCB *)KOFFSET);
     char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
@@ -163,7 +164,7 @@ size_t rw_prepare(Msg *m,
                 return 0;
             case CHAR_DEV:
                 m->ret = SUCC;
-                return write_char_dev_file(fte->dev_id, buf, m->len);
+                return rw_char_dev_file(fte->dev_id, buf, m->len);
             default:
                 // not implement yet
                 assert(0);
@@ -186,9 +187,9 @@ size_t rw_prepare(Msg *m,
 }
 
 size_t write_file(Msg *m) {
-    return rw_prepare(m, write_block_file);
+    return rw_prepare(m, write_block_file, write_char_dev_file);
 }
 
 size_t n_read_file(Msg *m) {
-    return rw_prepare(m, read_block_file);
+    return rw_prepare(m, read_block_file, read_char_dev_file);
 }

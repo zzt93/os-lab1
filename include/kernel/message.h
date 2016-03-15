@@ -1,7 +1,6 @@
 #ifndef __MESSAGE_H__
 #define __MESSAGE_H__
 
-#include "kernel/message.h"
 #include "types.h"
 #include "adt/list.h"
 
@@ -75,5 +74,6 @@ typedef enum {
             m.ret = info;                       \
         }                                       \
     }                                           \
+
 
 #endif /* __MESSAGE_H__ */

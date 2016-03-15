@@ -113,6 +113,10 @@ void do_syscall(TrapFrame *tf) {
                 m.dev_id = tf->ebx;
                 m.buf = current;
                 break;
+            case SYS_pwd:
+                kprintf("%s\n", (void **)&current->cwd_path);
+                tf->eax = 1;
+                return;
             default:
                 printk(RED"no such system call %d "RESET, id);
                 assert(0);
