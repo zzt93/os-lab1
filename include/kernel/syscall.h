@@ -92,7 +92,7 @@ int makedir(const char *name);
 int delfile(const char *name);
 int deldir(const char *name);
 // name(with path)
-int listdir(const char *name, char *buf);
+int listdir(const char *name, char *buf, int len);
 int chdir(const char *name);
 int print_cwd_path();
 

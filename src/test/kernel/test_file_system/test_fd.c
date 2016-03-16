@@ -92,11 +92,11 @@ static int test_open(const char *name) {
     int fd;
     Msg m;
     m.ret = FM_ERR;
+    m.req_pid = (int)current;
     m.buf = current;
     m.dev_id = (int)name;
     fd = open_file(&m);
     test_list(NULL);
-
     return fd;
 }
 

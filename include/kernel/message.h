@@ -44,24 +44,25 @@ void init_msg(
 // e.g. err[NO_SUCH] == "No such file or directory"
 // @see set_error_msg(), error.c
 typedef enum {
-    SUCC = -1,
-    FAIL = 0,
-    FM_ERR,
-    // no such directory or file
-    NO_SUCH,
-    IS_DIR,
-    FILE_EXIST,
-    NO_MORE_DISK,
-    BUF_OF,
-    INVALID_FILENAME,
+    // MM related error
+    MM_ERR = -14,
+    NO_MORE_MEMORY,
     // PM related error
     PM_ERR,
-    SEGMENTATION,
-    INVALID_PRI,
     NOT_EXE,
-    // MM related error
-    MM_ERR,
-    NO_MORE_MEMORY,
+    INVALID_PRI,
+    SEGMENTATION,
+    // FM related error
+    FM_ERR,
+    INVALID_FILENAME,
+    BUF_OF,
+    NO_MORE_DISK,
+    FILE_EXIST,
+    IS_DIR,
+    // no such directory or file
+    NO_SUCH,
+    FAIL,
+    SUCC,
 } Msg_res;
 
 /**
@@ -75,5 +76,9 @@ typedef enum {
         }                                       \
     }                                           \
 
+static inline
+int has_error(int msg_res) {
+    return msg_res < 0;
+}
 
 #endif /* __MESSAGE_H__ */

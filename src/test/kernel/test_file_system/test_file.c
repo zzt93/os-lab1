@@ -21,9 +21,9 @@ void test_list(char *name) {
         (int)entry, (int)name, current, INVALID_ID, SZ);
     m.ret = FM_ERR;
     size = list_dir(&m);
-    assert(m.ret >= SUCC && m.ret < len_err);
+    assert(m.ret <= SUCC);
     if (m.ret != SUCC) {
-        printk("%s", err[m.ret]);
+        printk("%s", get_err_msg(m.ret));
         return;
     }
     assert(strcmp(entry[0].filename, ".") == 0);

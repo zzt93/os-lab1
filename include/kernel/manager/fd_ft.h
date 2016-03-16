@@ -7,6 +7,10 @@
 int detach_fte(FDE *, FTE *);
 
 static inline void assign_fte(FDE *d, FTE *t) {
+    assert(d != NULL);
+    if (t == NULL) {
+        return;
+    }
     if (!is_invalid_fd(d)) {
         detach_fte(d, d->ft_entry);
     }

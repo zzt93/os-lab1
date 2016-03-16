@@ -58,6 +58,14 @@ void irq_handle(TrapFrame *tf) {
     } else if (irq < 1000) {
         printk("Stack :%x %x %x %x ", tf->eip, tf->ebp, tf->xxx, tf->esp);
         printk("error code: %x ;cr2: %x ", tf->error_code, read_cr2());
+//        if (current->type == USER) {
+//            Msg m;
+//            m.buf = current;
+//            kexit(&m);
+//            prepare_current();
+//            return;
+//        }
+
 		extern uint8_t logo[];
 		panic("Unexpected exception #%d\n\33[1;31mHint: The machine is always right! For more details about exception #%d, see\n%s\n\33[0m", irq, irq, logo);
 	} else if (irq >= 1000) {

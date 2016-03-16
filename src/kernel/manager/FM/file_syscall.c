@@ -15,8 +15,8 @@ char test_sizeof_Dir_entry[sizeof(Dir_entry) % 32 == 0 ? 1 : -1];
 
 static
 void set_error_msg(char *buf, int i) {
-    assert(i >= 0);
-    memcpy(buf, err[i], err_size[i]);
+    assert(i < 0);
+    memcpy(buf, err[-i], err_size[-i]);
 }
 
 const char *const current_dir = ".";
@@ -65,6 +65,9 @@ static inode_t contain_file(inode_t node_off, char *name) {
    Analyze the file name with path
    and return node offset of that file
    -- path can't be NULL
+
+   TODO this may return NO_SUCH which may in range of [inode_start,
+   inode_start + inode_area_size]
  */
 inode_t file_path(inode_t cwd, const char * const name) {
     assert(name != NULL);
@@ -355,23 +358,28 @@ int list_dir(Msg *m) {
     inode_t node_off;
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
     const char *name;
-    if ((char *)m->dev_id == NULL) { // i.e. name is empty
+    if ((char *)m->dev_id == NULL) {
         node_off = cwd;
     } else {
         name = (const char *)get_pa(&aim->pdir, m->dev_id);
-        // if not specify the list name,
-        // using default file path -- current working directory node_off
-        node_off = file_path(cwd, name);
+        if (str_empty(name)) { // i.e. name is empty
+            node_off = cwd;
+        } else {
+            // if not specify the list name,
+            // using default file path -- current working directory node_off
+            node_off = file_path(cwd, name);
+        }
     }
-    if (node_off < inode_start) {
+    if (!file_exist(node_off)) {
         m->ret = NO_SUCH;
         set_error_msg(buf, node_off);
-        return 0;
+        return NO_SUCH;
     }
     iNode node;
     // get the node info of this file
     n_dev_read(now_disk, FM, &node, node_off, sizeof(iNode));
     if (node.size > m->len) {
+        m->ret = BUF_OF;
         return BUF_OF;
     }
     size_t read = 0;
@@ -405,7 +413,7 @@ int ch_dir(Msg *m) {
     assert(off >= inode_start);
     if (name != NULL) {
         off = file_path(cwd, name);
-        if (off < inode_start) {
+        if (!file_exist(off)) {
             m->ret = NO_SUCH;
             return FAIL;
         }

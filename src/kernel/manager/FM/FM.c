@@ -56,8 +56,9 @@ static void FM_job() {
                 break;
             case FM_open:
                 /**
+                   @param m->req_pid -- (PCB *) process own the name buffer
                    @param m->dev_id -- (char *) the program/file name
-                   @param m->buf -- (PCB *) request PCB pointer
+                   @param m->buf -- (PCB *) process want the fd
                    @return -- the fd if succeed
                 */
                 res = open_file(&m);
@@ -65,7 +66,7 @@ static void FM_job() {
                 break;
             case FM_close:
                 /**
-                   @param m->buf -- (PCB *) request PCB pointer
+                   @param m->buf -- (PCB *) process own the fd
                    @param m->dev_id -- (int) file fd
                    @return -- the fd
                  */
@@ -90,14 +91,22 @@ static void FM_job() {
                 delete_file(&m);
                 break;
             case FM_lsdir:
+            {
                 /**
                    @param m->req_pid -- (char *) buffer to store ls result
                    @param m->dev_id -- (char *) file name to list
-                   @param m->buf -- (PCB *) process own above buffer
-                 */
-                list_dir(&m);
+                   @param m->buf -- (PCB *) process owning above name buffer and result buffer
+                   @param m->len -- (int ) buffer length
+                */
+                int res = list_dir(&m);
+                SET_IF_SUCC(m, res);
                 break;
+            }
             case FM_chdir:
+                /**
+                   @param m->buf -- (PCB *) process which want to change dir and own the name buffer
+                   @param m->dev_id -- (char *) directory name
+                 */
                 ch_dir(&m);
                 break;
             default:

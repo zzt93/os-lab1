@@ -47,7 +47,7 @@ int entry() {
             }
             int res = chdir(save[1]);
             if (res != SUCC) {
-                printf("%s: %s\n", err[res], save[1]);
+                printf("%s: %s\n", get_err_msg(res), save[1]);
             }
             continue;
         } else if (strcmp(save[0], PWD) == 0) {
@@ -63,17 +63,22 @@ int entry() {
 		// TODO add redirect
         if((pid = fork()) == 0) {
 			// no thread will receive the response of exec, so it failure should be known by waitpid
-            int res = exec(filename, save[1] - copy + cmd);
-            // if run to here, means not find the file to replace
+            int res;
+            if (count == 1) {
+                res = exec(filename, "");
+            } else {
+                res = exec(filename, save[1] - copy + cmd);
+            }
+            // if run to here, means fail to replace
             // the forked process, so just remind.
-            printf("No such file or not executable: %s -- %d",
+            printf("No such file or not executable: %s -- %s",
                 filename,
-                   res);
+                get_err_msg(res));
         }
         else {
 			// if exec fail, waitpid will fail
             res = waitpid(pid);
-            if (res == 0) {
+            if (res != SUCC) {
                 printf("Unknown command or wrong args: %s\n", cmd);
                 continue;
             }

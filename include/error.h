@@ -9,6 +9,14 @@ extern int err_size[];
 
 void init_error_msg();
 
+static inline
+const char * const get_err_msg(int i) {
+    if (i >= 0) {
+        return "get_err_msg(): wrong parameter";
+    }
+    return err[-i];
+}
+
 #include "kernel/message.h"
 
 #endif /* __ERROR_H__ */

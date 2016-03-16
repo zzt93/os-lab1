@@ -56,6 +56,7 @@ int page_copy(Msg *m) {
     }
 
     // reply message
+    m->ret = SUCC;
     return 1;
 }
 
@@ -120,5 +121,6 @@ int page_free(Msg *m) {
         v = list_entry(p, Seg_info, link);
         state &= seg_free(aim, v);
     }
+    m->ret = SUCC;
     return state;
 }

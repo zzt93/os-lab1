@@ -15,8 +15,11 @@ static void ram_disk_job() {
         pid_t dest = m.src;
         switch(m.type) {
             case DEV_READ:
-                m.ret = read_ram(&m);
+            {
+                int res = read_ram(&m);
+                SET_IF_SUCC(m, res);
                 break;
+            }
             default:
                 assert(false);
                 break;

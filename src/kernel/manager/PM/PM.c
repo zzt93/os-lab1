@@ -15,6 +15,16 @@ extern PCB* current;
 
 int PM;
 
+#include "kernel/user_process.h"
+#include "kernel/manager/f_dir.h"
+void change_to_bin() {
+    set_cwd_path(current, default_cwd_name);
+    Msg m;
+    m.buf = current;
+    m.dev_id = (int)bin;
+    ch_dir(&m);
+}
+
 /**
    The message sent to PM should specify:
    m->type
@@ -43,10 +53,13 @@ static void PM_job() {
             */
             case PM_CREATE:
             {
+                change_to_bin();
+
                 Msg open_m;
+                open_m.req_pid = (int)current;
                 open_m.buf = current;
                 open_m.dev_id = m.i[0];
-                // set file descriptor for exec
+                // set file descriptor for create_process
                 int fd = open_file(&open_m);
                 assert(fd > CWD && fd < PROCESS_MAX_FD);
                 m.i[0] = fd;
@@ -58,6 +71,11 @@ static void PM_job() {
                     add2wake(p);
                     m.ret = SUCC;
                 }
+                // close file anyway
+                Msg close_m;
+                close_m.buf = current;
+                close_m.dev_id = fd;
+                close_file(&close_m);
                 break;
             }
             case PM_fork:
@@ -78,8 +96,8 @@ static void PM_job() {
             case PM_exec:
             {
                 Msg open_m;
-                PCB *req_pcb = (PCB *)m.i[1];
-                open_m.buf = req_pcb;
+                open_m.req_pid = m.i[1];
+                open_m.buf = current;
                 open_m.dev_id = m.i[0];
                 // set file descriptor for exec
                 int fd = open_file(&open_m);
@@ -98,12 +116,12 @@ static void PM_job() {
                 if (new != NULL) {// mean exec succeed
                     // put in queue
                     add2wake(new);
-                    // close file
-                    Msg close_m;
-                    close_m.buf = req_pcb;
-                    close_m.dev_id = fd;
-                    close_file(&close_m);
                 }
+                // close file anyway
+                Msg close_m;
+                close_m.buf = current;
+                close_m.dev_id = fd;
+                close_file(&close_m);
                 // for the thread apply exec is now not exist,
                 // so no need to send back
                 continue;
@@ -193,12 +211,12 @@ PCB *create_process(Msg* m) {
     assert( ((int)pdir&0xfff) == 0);
     /* read 512 bytes starting from offset 0 from file "name"
        into buf */
-	/* it contains the ELF header and program header table */
+    /* it contains the ELF header and program header table */
     init_msg(m,
         current->pid,
         FM_read,
         (int)current, name, buf, 0, B_SIZE);
-	send(FM, m);
+    send(FM, m);
     receive(FM, m);
     if (m->ret != SUCC) {
         return NULL;
@@ -211,13 +229,13 @@ PCB *create_process(Msg* m) {
     ListHead vir_range;
     list_init(&vir_range);
 
-	ph_table = (struct ProgramHeader*)((char *)elf + elf->phoff);
+    ph_table = (struct ProgramHeader*)((char *)elf + elf->phoff);
     // ignore the stack header for the time being
     end_ph = ph_table + elf->phnum - 1;
-	for (; ph_table < end_ph; ph_table++) {
-		/* scan the program header table, load each segment into memory */
+    for (; ph_table < end_ph; ph_table++) {
+        /* scan the program header table, load each segment into memory */
 
-		va = (unsigned char*)ph_table->vaddr; /* virtual address */
+        va = (unsigned char*)ph_table->vaddr; /* virtual address */
         //assert(va >= 0x08048000);
         assert(va > (unsigned char*)0);
         assert(va < (unsigned char*)KERNEL_VA_START);
@@ -228,7 +246,7 @@ PCB *create_process(Msg* m) {
         vir_init(tmp,
             (uint32_t)va, (uint32_t)va + ph_table->memsz, ph_table->flags);
         list_add_before(&vir_range, &(tmp->link));
-		/* allocate pages starting from va, with memory size no less than ph->memsz */
+        /* allocate pages starting from va, with memory size no less than ph->memsz */
         /*
           flags: RWE is the lowest three bits
           TODO: is always user? i.e. always use USER_PAGE_ENTRY?
@@ -237,7 +255,7 @@ PCB *create_process(Msg* m) {
             current->pid,
             NEW_PAGE,
             INVALID_ID, (ph_table->flags & 0x2) | (USER_PAGE_ENTRY << 2), pdir, (int)va, ph_table->memsz);
-		send(MM, m);
+        send(MM, m);
         receive(MM, m);
 
         pa = m->buf; // pa a is physical address
@@ -247,26 +265,28 @@ PCB *create_process(Msg* m) {
         // so have to use physical address directly
         assert(pa >= (unsigned char*)KERNEL_PA_END);
         assert(pa < (unsigned char*)PHY_MEM);
-		/* read ph->filesz bytes starting from offset ph->off from file into pa */
-        // change the offset for disk read -- disk read ignore direct offset parameter
-        m->buf = current;
-        m->dev_id = name;
-        m->len = SEEK_SET;
-        m->offset = ph_table->off;
-        // change offset and read should be atomic
-        lseek_file(m);
-        init_msg(m,
-            current->pid,
-            FM_read,
-            (int)current, name, pa, ph_table->off, ph_table->filesz);
-        // old ram way
-        // INVALID_ID, name, pa, ph_table->off, ph_table->filesz);
-		send(FM, m);
-        receive(FM, m);
+        /* read ph->filesz bytes starting from offset ph->off from file into pa */
+        if (ph_table->filesz != 0) {
+            // change the offset for disk read -- disk read ignore direct offset parameter
+            m->buf = current;
+            m->dev_id = name;
+            m->len = SEEK_SET;
+            m->offset = ph_table->off;
+            // change offset and read should be atomic operation
+            lseek_file(m);
+            init_msg(m,
+                current->pid,
+                FM_read,
+                (int)current, name, pa, ph_table->off, ph_table->filesz);
+            // old ram way
+            // INVALID_ID, name, pa, ph_table->off, ph_table->filesz);
+            send(FM, m);
+            receive(FM, m);
+        }
         // initialize the gap between [file_size, memory_size)
         // all to zero
-		for (i = pa + ph_table->filesz; i < pa + ph_table->memsz; *i ++ = 0);
-	}
+        for (i = pa + ph_table->filesz; i < pa + ph_table->memsz; *i ++ = 0);
+    }
 
     // initialize the va for stack
     // set the page directory, page table for user stack

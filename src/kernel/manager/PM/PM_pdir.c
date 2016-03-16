@@ -51,6 +51,7 @@ void init_kernel_image(PDE* pdir) {
     PTE* ptable = (PTE*)va_to_pa(get_kptable());
     uint32_t pdir_idx;
     for (pdir_idx = 0; pdir_idx < KMEM / PD_SIZE; pdir_idx++) {
+        // make user process can only read from kernel
         make_specific_pde(&pdir[pdir_idx + KERNEL_VA_START / PD_SIZE], ptable, KERNEL_PAGE_ENTRY, PAGE_R);
         ptable += NR_PTE;
     }

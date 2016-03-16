@@ -31,13 +31,13 @@ static void MM_job() {
         switch(m.type) {
             //case NEW_PDIR:
             case NEW_PAGE:
-                m.ret = init_va(&m);
+                init_va(&m);
                 break;
             case COPY_page:
-                m.ret = page_copy(&m);
+                page_copy(&m);
                 break;
             case FREE_page:
-                m.ret = page_free(&m);
+                page_free(&m);
                 break;
             default:
                 assert(false);

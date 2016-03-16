@@ -22,5 +22,6 @@ int split(char *s, char delimiter, char **save);
 #define INVALID_INDEX -1
 
 int find_char(const char *str, int ith, char aim);
+bool str_empty(const char * str);
 
 #endif

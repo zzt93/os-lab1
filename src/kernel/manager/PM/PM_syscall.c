@@ -273,8 +273,10 @@ PCB * kexec(Msg *m) {
     PCB *aim = (PCB *)m->i[1];
     // TODO check whether is file is executable before free current process
 
-    // save arguments
-    size_t len = save_args(m, args);
+    // save arguments if necessary
+    size_t len;
+    assert(m->buf != NULL);
+    len = save_args(m, args);
     // save the resources to inherit: pid, file descriptor, cwd_path
     FDE tmp[PROCESS_MAX_FD];
     memcpy(tmp, aim->fd_table, sizeof(FDE) * PROCESS_MAX_FD);
@@ -306,7 +308,7 @@ void notify_wait(PCB *aim) {
     Msg m;
     m.src = current->pid;
     // set return value for waitpid
-    m.ret = 1;
+    m.ret = SUCC;
     list_foreach(p, head) {
         t = list_entry(p, Waiting, link);
         send(t->wait->pid, &m);

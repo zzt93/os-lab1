@@ -98,25 +98,8 @@ void put_by_state(PCB *p) {
             assert(false);
     }
 }
-/**
-   关于页目录, 它是通过CR3寄存器寻找到的.
-   由于每个进程都拥有自己的页目录, 所以在进行上下文切换的时候,
-   我们必须将被调度进程的页目录基地址载入CR3寄存器, 否则被调度进程将会运行在其它进程的地址空间上, 从而产生错误.
- */
-void
-schedule(void) {
-	/* implement process/thread schedule here */
-    NOINTR;
-    PROCESS_STATE s = current->state;
-    if (s >= SLEEPED) { // i.e. go to sleep now
-        sleeped_add(current);
-        printk("add %d to tree\n", current->pid);
-    } else if (s < NOT_SLEEPED) {
-        put_by_state(current);
-    } else {
-        assert(0);
-    }
 
+void prepare_current() {
     //printk("#%d count of lock %d\n", current->pid, current->count_of_lock);
     current = choose_process();
     NOINTR;
@@ -154,6 +137,26 @@ schedule(void) {
     // can't use unlock, for interrupt procedure is not finished!!!
     //unlock();
     current->count_of_lock--;
+}
+/**
+   关于页目录, 它是通过CR3寄存器寻找到的.
+   由于每个进程都拥有自己的页目录, 所以在进行上下文切换的时候,
+   我们必须将被调度进程的页目录基地址载入CR3寄存器, 否则被调度进程将会运行在其它进程的地址空间上, 从而产生错误.
+ */
+void
+schedule(void) {
+	/* implement process/thread schedule here */
+    NOINTR;
+    PROCESS_STATE s = current->state;
+    if (s >= SLEEPED) { // i.e. go to sleep now
+        sleeped_add(current);
+        printk("add %d to tree\n", current->pid);
+    } else if (s < NOT_SLEEPED) {
+        put_by_state(current);
+    } else {
+        assert(0);
+    }
+    prepare_current();
 }
 
 

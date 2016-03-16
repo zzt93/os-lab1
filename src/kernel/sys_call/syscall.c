@@ -104,8 +104,9 @@ void do_syscall(TrapFrame *tf) {
                 // name
                 m.dev_id = tf->ebx;
                 m.buf = current;
-                // the target buffer
+                // the result buffer
                 m.req_pid = tf->ecx;
+                m.len = tf->edx;
                 break;
             case SYS_chdir:
                 m.type = FM_chdir;

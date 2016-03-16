@@ -116,3 +116,7 @@ int find_char(const char *str, int ith, char aim) {
     }
     return INVALID_INDEX;
 }
+
+bool str_empty(const char * str) {
+    return *str == '\0';
+}

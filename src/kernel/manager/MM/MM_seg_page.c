@@ -61,5 +61,6 @@ int init_va(Msg* m) {
 
     // send back with the starting physical address
     // which is set in the upper loop
+    m->ret = SUCC;
     return 1;
 }

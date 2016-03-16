@@ -26,15 +26,17 @@ FDE * get_fde(PCB *aim, int i) {
  */
 int open_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
-    char *name = (char *)get_pa(&aim->pdir, m->dev_id);
+    PCB *has_name = (PCB *)m->req_pid;
+    char *name = (char *)get_pa(&has_name->pdir, m->dev_id);
     if (invalid_filename(name)) {
+        m->ret = INVALID_FILENAME;
         return INVALID_FD_I;
     }
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
     uint32_t node_off = file_path(cwd, name);
     if (node_off < inode_start) {
         m->ret = node_off;
-        return FAIL;
+        return INVALID_FD_I;
     }
 
     iNode node;
@@ -44,8 +46,13 @@ int open_file(Msg *m) {
     // TODO only adding link target to file table; for reading
     // and writing to it become convenient(no more change)
     FTE *fte = add_fte(&node, node_off);
-    // add a FDE in process fd table
     int j = first_fd(aim, INVALID_FD);
+    if (fte == NULL || invalid_fd_i(j)) {
+        m->ret = NO_MORE_MEMORY;
+        return INVALID_FD_I;
+    }
+
+    // add a FTE in process fd table
     assign_fte(&aim->fd_table[j], fte);
     m->ret = SUCC;
     return j;
