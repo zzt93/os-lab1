@@ -19,6 +19,7 @@ void get_time(Time *tm);
 extern int TIMER;
 
 typedef struct {
+    // TODO replace int with time_t?
     int time;
     int pid;
 } Timer;
@@ -38,5 +39,17 @@ void update_non_block_timer();
 
 // driver id of timer
 extern int d_timer;
+
+typedef enum {
+    Seconds = 0x00,
+    Minutes = 0x02,
+    Hours = 0x04,
+    Weekday = 0x06,
+    Day_of_month = 0x07,
+    Month = 0x08,
+    Year = 0x09,
+    Century = 0x32,
+} TimeReg;
+
 
 #endif

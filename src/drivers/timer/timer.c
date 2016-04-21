@@ -5,6 +5,7 @@
 #include "lib/string.h"
 #include "kernel/message.h"
 #include "kernel/init_proc.h"
+#include "lib/math.h"
 
 #define PORT_TIME 0x40
 #define PORT_RTC  0x70
@@ -48,6 +49,10 @@ timer_driver_thread(void) {
 		receive(ANY, &m);
         dest = m.src;
 		switch (m.type) {
+            /**
+               @param m->i[0] -- seconds for wait
+               @param m->i[1] -- request process's pid
+             */
             case NEW_TIMER:
                 kwait(&m);
                 continue;
@@ -106,11 +111,23 @@ init_i8253(void) {
 	out_byte(PORT_TIME, count >> 8);
 }
 
+static inline
+uint8_t read_register(TimeReg reg) {
+    out_byte(PORT_RTC, reg);
+    uint8_t data = in_byte(PORT_RTC + 1);
+    return BCD8421_to_int(data);
+}
+
 static void
 init_rt(void) {
-	memset(&rt, 0, sizeof(Time));
-	/* Optional: Insert code here to initialize current time correctly */
-
+	//memset(&rt, 0, sizeof(Time));
+	/* Insert code here to initialize current time correctly */
+    rt.second = read_register(Seconds);
+    rt.minute = read_register(Minutes);
+    rt.hour = read_register(Hours);
+    rt.day = read_register(Day_of_month);
+    rt.month = read_register(Month);
+    rt.year = read_register(Year);
 }
 
 /**

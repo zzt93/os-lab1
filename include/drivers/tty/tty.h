@@ -20,9 +20,10 @@ typedef struct Console {
 	int w, h, wh;
     // buffer size and position of cursor
 	int size, pos;
-    // line buffer
+    // line buffer of user input(not include output)
 	char lbuf[LBUF_SZ + 1];
-    // cooked buffer -- all the user input except the new line
+    // cooked buffer -- all the user input(except the new line)
+    // that not handled for the time being
 	char cbuf[CBUF_SZ + 1];
     // r -- the index for cooked buffer
     // f -- the index for already handled char in cooked buf

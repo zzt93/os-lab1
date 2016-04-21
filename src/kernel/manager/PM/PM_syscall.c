@@ -132,11 +132,12 @@ PCB * kfork(Msg* m) {
     // shallow copy: privilege, sign, pid, fd_table
     s_copy(father, child);
     // deep copy ptable, page, set page directory
-    // except kernel image, including user stack
-    // handle content on the user stack which must use physical address to **copy**
-    // for current thread is PM which has different page directory with user process
+    // (including user stack, except kernel image)
+    // To handle content on the user stack, we must use physical address to **copy**
+    // because current thread is PM which has different page directory with user process
     // The pointer field on the user stack is the same, so no need to change pointer field.
-    //
+    // It will re-use read-only page which save memory and time: for example, code segment
+    // and read-only data.
     init_msg(m,
         current->pid,
         COPY_page,
@@ -307,6 +308,7 @@ void notify_wait(PCB *aim) {
     Waiting *t = NULL;
     Msg m;
     m.src = current->pid;
+    printk("notify wait #%d\n", m.src);
     // set return value for waitpid
     m.ret = SUCC;
     list_foreach(p, head) {
@@ -341,4 +343,5 @@ void kwaitpid(Msg *m) {
     init_wait(w, m->buf);
     // let m->buf, ie user process waiting on the aim
     list_add_after(&aim->waitpid, &w->link);
+    printk("waitpid #%d\n", m->i[0]);
 }

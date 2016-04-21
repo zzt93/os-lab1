@@ -34,7 +34,9 @@ that is why `dev_read() & dev_write()` using `name` as first argument.~~
 
 Aug 2 2015 update:
 
-## State of a process
+## State of a process (every process now have two referrer)
+#### one is in all (a map) @see process.c
+#### another is one of following case:
 - running -- store in `current`
 - ready -- store in `wake queue`
 - sleeped -- `sleeped tree`, e.g. `receive()`, `sleep()`, all system call

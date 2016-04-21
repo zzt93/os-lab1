@@ -144,13 +144,17 @@ static void
 removec(Console *c) {
     char *ptr = &c->lbuf[-- c->i];
     uint16_t *scr = &c->vbuf[c->pos - 1];
-    while (*ptr != 0) {
+    while (*ptr != 0) {// move late chars back when delete a char in
+        // the middle of input array
         *ptr = *(ptr + 1);
         *scr = *(scr + 1);
         ptr ++; scr ++;
     }
 }
 
+
+#include "drivers/time.h"
+#include "drivers/sound.h"
 static void
 backsp(Console *c) {
     if (c->i > 0) {
@@ -161,9 +165,16 @@ backsp(Console *c) {
             c->pos --;
         }
     }
-    else {
-        /* Optional: Insert code here to play some sound */
-
+    else {// c->i == 0, i.e. at the start of the line buffer
+        /* Insert code here to play some sound */
+        // TODO can use message?
+        uint8_t state = in_byte(PORT_PC_SPEAKER);
+        out_byte(PORT_PC_SPEAKER, state | PC_SPEAKER_ON);
+        Msg m;
+        m.i[0] = 1;
+        m.i[1] = current->pid;
+        kwait(&m);
+        out_byte(PORT_PC_SPEAKER, state | PC_SPEAKER_OFF);
     }
 }
 
@@ -174,6 +185,7 @@ backsp(Console *c) {
 static size_t
 get_cooked(Console *c, pid_t pid, char *buf, int count) {
     assert(c->f != c->r);
+    assert(c->r > c->f);
     // move it to dev_rw -- move it is wrong
     // convertion have to be in the target process and
     // dev_rw is at source process
@@ -194,7 +206,7 @@ get_cooked(Console *c, pid_t pid, char *buf, int count) {
 /**
    only handle other devices read request when an enter is pressed
    ie, this line can't be changed
-   pressing [enter] -- consl_feed -> cook -> read_request
+   pressing [key] -- read_key -- consl_feed -> cook -> read_request
    ask for read -- dev_read ->dev_rw -> send to tty -> ttyd -> read_request
  */
 void

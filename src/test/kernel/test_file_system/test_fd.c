@@ -238,7 +238,7 @@ void test_std_rw() {
     // write to stdout
     int fd = STDOUT_FILENO;
     Msg m;
-    char buffer[] = {"I am a student\n"};
+    char buffer[] = {"Enter some words to test read stdin write stdout:\n"};
     //char read_buffer[LEN];
     set_rw_msg(&m, fd, buffer);
     int len = sizeof buffer / sizeof(char);
@@ -246,7 +246,7 @@ void test_std_rw() {
     size_t w = write_file(&m);
     assert(w == len);
     assert(m.ret == SUCC);
-    // TODO add read from stdin then write
+    // add read from stdin then write
     fd = STDIN_FILENO;
     char read_buf[LEN];
     set_rw_msg(&m, fd, read_buf);

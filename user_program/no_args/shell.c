@@ -41,6 +41,7 @@ int entry() {
             printf("Unknown command: %s\n", cmd);
             continue;
         }
+        // check shell built-in command
         if (strcmp(save[0], CD) == 0)  {
             if (!check_args_num(count, 2)) {
                 continue;
@@ -60,7 +61,8 @@ int entry() {
         filename = save[0];
 
         // TODO check file existence and whether it is executable -- many be checked by exec
-		// TODO add redirect
+		// TODO add redirect: <, >, 2>, &>, >>
+        // TODO add pipe
         if((pid = fork()) == 0) {
 			// no thread will receive the response of exec, so it failure should be known by waitpid
             int res;

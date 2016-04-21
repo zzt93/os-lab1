@@ -20,6 +20,7 @@ Sep 26 2015 update:
 
 ## The functionalities that I have already implemented:
 
+###Mis
 printk -- printf in kernel  
 kmalloc -- malloc in kernel -- using next-fit algorithm  
 the key press interrupt handler  
@@ -38,6 +39,9 @@ add page protection
 put user in ring3  
 wait(int second) -- system call  
 random number  
+
+non-blocked timer -- used to make a process run specific seconds, i.e. counting its running time  
+LCM and GCD  
 
 ### process
 fork a process  
@@ -59,9 +63,6 @@ close a file
 read a file  
 write a file  
 lseek a file: i.e. change the cursor for reading/writing  
-
-non-blocked timer -- used to make a process run specific seconds  
-LCM and GCD  
 
 ###shell utility:
 - cd

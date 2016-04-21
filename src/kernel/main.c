@@ -85,7 +85,7 @@ os_init_cont(void) {
     //more_frequent();
     // init empty thread
     init_proc_test();
-    
+
     // here is to initialize shell process, which must later
     // than init_manager -- for it will send message to
     // managers
