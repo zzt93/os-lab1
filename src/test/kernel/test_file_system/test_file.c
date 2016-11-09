@@ -50,6 +50,7 @@ int set_name_msg(const char *name, int (*f)(Msg *)) {
 
 extern const char bin[];
 static char name2[] = "dev";
+// TODO make special device file: /dev/zero, /dev/null, /dev/random
 static char name3[] = "/home";
 static char name4[] = "./media";
 static char name5[] = "home/zzt/";

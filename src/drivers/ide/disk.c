@@ -31,6 +31,11 @@ issue_write() {
 	out_byte(IDE_PORT_BASE + 7, 0x30);
 }
 
+/**
+seems like the DMA way, ide_prepare() send the message about reading,
+when it finished, send a interrupt to CPU and to wake up ide to handle
+it.
+*/
 void
 disk_do_read(void *buf, uint32_t sector) {
 	int i;

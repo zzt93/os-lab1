@@ -19,7 +19,7 @@ static const char *ttynames[NR_TTY] = {"tty1", "tty2", "tty3", TTY4};
 extern char * user_name;
 
 // real memory of screen
-// memory-mapped screen
+// memory-mapped io: screen
 static uint16_t *vmem = (void*)pa_to_va(0xb8000);
 
 static uint16_t vbuf[NR_TTY][SCR_W * SCR_H * 2];
@@ -152,9 +152,49 @@ removec(Console *c) {
     }
 }
 
+#include "drivers/sound.h"
+
+static uint8_t
+start_sound() {
+    uint8_t state = in_byte(PORT_PC_SPEAKER) & 0xFC;
+    out_byte(PORT_PC_SPEAKER, state | PC_SPEAKER_ON);
+    return state;
+}
+
+static void
+close_sound(uint8_t state) {
+    out_byte(PORT_PC_SPEAKER, state);
+}
+
+void
+pit_sound(uint16_t freq) {
+    uint16_t counter = PIT_FREQ / freq;
+    out_byte(PIT_CONTROL, 0xB6);
+    out_byte(PIT_CHANNEL_2, counter & 0x0f);
+    out_byte(PIT_CHANNEL_2, counter >> 8);
+    out_byte(PORT_PC_SPEAKER, in_byte(PORT_PC_SPEAKER) | 0x3);
+}
+
+void
+pit_stop() {
+    out_byte(PORT_PC_SPEAKER, in_byte(PORT_PC_SPEAKER) & 0xFC);
+}
+
+static void
+wait_sometime() {
+    volatile int count = 0;
+    while (count < 10000) {
+        count++;
+    }
+    // can't stop this thread, will stop screen update
+//   Msg m;
+//   m.i[0] = 1;
+//   m.i[1] = current->pid;
+//   kwait(&m);
+//   receive(TIMER, &m);
+}
 
 #include "drivers/time.h"
-#include "drivers/sound.h"
 static void
 backsp(Console *c) {
     if (c->i > 0) {
@@ -166,15 +206,18 @@ backsp(Console *c) {
         }
     }
     else {// c->i == 0, i.e. at the start of the line buffer
-        /* Insert code here to play some sound */
-        // TODO can use message?
-        uint8_t state = in_byte(PORT_PC_SPEAKER);
-        out_byte(PORT_PC_SPEAKER, state | PC_SPEAKER_ON);
-        Msg m;
-        m.i[0] = 1;
-        m.i[1] = current->pid;
-        kwait(&m);
-        out_byte(PORT_PC_SPEAKER, state | PC_SPEAKER_OFF);
+        /* Insert code here to play some warning sound */
+        /* may change to rather thread to make sound, rather than
+           blocking TTY
+         */
+        assert(current->pid == TTY);
+        volatile int count = 0;
+        while (count < 10000) {
+            uint8_t s = start_sound();
+            wait_sometime();
+            close_sound(s);
+            count++;
+        }
     }
 }
 

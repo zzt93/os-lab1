@@ -53,6 +53,7 @@ static void PM_job() {
             */
             case PM_CREATE:
             {
+                // change the cwd to /bin
                 change_to_bin();
 
                 Msg open_m;

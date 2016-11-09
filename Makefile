@@ -11,7 +11,7 @@ SFILES  = $(shell find src/ -name "*.S")
 OBJS    = $(CFILES:.c=.o) $(SFILES:.S=.o)
 
 run: hardDisk
-	$(QEMU) -no-shutdown -serial stdio harddisk/harddisk.img
+	$(QEMU) -no-shutdown -serial stdio -soundhw pcspk harddisk/harddisk.img
 
 debug: hardDisk
 	gnome-terminal -e "bash -c \"gdb -s kernel; exec bash\""

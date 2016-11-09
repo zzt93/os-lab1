@@ -33,6 +33,10 @@ static int cmp(Timer *t1, Timer *t2) {
 
 HEAP(Timer*, 10, cmp, block_timer)
 
+/**
+   hang up the process by not sending response message
+   until the time is up
+ */
 int kwait(Msg *m) {
     Timer *t = kmalloc(sizeof(Timer));
     if (t == NULL) {
@@ -43,6 +47,9 @@ int kwait(Msg *m) {
     return 1;
 }
 
+/**
+   IRQ of timer
+ */
 void update_timer() {
     // check if any timer is finished
     if (block_timer_empty()) {
@@ -50,10 +57,12 @@ void update_timer() {
     }
     Timer *t;
     Msg m;
-    // using current->pid is wrong, for current is not fixed
+    // using current->pid is wrong, because this is a interrupt
+    // handler so current is not fixed
     m.src = TIMER;
     while (!block_timer_empty() && (t = block_timer_max())->time == 1) {
         block_timer_pop_max();
+        // send a message with no useful message
         send(t->pid, &m);
         kfree(t);
     }

@@ -14,7 +14,8 @@ extern PCB* current;
    并填写页表项.
    FM需要把程序加载到这些物理页面中,
    使得将来用户进程运行的时候, 能够通过我们填写的页目录和页表, 找到一些物理页面, 同时这些物理页面中正好包含着程序的内容, 这样用户进程才能正确运行, 否则将会抛出异常.
-   填写页目录项和页表项分别使用make_pde()函数和make_pte()函数, 它们都在src/kernel/memory/util.c中定义, 你可以在src/kernel/memory/kvm.c中参考内核启动分页机制的过程.
+   填写页目录项和页表项分别使用make_pde()函数和make_pte()函数, 它们都在src/kernel/memory/util.c中定义,
+   你可以在src/kernel/memory/kvm.c中参考内核启动分页机制的过程.
    内核映像占用0xc0000000及以上的虚拟地址, 我们只需要让相应的页目录项指向相应的内核页表就可以了, 无须为内核映像重新分配页表.
 
    allocate new virtual page to a process
@@ -37,7 +38,7 @@ int init_va(Msg* m) {
 	uint32_t pdir_idx, ptable_idx;
     //pdir_idx = off >> 22;
     //ptable_idx = (off >> 12) & 0x3ff;
-    // TODO @see seg_free to simplify this loop
+    // TODO @see seg_free to simplify this loop: off + page_size?
     for (; off < m->offset + m->len; off++) {
         pdir_idx = off >> 22;
         ptable_idx = (off >> 12) & 0x3ff;

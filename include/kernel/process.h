@@ -67,10 +67,10 @@ typedef struct {
     // stack of user
     uint8_t kstack[KSTACK_SIZE];
     // pid
-    int pid;
+    pid_t pid;
     PROCESS_STATE state;
-    // to be linked on a semaphore list
-    // if it is running, link must be empty
+    // to be linked on a semaphore list by P() & V()
+    // @invariant: if it is running, link must be empty
     ListHead link;
     ListHead mes;
     //Sem mes_lock;
@@ -89,6 +89,8 @@ typedef struct {
     Pri_t priority;
     // cwd path for user process
     char *cwd_path;
+    // the pid the process waiting for
+    //pid_t waiting_for;
 } PCB;
 
 extern PCB *current;
@@ -135,6 +137,8 @@ extern Sem wake_lock, sleeped_lock;
 
 
 void put_by_state(PCB *);
+
+#define INVALID_PID (PID_LIMIT+1)
 
 //#define CWD_PATH_LENGTH 32
 

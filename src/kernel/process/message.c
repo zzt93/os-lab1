@@ -110,7 +110,7 @@ void receive(pid_t src, Msg *m) {
     lock();
     printk("Msg count: %d; ", list_size(&(current->mes)) );
     NOINTR;
-    while (!has_message(current, src)) {// no such message
+    while (!has_message(current, src)) {// no requested message
         // go to sleep
         // if some thread send message to it, it will wake_up this,
         // so return from here and continue

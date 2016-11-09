@@ -145,6 +145,7 @@ PCB * kfork(Msg* m) {
     send(MM, m);
     receive(MM, m);
 
+    // TODO user process need kernel image???
     init_kernel_image(get_pdir_addr(child));
     // special handler for kernel stack and tf
     // copy just the first TrapFrame:

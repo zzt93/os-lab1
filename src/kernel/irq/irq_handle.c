@@ -4,7 +4,11 @@
 
 #define NR_IRQ_HANDLE 32
 
-/* In Nanos, there are no more than 16(actually, 3) hardward interrupts. */
+/* In Nanos, there are no more than 16(actually, 3) hardward interrupts.
+   0 -- time interrupt
+   1 -- key board interrupt
+   14 -- hard disk interrupt
+*/
 #define NR_HARD_INTR 16
 
 /* Structures below is a linked list of function pointers indicating the
@@ -22,6 +26,11 @@ struct IRQ_t {
 };
 
 static struct IRQ_t handle_pool[NR_IRQ_HANDLE];
+/**
+   prepare a linked list for every irq number
+   i.e. for same interrupt, you can register more than one
+   handler to handler it.
+ */
 static struct IRQ_t *handles[NR_HARD_INTR];
 static int handle_count = 0;
 
@@ -34,6 +43,10 @@ add_irq_handle(int irq, void (*func)(void) ) {
 	}
 	ptr = &handle_pool[handle_count ++]; /* get a free handler */
 	ptr->routine = func;
+    /*
+      if this irq number is already have some handler,
+      not to override it but to attach the next.
+     */
 	ptr->next = handles[irq]; /* insert into the linked list */
 	handles[irq] = ptr;
 }
@@ -53,11 +66,12 @@ void irq_handle(TrapFrame *tf) {
 		panic("Unhandled exception!");
 	}
 
-    if (irq == 0x80) {
+    if (irq == 0x80) {// system call int 0x80
         do_syscall(tf);
     } else if (irq < 1000) {
         printk("Stack :%x %x %x %x ", tf->eip, tf->ebp, tf->xxx, tf->esp);
         printk("error code: %x ;cr2: %x ", tf->error_code, read_cr2());
+        // TODO capture the illegal behaviour of user process and kill it
 //        if (current->type == USER) {
 //            Msg m;
 //            m.buf = current;
@@ -74,8 +88,8 @@ void irq_handle(TrapFrame *tf) {
 		int irq_id = irq - 1000;
 		assert(irq_id < NR_HARD_INTR);
 		struct IRQ_t *f = handles[irq_id];
-
-		while (f != NULL) { /* call handlers one by one */
+        /* call handlers for this irq one by one */
+		while (f != NULL) {
 			f->routine();
             NOINTR;
 			f = f->next;

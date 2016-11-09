@@ -48,7 +48,7 @@ Aug 2 2015 update:
 ## Virtual address
 The kernel's virtual address space: [0xc000 0000, 0xffff ffff]  
 The user process's virtual address space: [0x0, 0xbfff ffff]  
-[paging](docs/pic/paging.png)
+[paging](./pic/paging.png)
 
 -----------------
 

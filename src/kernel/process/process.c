@@ -32,3 +32,21 @@ int remove_process(PCB *pcb) {
     assert(pcb != NULL);
     return all_remove(pcb->pid);
 }
+
+/**
+   TODO deadlock detection: add a field in PCB for waiting process
+
+   // pid_t waiting_for;
+   when to update this field:
+   - adding to sleeped tree
+   -- send msg to some process: waiting_for = pid;
+   -- receive the msg: waiting_for = INVALID_PID
+   -- timer kwait() (covered by sending and receiving)
+   - block on process->link
+   -- P() & V()
+   - block on process->waitpid
+   -- waitpid()
+
+   check whether this make a cycle. if it make, choose a victim
+   and exit it.
+ */
