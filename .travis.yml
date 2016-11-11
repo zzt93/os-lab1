@@ -3,9 +3,12 @@ compiler:
 - gcc
 os:
 - linux
-sudo: true
-before_install:
- - sudo apt-get -qq update
- - sudo apt-get install -y python3.5
+sudo: false
+addons:
+  apt:
+    sources:
+        - deadsnakes
+    packages:
+        - python3.4
 script:
 - make hardDisk
