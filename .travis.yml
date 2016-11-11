@@ -5,6 +5,7 @@ os:
 - linux
 sudo: false
 before_install:
-- python3 --version
+ - sudo apt-get -qq update
+ - sudo apt-get install -y python3
 script:
 - make hardDisk
