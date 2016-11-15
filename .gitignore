@@ -18,3 +18,4 @@ log
 
 harddisk/__pycache__/
 harddisk/hard_disk
+*pyc

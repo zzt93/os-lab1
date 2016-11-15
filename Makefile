@@ -1,7 +1,7 @@
 CC      = gcc
 LD      = ld
 CFLAGS  = -m32 -static -ggdb -MD -Wall -Werror -I./include -O0 \
-		 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer
+		 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer -Wreturn-type
 ASFLAGS = -m32 -MD -I./include
 LDFLAGS = -melf_i386
 QEMU    = qemu-system-i386
@@ -30,7 +30,7 @@ kernel: $(OBJS)
 	readelf -a kernel > elf.txt		# obtain more information about the executable
 
 harddisk.img: disk.img
-	python3 harddisk/makeimg.py
+	python harddisk/makeimg.py
 	cat harddisk/harddisk disk.img > disk.img
 
 -include $(OBJS:.o=.d)
@@ -38,6 +38,8 @@ harddisk.img: disk.img
 clean:
 	@cd boot; make clean
 	rm -f kernel disk.img $(OBJS) $(OBJS:.o=.d)
+
+rebuild: clean
 	make disk.img
 
 user_pro: lib_comp

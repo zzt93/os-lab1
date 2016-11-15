@@ -1,9 +1,9 @@
 
 run:
-	python3 getsize.py | bash -x -e update_super_block.sh
+	python getsize.py | bash -x -e update_super_block.sh
 
 newimg:
-	python3 makeimg.py
+	python makeimg.py
 
 catimg:
 	cat ../disk.img hard_disk > harddisk.img
