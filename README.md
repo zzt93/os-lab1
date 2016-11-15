@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/zzt93/os-lab1.svg?branch=dev-sound)](https://travis-ci.org/zzt93/os-lab1)
+
 # os-lab1
 os-lab1
 
