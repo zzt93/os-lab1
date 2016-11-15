@@ -64,7 +64,7 @@ void memcpy(void *dest, const void *src, size_t size) {
    str = "abc" -- len = 3
  */
 size_t strlen(const char *str) {
-	int len = 0;
+	size_t len = 0;
 	while (*str ++) len ++;
 	return len;
 }

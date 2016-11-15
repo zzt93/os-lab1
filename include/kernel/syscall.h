@@ -93,7 +93,7 @@ int delfile(const char *name);
 int deldir(const char *name);
 // name(with path)
 int listdir(const char *name, char *buf, int len);
-int chdir(const char *name);
+int chdir(const char *path);
 int print_cwd_path();
 
 int timer_start(int seconds);
