@@ -3,8 +3,11 @@ compiler:
 - gcc
 os:
 - linux
-sudo: false
+sudo: true
+
 before_install:
-- which python3
+- sudo pip install enum34
+
 script:
 - make hardDisk
+
