@@ -6,9 +6,6 @@ os:
 sudo: true
 
 before_install:
-- sudo apt-get -qq update
-- sudo apt-get install -y python3
-- python3 --version
 - sudo pip install enum34
 
 script:
