@@ -2,16 +2,8 @@
 #include "sys_call/io/io.h"
 #include "lib/string.h"
 #include "error.h"
+#include "shell.h"
 
-
-#define BUF_SZ 256
-// one for command itself
-#define MAX_PARAMETER_NR (10 + 1)
-//#define NAME_LEN 32
-
-const char const * CD = "cd";
-const char const * PWD = "pwd";
-//char *user_name[NAME_LEN] = "zzt@os-lab: ";
 
 bool check_args_num(int real, int target) {
     if (real == target) {
@@ -63,7 +55,7 @@ int entry() {
         // TODO check file existence and whether it is executable -- many be checked by exec
 		// TODO add redirect: <, >, 2>, &>, >>
         // TODO add pipe
-        if((pid = fork()) == 0) {
+        if((pid = fork()) == 0) {// child process go this way
 			// no thread will receive the response of exec, so it failure should be known by waitpid
             int res;
             if (count == 1) {
@@ -77,7 +69,7 @@ int entry() {
                 filename,
                 get_err_msg(res));
         }
-        else {
+        else {// father wait here
 			// if exec fail, waitpid will fail
             res = waitpid(pid);
             if (res != SUCC) {

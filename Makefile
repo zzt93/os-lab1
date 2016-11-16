@@ -48,3 +48,6 @@ user_pro: lib_comp
 lib_comp:
 	@cd user_program; make systemcall
 
+test: hardDisk
+	bash test_press_key.sh
+	bash repeat.sh

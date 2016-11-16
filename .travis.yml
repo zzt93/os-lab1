@@ -7,7 +7,9 @@ sudo: true
 
 before_install:
 - sudo pip install enum34
+- sudo apt-get install qemu-system-i386
 
 script:
-- make hardDisk
+- make user_pro
+- make test
 

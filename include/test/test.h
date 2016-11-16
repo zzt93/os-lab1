@@ -8,6 +8,7 @@
 #include "test_file.h"
 #include "test_math.h"
 
+void test();
 
 void test_list_entry();
 void test_tree();

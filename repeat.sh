@@ -1,8 +1,8 @@
 #!/bin/bash
 
 logfile=log
-maxrun=0	# Run qemu for $maxrun times. When this value is 0, qemu will run forever (use ctrl+C to stop running).
-timeinterval=1	# Each run lasts for $timeinterval second.
+maxrun=10	# Run qemu for $maxrun times. When this value is 0, qemu will run forever (use ctrl+C to stop running).
+timeinterval=10	# Each run lasts for $timeinterval second.
 i=1
 
 function die {
@@ -38,7 +38,7 @@ do
     elif [ $i == $maxrun ]
     then
         die '\n\033[1;31mReach maximal run!\033[0m'
-    elif [ $(grep -c 'Now: current is #0' $logfile) -ge 20 ]
+    elif [ $(grep -c 'timer pid: #1, device id: #0' $logfile) -ge 2 ]
     then
         die '\n\033[1;31mMysterious repetition is detected!\033[0m'
     fi

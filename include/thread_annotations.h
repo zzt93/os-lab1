@@ -58,7 +58,7 @@
 #endif
 
 #ifndef NOT_THREAD_SAFE
-#define NOT_THREAD_SAFE
+#define NOT_THREAD_SAFE(...)
 #endif
 
 #ifndef THREAD_SAFE

@@ -24,3 +24,12 @@ sendkey 3
 sendkey 4
 sendkey 5
 sendkey ret
+sendkey e
+sendkey x
+sendkey i
+sendkey t
+sendkey ret
+sendkey p
+sendkey w
+sendkey d
+sendkey ret

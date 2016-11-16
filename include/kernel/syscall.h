@@ -78,7 +78,8 @@ int using_edf();
 int prompt();
 
 // FM related system call
-int open(int filename); // return file descriptor
+//int open(int filename); // return file descriptor
+int open(const char *name); // return file descriptor
 int read(int fd, uint8_t *buf, int len);
 int write(int fd, uint8_t *buf, int len);
 int close(int fd);
@@ -88,12 +89,12 @@ int dup2(int oldfd, int newfd);
 
 // hierarchy file system call
 int createfile(const char *name);
-int makedir(const char *name);
+int makedir(const char *dir);
 int delfile(const char *name);
-int deldir(const char *name);
+int deldir(const char *dir);
 // name(with path)
-int listdir(const char *name, char *buf, int len);
-int chdir(const char *path);
+int listdir(const char *dir, char *buf, int len);
+int chdir(const char *dir);
 int print_cwd_path();
 
 int timer_start(int seconds);

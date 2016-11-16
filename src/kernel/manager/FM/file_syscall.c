@@ -149,6 +149,8 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
             name[last_slash] = '\0';
             if (name[last_slash + 1] == '\0') {
                 // e.g. make a directory: /media/
+                // TODO use simplified path invalidate this occasion
+                // assert(false);
                 if (type == NODE_PLAIN) {
                     return FAIL;
                 }
@@ -157,7 +159,7 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
                 name[last_slash] = '\0';
             }
 
-            // get the node offset of directory this file resides
+            // get the node offset of directory which this file resides
             dir = file_path(cwd, name);
         }
         filename = name + last_slash + 1;
