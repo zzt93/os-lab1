@@ -6,7 +6,7 @@
 
 #include "sys_call/io/out.h"
 
-#define BUF_SZ 128
+#define ARGS_MAX_LEN 128
 
 int init_p;
 
@@ -53,7 +53,7 @@ int entry(char *args) {
     int len = strlen(args);
     int count;
     char *save[NUM_TASKS * 2] = {0};
-    char copy[BUF_SZ];
+    char copy[ARGS_MAX_LEN];
     memcpy(copy, args, len);
     count = split(copy, ' ', save);
     if (count != NUM_TASKS * 2) {

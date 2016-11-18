@@ -18,15 +18,15 @@ bool check_args_num(int real, int target) {
 }
 
 int entry() {
-    char cmd[BUF_SZ], copy[BUF_SZ];
+    char cmd[ONE_CMD_MAX_LEN], copy[ONE_CMD_MAX_LEN];
     char *save[MAX_PARAMETER_NR] = {0};
     char *filename = NULL;
     int pid, count, res;
     while(1) {
         prompt();
-        memset(cmd, 0, BUF_SZ);
-        read_line(cmd, BUF_SZ);
-        memcpy(copy, cmd, BUF_SZ);
+        memset(cmd, 0, ONE_CMD_MAX_LEN);
+        read_line(cmd, ONE_CMD_MAX_LEN);
+        memcpy(copy, cmd, ONE_CMD_MAX_LEN);
         count = split(copy, ' ', save);
         user_assert(MAX_PARAMETER_NR >= count);
         if (count < 1) {
