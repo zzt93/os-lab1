@@ -22,6 +22,8 @@ typedef struct {
 
 #define MAX_DIR_DEPTH 16
 
+#define MAX_PATH_LEN (MAX_DIR_DEPTH * sizeof(Dir_entry))
+
 extern const char *const current_dir;
 extern const char *const father_dir;
 extern const char *const default_cwd_name;

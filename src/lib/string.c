@@ -120,3 +120,22 @@ int find_char(const char *str, int ith, char aim) {
 bool str_empty(const char * str) {
     return *str == '\0';
 }
+
+/**
+ * compare two string at most len bytes, if either string's size is smaller than len
+ * stop at min {len(f), len(s)}
+ * @param f
+ * @param s
+ * @param len
+ * @return
+ */
+int strncmp(const char* f, const char* s, size_t len) {
+    size_t i = 0;
+    while (f[i] == s[i] && f[i] != '\0') {
+        i++;
+        if (i == len) {
+            return 0;
+        }
+    }
+    return f[i] - s[i];
+}

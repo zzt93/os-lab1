@@ -64,6 +64,7 @@ void test() {
     test_heap();
     */
     initBaseDirForTest();
+    test_simplify_path();
     read_ram_write_disk();
 }
 

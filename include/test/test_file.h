@@ -23,4 +23,6 @@ void test_lseek();
 void test_read_write();
 void read_ram_write_disk();
 
+void test_simplify_path();
+
 #endif /* __TEST_FILE_H__ */

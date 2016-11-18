@@ -1,3 +1,4 @@
+#include <kernel/kernel.h>
 #include "kernel/message.h"
 #include "drivers/hal.h"
 #include "kernel/process.h"
@@ -398,16 +399,10 @@ int list_dir(Msg *m) {
     }
 }
 
-int is_absolute_path(const char *path) {
-    if (path[0] == '/') {
-        return true;
-    }
-    return false;
-}
 
 int ch_dir(Msg *m) {
     PCB *aim = (PCB *)m->buf;
-    const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
+    const char *name = simplify_path(aim->cwd_path,(const char *)get_pa(&aim->pdir, m->dev_id));
     // if not specify the list name,
     // using default file path -- current working directory node_off
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
@@ -424,6 +419,7 @@ int ch_dir(Msg *m) {
             free_cwd_path(aim);
             set_cwd_path(aim, name);
         } else {
+            assert(false);
             append_cwd_path(aim, name);
         }
     }

@@ -1,3 +1,4 @@
+#include <kernel/kernel.h>
 #include "kernel/message.h"
 #include "kernel/process.h"
 #include "kernel/manager/fd.h"
@@ -26,8 +27,9 @@ FDE * get_fde(PCB *aim, int i) {
  */
 int open_file(Msg *m) {
     PCB *aim = (PCB *)m->buf;
-    PCB *has_name = (PCB *)m->req_pid;
-    char *name = (char *)get_pa(&has_name->pdir, m->dev_id);
+    PCB *own_name = (PCB *)m->req_pid;
+    const char *name = simplify_path(own_name->cwd_path,
+                                     (const char *) get_pa(&own_name->pdir, m->dev_id));
     if (invalid_filename(name)) {
         m->ret = INVALID_FILENAME;
         return INVALID_FD_I;

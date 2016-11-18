@@ -11,6 +11,7 @@ size_t strlen(const char *);
 void strcpy(char *d, const char *s);
 
 int strcmp(const char* f, const char* s);
+int strncmp(const char* f, const char* s, size_t len);
 int is_letter(char);
 char to_upper(char);
 
