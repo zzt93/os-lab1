@@ -30,7 +30,7 @@ int open_file(Msg *m) {
     PCB *own_name = (PCB *)m->req_pid;
     const char *name = simplify_path(own_name->cwd_path,
                                      (const char *) get_pa(&own_name->pdir, m->dev_id));
-    if (invalid_filename(name)) {
+    if (null_filename(name)) {
         m->ret = INVALID_FILENAME;
         return INVALID_FD_I;
     }

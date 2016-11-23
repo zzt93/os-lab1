@@ -30,12 +30,15 @@ int is_absolute_path(const char *path) {
  * <li>remove redundant "/"</li>
  * <li>remove "." ".."</li>
  *
- * @param path
+ * @param path no space in it
  * @return simplified path accroding to rules -- always be an **absolute path**
  */
 const char *simplify_path(const char *cwd, const char *path)
 NOT_THREAD_SAFE("assume only one thread invoke it") {
-
+    if (path == NULL) {
+        return path;
+    }
+    assert(cwd != NULL);
     if (!is_absolute_path(path)) { // relative path
         size_t len = strlen(cwd);
         void *tmp_path = kmalloc(len);

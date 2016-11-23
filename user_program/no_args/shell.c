@@ -59,6 +59,7 @@ int entry() {
 			// no thread will receive the response of exec, so it failure should be known by waitpid
             int res;
             if (count == 1) {
+                // for example: `ls `
                 res = exec(filename, "");
             } else {
                 res = exec(filename, save[1] - copy + cmd);
