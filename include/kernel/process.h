@@ -28,7 +28,7 @@ typedef enum {
 
 static inline
 bool invalid_fd_i(int fd) {
-    return fd > PROCESS_MAX_FD || fd < 0;
+    return fd >= PROCESS_MAX_FD || fd < 0;
 }
 
 
