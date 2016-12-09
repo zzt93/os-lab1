@@ -122,4 +122,4 @@ dynamic allocated bit map( using kmalloc)
 ### TODO
 - load program when it needs -- 缺页
 - command: mkdir, rm, touch, >, vi
-- network: tcp/ip, socket -- ping, 
+- network: tcp/ip, socket -- ping, traceroute
