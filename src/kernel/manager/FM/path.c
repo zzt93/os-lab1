@@ -41,9 +41,10 @@ NOT_THREAD_SAFE("assume only one thread invoke it") {
     assert(cwd != NULL);
     if (!is_absolute_path(path)) { // relative path
         size_t len = strlen(cwd);
-        void *tmp_path = kmalloc(len);
+        size_t plen = strlen(path) + 1;
+        void *tmp_path = kmalloc(len + plen);
         memcpy(tmp_path, cwd, len);
-        memcpy(tmp_path + len, path, +strlen(path) + 1);
+        memcpy(tmp_path + len, path, plen);
         return simplify_absolute_path(tmp_path);
     }
     return simplify_absolute_path(path);
