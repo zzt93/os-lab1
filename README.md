@@ -123,3 +123,8 @@ dynamic allocated bit map( using kmalloc)
 - load program when it needs -- 缺页
 - command: mkdir, rm, touch, >, vi
 - network: tcp/ip, socket -- ping, traceroute
+  - loopback interface
+  - driver code
+  - kernel code: protocol impl
+  - system call
+  - command: ping, traceroute
