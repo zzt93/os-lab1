@@ -42,10 +42,19 @@ NOT_THREAD_SAFE("assume only one thread invoke it") {
     if (!is_absolute_path(path)) { // relative path
         size_t len = strlen(cwd);
         size_t plen = strlen(path) + 1;
-        void *tmp_path = kmalloc(len + plen);
+        char _path_buf[MAX_PATH_LEN];
+        void *tmp_path = _path_buf;
+        if (len + plen > MAX_PATH_LEN) {
+            tmp_path = kmalloc(len + plen);
+        }
+
         memcpy(tmp_path, cwd, len);
         memcpy(tmp_path + len, path, plen);
-        return simplify_absolute_path(tmp_path);
+        const char *absolute_path = simplify_absolute_path(tmp_path);
+        if (_path_buf != tmp_path) {
+            kfree(tmp_path);
+        }
+        return absolute_path;
     }
     return simplify_absolute_path(path);
 }

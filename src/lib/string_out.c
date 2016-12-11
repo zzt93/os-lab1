@@ -16,14 +16,22 @@ int to_int(char *str) {
 }
 
 /**
-   - This function is thread safe
-   - it will change the delimiter in the string to '\0'
-   - this function can't work for const string
-   str -- point to string
-   delimiter -- the delimiter char
-   saveptr -- the pointer array store each part
+    - this function is thread safe
+    - it will change the delimiter in the string to '\0'
+    - this function can't work for const string
+    - this function skip leading delimiter, but not trailing delimiter
 
-   return: how many parts are splited
+    @arg str -- point to string
+    @arg delimiter -- the delimiter char
+    @arg saveptr -- the pointer array store each part
+
+    e.g.
+    "/afd/asd/" -- ["afd", "asd"]
+    "//sdf/sdf//" -- ["sdf", "sdf", ""]
+
+
+    @return: how many parts are splited
+    tested by test_string.c#test_split
  */
 int split(char *str, char delimiter, char **saveptr) {
     // skip heading delimiter

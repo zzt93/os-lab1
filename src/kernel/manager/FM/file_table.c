@@ -103,7 +103,7 @@ void init_file_table() {
     // set to a directory -- now is root
     // read it from disk
     // TODO using "/" as default cwd for the time being
-    inode_t aim = file_path(0, default_cwd_name);
+    inode_t aim = file_nodeoff(0, default_cwd_name);
     assert(aim == inode_start);
     iNode node;
     n_dev_read(now_disk, FM, (char *)&node, aim, sizeof node);

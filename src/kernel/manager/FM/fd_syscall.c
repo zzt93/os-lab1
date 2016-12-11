@@ -17,7 +17,14 @@ FDE * get_fde(PCB *aim, int i) {
     return aim->fd_table + i;
 }
 
-
+/**
+   check whether file exist by checking node offset with
+   inode area's start
+ */
+static inline
+int file_exist(inode_t off) {
+    return off >= inode_start && off < inode_start + inode_area_size;
+}
 /**
    TODO how to handle link file:
 
@@ -35,8 +42,8 @@ int open_file(Msg *m) {
         return INVALID_FD_I;
     }
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
-    uint32_t node_off = file_path(cwd, name);
-    if (node_off < inode_start) {
+    uint32_t node_off = file_nodeoff(cwd, name);
+    if (!file_exist(node_off)) {
         m->ret = node_off;
         return INVALID_FD_I;
     }

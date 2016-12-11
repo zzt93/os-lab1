@@ -5,7 +5,7 @@
 #include "test/test.h"
 #include "const.h"
 
-void initBaseDirForTest();
+void init_base_dir_for_test();
 
 void test_printk() {
     /*
@@ -63,12 +63,12 @@ void test() {
     test_nb_timer();
     test_heap();
     */
-    initBaseDirForTest();
+    init_base_dir_for_test();
     test_simplify_path();
     read_ram_write_disk();
 }
 
-void initBaseDirForTest() {
+void init_base_dir_for_test() {
     test_list(NULL);
     test_mkdir();
     //test_deldir();

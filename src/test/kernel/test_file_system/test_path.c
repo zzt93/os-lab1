@@ -22,13 +22,13 @@ static char *result[] = {
 
 static char *relative[] = {
         "../.././...//a/",
-        "zzt/./he/.."
+        "zzt/./he/..",
         "zzt/./he/a/.."
 };
 
 static char *result2[] = {
         "/.../a",
-        "/home/zzt"
+        "/home/zzt",
         "/home/zzt/he"
 };
 

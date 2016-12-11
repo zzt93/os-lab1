@@ -45,7 +45,7 @@ bool filename_too_long(const char *name) {
     return strlen(name) >= MAX_FILENAME_LEN;
 }
 
-inode_t file_path(inode_t cwd, const char * const name);
+inode_t file_nodeoff(inode_t cwd, const char *const name);
 
 #include "kernel/message.h"
 

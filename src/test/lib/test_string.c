@@ -43,3 +43,7 @@ void test_string() {
         assert(index[in] == in);
     }
  }
+
+void test_split() {
+
+}
