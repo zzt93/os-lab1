@@ -1,7 +1,7 @@
 CC      = gcc
 LD      = ld
 CFLAGS  = -m32 -static -ggdb -MD -Wall -Werror -I./include -O0 \
-		 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer -Wreturn-type
+		 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer -Wreturn-type -std=c99
 ASFLAGS = -m32 -MD -I./include
 LDFLAGS = -melf_i386
 QEMU    = qemu-system-i386
