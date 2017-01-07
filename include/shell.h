@@ -12,8 +12,8 @@
 //#define NAME_LEN 32
 
 // shell built-in command/program
-const char const * CD = "cd";
-const char const * PWD = "pwd";
+static const char const * CD = "cd";
+static const char const * PWD = "pwd";
 //char *user_name[NAME_LEN] = "zzt@os-lab: ";
 
 

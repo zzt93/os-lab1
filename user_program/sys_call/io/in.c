@@ -1,5 +1,4 @@
 #include "kernel/syscall.h"
-#include "shell.h"
 
 
 int read_line(char *str, int capacity) {

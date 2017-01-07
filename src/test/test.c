@@ -63,6 +63,7 @@ void test() {
     test_nb_timer();
     test_heap();
     */
+    test_split();
     init_base_dir_for_test();
     test_simplify_path();
     read_ram_write_disk();

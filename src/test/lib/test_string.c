@@ -22,10 +22,10 @@ void test_string() {
 
     // test find_char
     char *path[] = {
-        "/a/b/c/d",
-        "./a/b/c/d",
-        "../a/b/c/d",
-        "aaa/b/c/d"
+            "/a/b/c/d",
+            "./a/b/c/d",
+            "../a/b/c/d",
+            "aaa/b/c/d"
     };
     int index[ARR_LEN(path)];
     int in;
@@ -42,8 +42,34 @@ void test_string() {
     for (in = 0; in < ARR_LEN(path); in++) {
         assert(index[in] == in);
     }
- }
+}
+
+static char *paths[] = {
+        "b",
+        "as/b",
+        "sdf//b",
+        "zzt/./he/b",
+        "zzt/./he/a/b",
+        "/home/zzt/./he/../b"
+        "../.././...//a/b",
+        "/../.././...//a/b",
+};
 
 void test_split() {
+    char *save[64] = {0};
+    for (int i = 0; i < sizeof(paths) / sizeof(paths[0]); ++i) {
+        int r = split(paths[i], '/', save);
+        assert(r == i + 1);
+        assert(save[i] != NULL);
+        assert(strcmp(save[i], "b") == 0);
+    }
+}
 
+void test_trim() {
+    char *strings[] = {
+            "", " ", " a", "a ", " a "
+    };
+    for (int i = 0; i < sizeof(strings)/ sizeof(strings[0]); ++i) {
+
+    }
 }

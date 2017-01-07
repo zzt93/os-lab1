@@ -8,7 +8,7 @@
 #define MAX_PARAMETER_NR (10 + 1)
 //#define NAME_LEN 32
 
-const char const * CD = "cd";
+static const char const * CD = "cd";
 //char *user_name[NAME_LEN] = "zzt@os-lab: ";
 
 int entry() {
