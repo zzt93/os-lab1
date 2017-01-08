@@ -18,7 +18,6 @@ void test_d_bit_map();
 void test_heap();
 
 void test_string();
-void test_split();
 
 void test_page_alloc();
 

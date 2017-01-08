@@ -1,4 +1,4 @@
-#include "kernel/syscall.h"
+#include "c_lib.h"
 
 
 int read_line(char *str, int capacity) {

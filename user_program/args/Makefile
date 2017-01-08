@@ -9,7 +9,7 @@ LDFLAGS = -melf_i386 -e _start
 CFILES  = $(shell find ./ -maxdepth 1 -name "*.c")
 SFILES  = $(shell find ./ -maxdepth 1 -name "*.S")
 SYS		= $(shell find ../sys_call/ -name "*.o")
-LIB     = ../../src/lib/string_out.o ../../src/lib/math.o ../../src/kernel/manager/error.o ../start.o
+LIB     = ../../src/user_c_lib/*.o ../../src/kernel/manager/error.o ../start.o
 OBJS    = $(CFILES:.c=.out) $(SFILES:.S=.out)
 ARRAYS  = $(OBJS:.out=.ar)
 

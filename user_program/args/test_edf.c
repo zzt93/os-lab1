@@ -1,9 +1,4 @@
-#include "kernel/syscall.h"
-
-#include "lib/string.h"
-#include "lib/math.h"
-
-
+#include "c_lib.h"
 #include "sys_call/io/out.h"
 
 #define ARGS_MAX_LEN 128
@@ -54,6 +49,7 @@ int entry(char *args) {
     int count;
     char *save[NUM_TASKS * 2] = {0};
     char copy[ARGS_MAX_LEN];
+    u_assert(args[0] != ' ', "should not start with space: %s\n", args);
     memcpy(copy, args, len);
     count = split(copy, ' ', save);
     if (count != NUM_TASKS * 2) {

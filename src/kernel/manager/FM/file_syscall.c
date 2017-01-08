@@ -83,7 +83,7 @@ inode_t file_nodeoff(inode_t cwd, const char *const name) {
     // this assume root is always the first
     // inode of my file system
     inode_t node_off = inode_start;
-    if (name[0] != '/') {// an relative path -- impossible now
+    if (name[0] != '/') {// an relative path -- impossible after simplify path
         assert(false);
         // i.e., set node_off as cwd's node
         node_off = cwd;
@@ -94,7 +94,9 @@ inode_t file_nodeoff(inode_t cwd, const char *const name) {
     char path[len];
     memcpy(path, name, len);
 
-    int parts = split(path, '/', save);
+    assert(path[0] == '/');
+    // to skip the first '/' so make split easier
+    int parts = split(path + 1, '/', save);
     assert(parts <= MAX_DIR_DEPTH);
     int i;
     for (i = 0; i < parts; i++) {

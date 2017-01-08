@@ -13,6 +13,15 @@ OBJS    = $(CFILES:.c=.o) $(SFILES:.S=.o)
 run: hardDisk
 	$(QEMU) -no-shutdown -serial stdio -soundhw pcspk harddisk/harddisk.img
 
+OBJS: replaceBinary
+
+replaceBinary: user_pro
+	mv ./src/drivers/ramdisk/ram.c ram.c
+	sed 's/\/\*\(user_program\/[^*]*\)\*\//tail -n+2 \1 | head -n-2/e' <ram.c >./src/drivers/ramdisk/ram.c
+
+replaceBack:
+	mv ram.c ./src/drivers/ramdisk/ram.c
+
 debug: hardDisk
 	gnome-terminal -e "bash -c \"gdb -s kernel; exec bash\""
 	$(QEMU) -serial stdio -s -S harddisk/harddisk.img
@@ -26,8 +35,8 @@ disk.img: kernel
 
 kernel: $(OBJS)
 	$(LD) $(LDFLAGS) -e os_init -Ttext 0xC0100000 -o kernel $(OBJS)
-	objdump -D kernel > code.txt	# disassemble result
-	readelf -a kernel > elf.txt		# obtain more information about the executable
+	objdump -D kernel > test/debug/code.txt	# disassemble result
+	readelf -a kernel > test/debug/elf.txt		# obtain more information about the executable
 
 harddisk.img: disk.img
 	python harddisk/makeimg.py
@@ -50,5 +59,5 @@ lib_comp:
 	@cd user_program; make systemcall
 
 test: hardDisk
-	bash test_press_key.sh
-	bash repeat.sh
+	bash test/test_press_key.sh
+	bash test/repeat.sh

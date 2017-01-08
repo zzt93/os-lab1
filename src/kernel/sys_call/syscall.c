@@ -140,7 +140,7 @@ void do_syscall(TrapFrame *tf) {
                 // arguments address
                 m.buf = (void *)tf->ecx;
                 break;
-            case SYS_ram_exec:
+            case SYS_ram_exec: // execute binary executable in kernel code/memory
                 m.type = PM_ram_exec;
                 // file name -- int
                 m.i[0] = tf->ebx;
@@ -241,6 +241,15 @@ void do_syscall(TrapFrame *tf) {
                 send(TTY, &m);
                 receive(TTY, &m);
                 tf->eax = m.ret;
+                break;
+            case SYS_assert:
+                // print error message
+                kprintf((const char *)tf->ebx, (void **)tf->ecx);
+                // then exit
+                m.type = PM_exit;
+                // current PCB*
+                m.buf = current;
+                send(PM, &m);
                 break;
             case SLEEP:
                 break;

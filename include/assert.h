@@ -22,6 +22,5 @@
 } while(0)
 
 // TODO implement by system call
-void user_assert(const char *, ...);
 
 #endif

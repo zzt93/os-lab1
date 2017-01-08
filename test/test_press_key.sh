@@ -1,10 +1,10 @@
 #!/bin/sh
 
-logfile=log
+logfile=logs/press_log
 initinterval=1	# wait $initinterval second after qemu starts before sending keys
 keyinterval=0.1	# send a key after for $keyinterval second.
 maxrun=10		# Run qemu for $maxrun times. When this value is 0, qemu will run forever (use ctrl+C to stop running).
-fifo=fifo #monitor-fifo
+fifo=logs/fifo #monitor-fifo
 cmdfile=cmd	#file containing strings to send to qemu
 i=1
 

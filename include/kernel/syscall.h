@@ -11,6 +11,8 @@ void do_syscall(TrapFrame*);
    Add new type system call may need to make clean
    the user program and update with new enum number
    of system call id.
+   Or, the system call id in code binary in ram.c may not match
+   with system call distribution, causing trouble.
  */
 enum {
     SYS_create,
@@ -54,8 +56,10 @@ enum {
     SYS_wait_timer,
     SYS_timer_start,
     SYS_timer_finished,
-    // put prompt -- user name/ prompt
+    // put prompt -- user name/cwd prompt
     SYS_prompt,
+    SYS_assert,
+    // in order to unite all form of context switch
     // for int 0x80 in sleep method
     // @see ./src/kernel/process/schedule.c
     SLEEP,
@@ -101,5 +105,7 @@ int timer_start(int seconds);
 int timer_finished();
 int set_timer(int seconds);
 int wait_timer();
+
+int user_assert(int expr, const char *format, ...);
 
 #endif /* __SYSCALL_H__ */

@@ -1,7 +1,4 @@
-#include "kernel/syscall.h"
 #include "sys_call/io/io.h"
-#include "lib/string.h"
-#include "error.h"
 #include "shell.h"
 
 
@@ -26,9 +23,10 @@ int entry() {
         prompt();
         memset(cmd, 0, ONE_CMD_MAX_LEN);
         read_line(cmd, ONE_CMD_MAX_LEN);
+        u_assert(cmd[0] != ' ', "should not start with space: %s\n", cmd);
         memcpy(copy, cmd, ONE_CMD_MAX_LEN);
         count = split(copy, ' ', save);
-        user_assert(MAX_PARAMETER_NR >= count);
+        u_assert(MAX_PARAMETER_NR >= count, "%d\n", count);
         if (count < 1) {
             printf("Unknown command: %s\n", cmd);
             continue;

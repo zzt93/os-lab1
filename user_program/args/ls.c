@@ -1,7 +1,5 @@
 #include "sys_call/io/out.h"
-#include "kernel/manager/f_dir.h"
-#include "kernel/syscall.h"
-#include "error.h"
+#include "c_lib.h"
 
 #define LS_NAME_MAX_LEN 512
 

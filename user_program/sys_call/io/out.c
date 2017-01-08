@@ -1,4 +1,4 @@
-#include "kernel/syscall.h"
+#include "c_lib.h"
 
 int print_serial(const char *ctl) {
 	return syscall(SYS_print_serial, ctl);
