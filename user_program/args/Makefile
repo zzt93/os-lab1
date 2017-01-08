@@ -20,9 +20,11 @@ compile: $(OBJS)
 
 $(OBJS): %.out : %.o
 	$(LD) $(LDFLAGS) -o $@ $< $(LIB) $(SYS)
-	objdump -D $@ > $(subst out,dump,$@)
-	readelf -a $@ > $(subst out,elf,$@)
 	xxd -c 4 -s 0 -i $@ > $(subst out,ar,$@)
 
+debug: compile
+	objdump -D $@ > debug/$(subst out,dump,$@)
+	readelf -a $@ > debug/$(subst out,elf,$@)
+
 clean:
-	rm -f $(OBJS) $(CFILES:.c=.o) $(CFILES:.c=.d)
+	rm -f $(OBJS) $(CFILES:.c=.o) $(CFILES:.c=.d) *.dump *.elf

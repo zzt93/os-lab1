@@ -16,6 +16,9 @@ static uint8_t file[NR_MAX_FILE][NR_FILE_SIZE] = {
     {
             /*user_program/args/exit.ar*/
     },
+    {
+            /*user_program/args/echo.ar*/
+    },
 };
 static uint8_t *disk = (void*)file;
 
