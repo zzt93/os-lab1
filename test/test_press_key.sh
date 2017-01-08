@@ -1,11 +1,11 @@
 #!/bin/sh
 
-logfile=logs/press_log
+logfile=test/logs/press_log
 initinterval=1	# wait $initinterval second after qemu starts before sending keys
 keyinterval=0.1	# send a key after for $keyinterval second.
 maxrun=10		# Run qemu for $maxrun times. When this value is 0, qemu will run forever (use ctrl+C to stop running).
-fifo=logs/fifo #monitor-fifo
-cmdfile=cmd	#file containing strings to send to qemu
+fifo=test/logs/fifo #monitor-fifo
+cmdfile=test/cmd	#file containing strings to send to qemu
 i=1
 
 function sendkey {
@@ -70,7 +70,7 @@ fi
 while true; do
 	echo -e "\nstart the ${i}th test..."
 
-	> $fifo
+	> $fifo # clear file content
 	tail -f $fifo | qemu-system-i386 -serial file:$logfile -monitor stdio harddisk/harddisk.img 2>> $logfile &
 	sleep $initinterval
 

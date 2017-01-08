@@ -1,6 +1,6 @@
 #!/bin/bash
 
-logfile=logs/log
+logfile=test/logs/log
 maxrun=10	# Run qemu for $maxrun times. When this value is 0, qemu will run forever (use ctrl+C to stop running).
 timeinterval=10	# Each run lasts for $timeinterval second.
 i=1
