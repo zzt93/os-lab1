@@ -60,6 +60,6 @@ lib_comp:
 	@cd user_program; make systemcall
 
 test: hardDisk
-	mkdir -p logs/
+	mkdir -p test/logs/
 	bash test/test_press_key.sh
 	bash test/repeat.sh

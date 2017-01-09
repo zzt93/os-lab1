@@ -10,7 +10,8 @@
 .*
 *~
 
-log
+logs/
+*.log
 
 *.elf
 *.dump

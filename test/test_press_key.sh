@@ -1,10 +1,10 @@
 #!/bin/sh
 
-logfile=test/logs/press_log
+logfile=test/logs/press.log
 initinterval=1	# wait $initinterval second after qemu starts before sending keys
 keyinterval=0.1	# send a key after for $keyinterval second.
 maxrun=10		# Run qemu for $maxrun times. When this value is 0, qemu will run forever (use ctrl+C to stop running).
-fifo=test/logs/fifo #monitor-fifo
+fifo=test/logs/fifo.log #monitor-fifo
 cmdfile=test/cmd	#file containing strings to send to qemu
 i=1
 
@@ -41,7 +41,7 @@ fi
 }
 
 function exec_cmdfile() {
-repeat=1	# modify this value if you want to execute commands in a file several times
+repeat=10	# modify this value if you want to execute commands in a file several times
 while [ $repeat != 0 ]; do
 	while read line; do
 		exec_cmd $line
