@@ -1,12 +1,12 @@
 #!/bin/bash
 
 logfile=test/logs/output.log
-maxrun=10	# Run qemu for $maxrun times. When this value is 0, qemu will run forever (use ctrl+C to stop running).
+maxrun=1	# Run qemu for $maxrun times. When this value is 0, qemu will run forever (use ctrl+C to stop running).
 timeinterval=10	# Each run lasts for $timeinterval second.
 i=1
 
 function die {
-    pkill -9 qemu
+    pkill qemu
     echo -e $1 1>&2
     stty echo
     exit $2
@@ -43,6 +43,6 @@ do
         die '\n\033[1;31mMysterious repetition is detected!\033[0m' 1
     fi
 
-    pkill -9 qemu
+    pkill qemu
     i=$((i + 1))
 done
