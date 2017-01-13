@@ -18,11 +18,11 @@ typedef enum {
 } Node_e;
 
 /**
-   if type == CHAR_DEV, node_off, filesize is meaningless
-   if type == FT_DIR, filesize if meaningless for the time being
+   if type == CHAR_DEV, `node_off`, `filesize` is meaningless
+   if type == FT_DIR, `filesize` is meaningless for the time being
 */
 typedef struct {
-    // node offset in ramdisk/disk relative to region node
+    // node offset in ramdisk/disk relative to region start
     uint32_t node_off;
     // file cursor offset relative to start of file
     int offset;
@@ -32,6 +32,10 @@ typedef struct {
     Node_e type;
     // cached value -- needing update
     uint32_t filesize;
+
+    // char file_flags; // rwxr-x---. init it use current user compared with file owner
+    // user *owner;
+    // group *own_group;
 } FTE;
 
 // max number for files that all the processes can open

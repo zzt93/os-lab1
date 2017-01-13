@@ -23,7 +23,7 @@ typedef uint32_t block_t;
 #define THI_INDIRECT (SEC_INDIRECT + 1)
 
 /**
- * inode is the abstraction of file, channel to different storage media
+ * inode is the abstraction of file storage, channel to different storage media
    Notice:
    if you add more members to Dir_entry
    remember that check whether the sizeof(Dir_entry) is
