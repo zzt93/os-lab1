@@ -132,7 +132,7 @@ const int default_file_block = 1;
    - FIXED -- add `const char *` and `memcpy`: this function change the content of name, may be changed later
  */
 static
-inode_t make_empty_file(File_e type, const char *fname, PCB *aim,
+inode_t make_empty_file(ENodeType type, const char *fname, PCB *aim,
         // the following one parameter is only useful for directory
                         inode_t *dir_off) {
     inode_t cwd = ((FTE *) aim->fd_table[CWD].ft_entry)->node_off;

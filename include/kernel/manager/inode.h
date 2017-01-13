@@ -11,7 +11,7 @@ typedef enum {
     NODE_PLAIN,
     NODE_SOFT_LINK,
     NOT_INODE,
-} File_e;
+} ENodeType;
 
 typedef uint32_t block_t;
 
@@ -41,7 +41,7 @@ struct INODE{
 	uint32_t index[FILE_LINK_NUM];
     // count of hard link
     int link_count;
-    File_e type;
+    ENodeType type;
 } __attribute__ ((__aligned__(128)));
 
 typedef struct INODE iNode;

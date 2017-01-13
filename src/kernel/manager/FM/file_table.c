@@ -55,7 +55,7 @@ FTE * add_fte(iNode *node, uint32_t node_off) {
 /**
    Add file type: fifo -- pipe, socket, character device, block device
  */
-FTE * add_special_file_to_fte(uint32_t offset, int dev_id, Node_e type) {
+FTE * add_special_file_to_fte(uint32_t offset, int dev_id, EFileType type) {
     // find the first free
     lock();
     int i = first_val(FREE);

@@ -15,7 +15,7 @@ typedef enum {
     SOCKET,
     BLOCK_DEV,
     CHAR_DEV,
-} Node_e;
+} EFileType;
 
 /**
    if type == CHAR_DEV, `node_off`, `filesize` is meaningless
@@ -29,7 +29,7 @@ typedef struct {
     // uniquely identify a device
     int dev_id;
     int ref_count;
-    Node_e type;
+    EFileType type;
     // cached value -- needing update
     uint32_t filesize;
 
