@@ -7,7 +7,8 @@ sudo: true
 
 before_install:
 - sudo pip install enum34
-- sudo apt-get install qemu kvm
+- sudo modprobe kvm-intel
+- sudo apt-get --install-suggests install qemu
 
 script:
 - make
