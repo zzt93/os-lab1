@@ -12,8 +12,9 @@ int entry(char *args) {
         for (i = 0; i < res; i++) {
             printf("%s, ", entry[i].filename);
         }
+        printf("\n");
     } else {
-        printf("%s: %s", get_err_msg(res), args);
+        printf("%s: %s\n", get_err_msg(res), args);
     }
     return res;
 }

@@ -61,6 +61,7 @@ rebuild: clean
 
 user_pro: $(LIBS)
 	@cd user_program; make
+	make -i recover
 
 
 
