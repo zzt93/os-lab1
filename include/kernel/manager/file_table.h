@@ -20,9 +20,9 @@ typedef enum {
 /**
    if type == CHAR_DEV, `node_off`, `offset`, `filesize` is meaningless
    if type == FT_DIR, `filesize` is meaningless for the time being
-   if type == SOCKET, `node_off` is a pointer to socket, `offset` & `filesize` is meaningless
+   if type == SOCKET, `node_off` is a pointer to Socket, `offset` & `filesize` is meaningless
 
-   @see socket
+   @see Socket
 */
 typedef struct {
     // node offset in ramdisk/disk relative to region start

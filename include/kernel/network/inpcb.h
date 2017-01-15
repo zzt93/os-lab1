@@ -7,11 +7,11 @@
 
 #include <netinet/in.h>
 
-typedef struct internet_protocol_control_block inpcb;
+typedef struct internet_protocol_control_block Inpcb;
 
-struct internet_protocol_control_block{
-    inpcb *inp_next;
-    inpcb *inp_prev;
+struct internet_protocol_control_block {
+    Inpcb *inp_next;
+    Inpcb *inp_prev;
     in_addr_t inp_faddr;
     in_port_t inp_fport;
     in_addr_t inp_laddr;

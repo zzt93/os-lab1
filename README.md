@@ -15,7 +15,7 @@ Try to learn os by lab
 - make  
 - qemu( I am using `qemu-system-i386` in makefile)  
 - gcc  
-`
+
 ----------------------
 
 Sep 26 2015 update:
