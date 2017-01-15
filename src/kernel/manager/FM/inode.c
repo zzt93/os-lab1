@@ -220,6 +220,7 @@ uint32_t get_block(iNode *node, int index) {
                 n_dev_write(now_disk, FM, &thi,
                     second + second_off, sizeof thi);
             } else {
+                // FIXME bug here
                 n_dev_read(now_disk, FM, &thi,
                     second + second_off, sizeof thi);
             }

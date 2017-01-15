@@ -23,7 +23,7 @@ void add_node_to_fte(FTE *fte, iNode *node, uint32_t node_off) {
     fte->dev_id = node->dev_id;
     fte->ref_count = 0;
     assert(node->type != NOT_INODE);
-    fte->type = node->type;
+    fte->type = (EFileType) node->type;
     fte->node_off = node_off;
     switch(fte->type) {
         case FT_DIR:

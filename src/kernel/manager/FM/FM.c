@@ -98,8 +98,8 @@ static void FM_job() {
                    @param m->buf -- (PCB *) process owning above name buffer and result buffer
                    @param m->len -- (int ) buffer length
                 */
-                int res = list_dir(&m);
-                SET_IF_SUCC(m, res);
+                int ls_res = list_dir(&m);
+                SET_IF_SUCC(m, ls_res);
                 break;
             }
             case FM_chdir:

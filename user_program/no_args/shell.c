@@ -36,7 +36,7 @@ int entry() {
             if (!check_args_num(count, 2)) {
                 continue;
             }
-            int res = chdir(save[1]);
+            res = chdir(save[1]);
             if (res != SUCC) {
                 printf("%s: %s\n", get_err_msg(res), save[1]);
             }
@@ -55,7 +55,6 @@ int entry() {
         // TODO add pipe
         if((pid = fork()) == 0) {// child process go this way
 			// no thread will receive the response of exec, so it failure should be known by waitpid
-            int res;
             if (count == 1) {
                 // for example: `ls `
                 res = exec(filename, "");
@@ -64,7 +63,7 @@ int entry() {
             }
             // if run to here, means fail to replace
             // the forked process, so just remind.
-            printf("No such file or not executable: %s -- %s",
+            printf("No such file or not executable: %s -- %s\n",
                 filename,
                 get_err_msg(res));
         }

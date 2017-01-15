@@ -381,6 +381,7 @@ int list_dir(Msg *m) {
     const char *name;
     if ((char *) m->dev_id == NULL) {
         node_off = cwd;
+        name = NULL;
     } else {
         name = simplify_path(aim->cwd_path,
                              (const char *) get_pa(&aim->pdir, m->dev_id));
@@ -413,6 +414,7 @@ int list_dir(Msg *m) {
         return read / sizeof(Dir_entry);
     } else {
         // not a directory, so just return it's parameter
+        assert(name != NULL);
         memcpy(buf, name, strlen(name) + 1);
         return 1;
     }

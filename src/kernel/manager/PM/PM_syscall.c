@@ -1,10 +1,9 @@
 #include "kernel/manager/PM_syscall.h"
 #include "kernel/manager/manager.h"
-#include "kernel/process.h"
 #include "lib/string.h"
 #include "lib/malloc.h"
+#include "types.h"
 
-#include "kernel/manager/fd.h"
 
 static void s_copy(PCB* src, PCB* dest) {
     dest->state = src->state;

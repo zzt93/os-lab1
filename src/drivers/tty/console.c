@@ -403,6 +403,8 @@ consl_feed(Console *c, int key) {
                 c = current_consl = ttys + key - K_F1;
             }
             break;
+        default:
+            printk(RED"\nUnknown key in console.c: %d\n"RESET, key);
     }
     consl_sync(c);
 }

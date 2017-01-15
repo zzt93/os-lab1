@@ -1,8 +1,10 @@
 #ifndef __PIPE_H__
 #define __PIPE_H__
 
+#include <types.h>
+
 #define LEN 8
-#define 256
+#define BUF_LEN 256
 
 typedef struct {
     int front, rear;

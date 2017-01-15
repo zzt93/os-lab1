@@ -44,6 +44,8 @@ readkey(void) {
 			case K_CTRL: ctrl --; break;
 			case K_ALT: alt --; break;
 			case K_CAPS: caps &= 1; break;
+			default:
+				printk(RED"\nUnknown key in keyboard.c: %d\n"RESET, code);
 		}
 	} else {// the key is pressed
 		int c = keychar[0][code];
@@ -80,6 +82,8 @@ readkey(void) {
 			case K_CTRL: ctrl ++; break;
 			case K_ALT: alt ++; break;
 			case K_CAPS: caps ++; break;
+			default:
+				printk(RED"\nUnknown key in keyboard.c: %d\n"RESET, code);
 		}
 	}
 }

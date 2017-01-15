@@ -23,7 +23,7 @@ int new_id() {
     return j + START_ID;
 }
 
-void pid_free(int pid) {
+void pid_free(pid_t pid) {
     int j = pid - START_ID;
     lock();
     assert(is_val(j, USED));

@@ -20,7 +20,7 @@ PCB* create_user_thread(
 
 int new_id();
 void set_esp(PCB *p, uint32_t esp);
-void pid_free();
+void pid_free(pid_t);
 
 static inline
 void set_pdir(PCB* p, uint32_t addr) {

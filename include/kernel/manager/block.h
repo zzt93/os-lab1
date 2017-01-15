@@ -18,7 +18,7 @@ extern uint32_t block_map_start;
 extern uint32_t block_start;
 extern uint32_t block_area_size;
 
-#define INVALID_ALLOC -1
+#define INVALID_ALLOC -1U
 
 uint32_t block_alloc();
 int block_free(uint32_t offset);
