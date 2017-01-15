@@ -55,7 +55,7 @@ FTE * add_fte(iNode *node, uint32_t node_off) {
 /**
    Add file type: fifo -- pipe, socket, character device, block device
  */
-FTE * add_special_file_to_fte(uint32_t offset, int dev_id, Node_e type) {
+FTE * add_special_file_to_fte(uint32_t offset, int dev_id, EFileType type) {
     // find the first free
     lock();
     int i = first_val(FREE);
@@ -96,6 +96,7 @@ FTE * get_fte(PCB *aim, int fd) {
 void init_file_table() {
     int dev_id = d_ttyi[NOW_TERMINAL];
     // offset for a device is meaningless?
+    // offset for char device is meaningless, but not for block device
     stdin = add_special_file_to_fte(-1, dev_id, CHAR_DEV);
     stdout = add_special_file_to_fte(-1, dev_id, CHAR_DEV);
     stderr = add_special_file_to_fte(-1, dev_id, CHAR_DEV);
@@ -103,7 +104,7 @@ void init_file_table() {
     // set to a directory -- now is root
     // read it from disk
     // TODO using "/" as default cwd for the time being
-    inode_t aim = file_path(0, default_cwd_name);
+    inode_t aim = file_nodeoff(0, default_cwd_name);
     assert(aim == inode_start);
     iNode node;
     n_dev_read(now_disk, FM, (char *)&node, aim, sizeof node);

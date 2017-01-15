@@ -1,6 +1,7 @@
 #include "adt/list.h"
 #include "assert.h"
 
+static
 struct T {
     int a;
     char c;

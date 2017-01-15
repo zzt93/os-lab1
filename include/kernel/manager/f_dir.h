@@ -22,6 +22,8 @@ typedef struct {
 
 #define MAX_DIR_DEPTH 16
 
+#define MAX_PATH_LEN (MAX_DIR_DEPTH * sizeof(Dir_entry))
+
 extern const char *const current_dir;
 extern const char *const father_dir;
 extern const char *const default_cwd_name;
@@ -34,14 +36,16 @@ uint32_t get_dir_e_off(iNode *dir, inode_t aim);
 
 #include "lib/string.h"
 static inline
-int invalid_filename(const char *name) {
-    if (name == NULL || strlen(name) >= MAX_FILENAME_LEN) {
-        return 1;
-    }
-    return 0;
+bool null_filename(const char *name) {
+    return name == NULL;
 }
 
-inode_t file_path(inode_t cwd, const char * const name);
+static inline
+bool filename_too_long(const char *name) {
+    return strlen(name) >= MAX_FILENAME_LEN;
+}
+
+inode_t file_nodeoff(inode_t cwd, const char *const name);
 
 #include "kernel/message.h"
 

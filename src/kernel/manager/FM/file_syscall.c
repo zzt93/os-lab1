@@ -1,3 +1,4 @@
+#include <kernel/kernel.h>
 #include "kernel/message.h"
 #include "drivers/hal.h"
 #include "kernel/process.h"
@@ -27,12 +28,16 @@ const char *const default_cwd_name = "/";
    test whether a directory contain a file by check the
    name list it store
    @return:
-   0 -- not contain
    node_offset of the file which called `name`
+   NO_SUCH -- no name
+   NOT_DIR -- dir_node_off is not directory
  */
-static inode_t contain_file(inode_t node_off, char *name) {
+static inode_t contain_file(inode_t dir_node_off, const char *name) {
+    if (filename_too_long(name)) {
+        return NO_SUCH;
+    }
     iNode node;
-    n_dev_read(now_disk, FM, &node, node_off, sizeof node);
+    n_dev_read(now_disk, FM, &node, dir_node_off, sizeof node);
     if (node.type != NODE_DIR) {
         return NOT_DIR;
     }
@@ -48,7 +53,7 @@ static inode_t contain_file(inode_t node_off, char *name) {
                 return dirs[j].inode_off;
             }
         }
-        i ++;
+        i++;
         block_off = get_block(&node, i);
         size -= block_size;
     }
@@ -62,42 +67,43 @@ static inode_t contain_file(inode_t node_off, char *name) {
 }
 
 /**
-   Analyze the file name with path
-   and return node offset of that file
-   -- path can't be NULL
+    Analyze the simplified file name with path
+    and return node offset of that file
+    -- path can't be NULL
 
-   TODO this may return NO_SUCH which may in range of [inode_start,
-   inode_start + inode_area_size]
+    @see simplify_path
+
+    TODO this may return NO_SUCH which may in range of [inode_start,
+    inode_start + inode_area_size]
  */
-inode_t file_path(inode_t cwd, const char * const name) {
+inode_t file_nodeoff(inode_t cwd, const char *const name) {
     assert(name != NULL);
-    // assume it as a relative path
-    // i.e., set node_off as cwd's node
-    inode_t node_off = cwd;
-    if (name[0] == '/') {// an absolute path
-        // set node_off as the root
-        // this assume root is always the first
-        // inode of my file system
-        node_off = inode_start;
+    // assume it as a absolute  path
+    // set node_off as the root
+    // this assume root is always the first
+    // inode of my file system
+    inode_t node_off = inode_start;
+    if (name[0] != '/') {// an relative path -- impossible after simplify path
+        assert(false);
+        // i.e., set node_off as cwd's node
+        node_off = cwd;
     }
     char *save[MAX_DIR_DEPTH];
-    int len = strlen(name) + 1;
+    size_t len = strlen(name) + 1;
+    assert(len >= 2);
     char path[len];
     memcpy(path, name, len);
-    assert(len >= 2);
-    if (name[len - 2] == '/') {
-        path[len - 2] = '\0';
-    }
 
-    // split "/afd/asd/" -- tested by test_file.c:name5, name6, name7
-    int parts = split(path, '/', save);
+    assert(path[0] == '/');
+    // to skip the first '/' so make split easier
+    int parts = split(path + 1, '/', save);
     assert(parts <= MAX_DIR_DEPTH);
     int i;
     for (i = 0; i < parts; i++) {
         node_off = contain_file(node_off, save[i]);
-        if (node_off == NO_SUCH) {// no such file or directory
+        if (node_off == NO_SUCH) {// save[i] not exist
             return NO_SUCH;
-        } else if (node_off == NOT_DIR) {
+        } else if (node_off == NOT_DIR) {// node_off exist but not a directory
             return NOT_DIR;
         }
     }
@@ -114,6 +120,7 @@ int file_exist(inode_t off) {
 }
 
 const int default_file_block = 1;
+
 /**
    return: the node offset of this empty file, if has
    any problem, return FAIL
@@ -125,12 +132,12 @@ const int default_file_block = 1;
    - FIXED -- add `const char *` and `memcpy`: this function change the content of name, may be changed later
  */
 static
-int make_empty_file(File_e type, const char *fname, PCB *aim,
-    // the following one parameter is only useful for directory
-    inode_t *dir_off) {
-    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
+inode_t make_empty_file(ENodeType type, const char *fname, PCB *aim,
+        // the following one parameter is only useful for directory
+                        inode_t *dir_off) {
+    inode_t cwd = ((FTE *) aim->fd_table[CWD].ft_entry)->node_off;
     inode_t dir;
-    int filenamelen = strlen(fname) + 1;
+    size_t filenamelen = strlen(fname) + 1;
     char name[filenamelen];
     memcpy(name, fname, filenamelen);
     char *filename;
@@ -149,6 +156,8 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
             name[last_slash] = '\0';
             if (name[last_slash + 1] == '\0') {
                 // e.g. make a directory: /media/
+                // TODO use simplified path invalidate this occasion
+                assert(false);
                 if (type == NODE_PLAIN) {
                     return FAIL;
                 }
@@ -157,14 +166,17 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
                 name[last_slash] = '\0';
             }
 
-            // get the node offset of directory this file resides
-            dir = file_path(cwd, name);
+            // get the node offset of directory which this file resides
+            dir = file_nodeoff(cwd, name);
         }
         filename = name + last_slash + 1;
     }
     // directory not exist or file is already exist
     if (!file_exist(dir)) {
         return NO_SUCH;
+    }
+    if (filename_too_long(filename)) {
+        return INVALID_FILENAME;
     }
     if (file_exist(contain_file(dir, filename))) {
         return FILE_EXIST;
@@ -187,7 +199,7 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
             return NO_MORE_DISK;
         }
     }
-    for (i = default_file_block; i < FILE_LINK_NUM; i ++) {
+    for (i = default_file_block; i < FILE_LINK_NUM; i++) {
         node.index[i] = 0;
     }
     node.link_count = 1;
@@ -198,7 +210,7 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
     Dir_entry dir_content;
     memcpy(dir_content.filename, filename, strlen(filename) + 1);
     dir_content.inode_off = new;
-    int len = write_block_file(now_disk, dir, W_LAST_BYTE, (char *)&dir_content, sizeof(Dir_entry));
+    int len = write_block_file(now_disk, dir, W_LAST_BYTE, (char *) &dir_content, sizeof(Dir_entry));
     if (len != sizeof(Dir_entry)) {
         return NO_MORE_DISK;
     }
@@ -209,15 +221,17 @@ int make_empty_file(File_e type, const char *fname, PCB *aim,
 }
 
 static inline
-int make_plain_file(const char *name, PCB *aim) {
-    inode_t i;
-    return make_empty_file(NODE_PLAIN, name, aim, &i);
+inode_t make_plain_file(const char *name, PCB *aim) {
+    inode_t ignore;
+    return make_empty_file(NODE_PLAIN, name, aim, &ignore);
 }
 
 int create_file(Msg *m) {
-    PCB *aim = (PCB *)m->buf;
-    const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
-    if (invalid_filename(name)) {
+    PCB *aim = (PCB *) m->buf;
+
+    const char *name = simplify_path(aim->cwd_path,
+                                     (const char *) get_pa(&aim->pdir, m->dev_id));
+    if (null_filename(name)) {
         return INVALID_FILENAME;
     }
     inode_t res = make_plain_file(name, aim);
@@ -229,14 +243,16 @@ int create_file(Msg *m) {
 }
 
 int make_dir(Msg *m) {
-    PCB *aim = (PCB *)m->buf;
-    const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
+    PCB *aim = (PCB *) m->buf;
+
+    const char *name = simplify_path(aim->cwd_path,
+                                     (const char *) get_pa(&aim->pdir, m->dev_id));
     if (name == NULL) {
         return INVALID_FILENAME;
     }
     inode_t dir_off;
     // the node offset of new directory
-    int new = make_empty_file(NODE_DIR, name, aim, &dir_off);
+    inode_t new = make_empty_file(NODE_DIR, name, aim, &dir_off);
     if (!file_exist(new)) {
         m->ret = new;
         return new;
@@ -250,7 +266,7 @@ int make_dir(Msg *m) {
     // copy ".."
     memcpy(dir[1].filename, father_dir, 3);
     dir[1].inode_off = dir_off;
-    write_block_file(now_disk, new, W_LAST_BYTE, (char *)&dir, 2 * sizeof(Dir_entry));
+    write_block_file(now_disk, new, W_LAST_BYTE, (char *) &dir, 2 * sizeof(Dir_entry));
 
     return new;
 }
@@ -259,16 +275,17 @@ int make_dir(Msg *m) {
    delete it in father's directory
    free inode, block in map
 */
+static
 int delete_a_file(inode_t father, inode_t this) {
     iNode this_node;
     n_dev_read(now_disk, FM,
-        &this_node, this, sizeof this_node);
+               &this_node, this, sizeof this_node);
     if (this_node.type == NODE_DIR) {
         int num_files = this_node.size / sizeof(Dir_entry);
         assert(this_node.size % sizeof(Dir_entry) == 0);
         Dir_entry dirs[num_files];
         // TESTED test add now_disk
-        read_block_file(now_disk, this, 0, (char *)dirs, R_LAST_BYTE);
+        read_block_file(now_disk, this, 0, (char *) dirs, R_LAST_BYTE);
         assert(strcmp(dirs[0].filename, current_dir) == 0);
         assert(strcmp(dirs[1].filename, father_dir) == 0);
         int i;
@@ -299,14 +316,16 @@ int delete_a_file(inode_t father, inode_t this) {
    - this function change the content of name, may be changed later
 */
 int delete_file(Msg *m) {
-    PCB *pcb = (PCB *)m->buf;
-    const char *fname = (const char *)get_pa(&pcb->pdir, m->dev_id);
-    if (invalid_filename(fname)) {
+    PCB *pcb = (PCB *) m->buf;
+
+    const char *fname = simplify_path(pcb->cwd_path,
+                                      (const char *) get_pa(&pcb->pdir, m->dev_id));
+    if (null_filename(fname)) {
         return FM_ERR;
     }
-    inode_t cwd = ((FTE *)pcb->fd_table[CWD].ft_entry)->node_off;
+    inode_t cwd = ((FTE *) pcb->fd_table[CWD].ft_entry)->node_off;
     inode_t dir;
-    int filenamelen = strlen(fname) + 1;
+    size_t filenamelen = strlen(fname) + 1;
     char name[filenamelen];
     memcpy(name, fname, filenamelen);
     char *filename;
@@ -325,13 +344,15 @@ int delete_file(Msg *m) {
             name[last_slash] = '\0';
             if (name[last_slash + 1] == '\0') {
                 // e.g. /media/
-                 // re-find a meaningful '/';
+                // re-find a meaningful '/';
+                // TODO simplify path invalidate this case
+                assert(false);
                 last_slash = find_char(name, -1, '/');
                 name[last_slash] = '\0';
             }
 
             // get the node offset of directory of this file
-            dir = file_path(cwd, name);
+            dir = file_nodeoff(cwd, name);
         }
         filename = name + last_slash + 1;
     }
@@ -352,22 +373,23 @@ int delete_file(Msg *m) {
    return: how many directory entry is read
  */
 int list_dir(Msg *m) {
-    assert((char *)m->req_pid != NULL);
-    PCB *aim = (PCB *)m->buf;
-    char *buf = (char *)get_pa(&aim->pdir, m->req_pid);
+    assert((char *) m->req_pid != NULL);
+    PCB *aim = (PCB *) m->buf;
+    char *buf = (char *) get_pa(&aim->pdir, m->req_pid);
     inode_t node_off;
-    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
+    inode_t cwd = ((FTE *) aim->fd_table[CWD].ft_entry)->node_off;
     const char *name;
-    if ((char *)m->dev_id == NULL) {
+    if ((char *) m->dev_id == NULL) {
         node_off = cwd;
     } else {
-        name = (const char *)get_pa(&aim->pdir, m->dev_id);
+        name = simplify_path(aim->cwd_path,
+                             (const char *) get_pa(&aim->pdir, m->dev_id));
         if (str_empty(name)) { // i.e. name is empty
             node_off = cwd;
         } else {
             // if not specify the list name,
             // using default file path -- current working directory node_off
-            node_off = file_path(cwd, name);
+            node_off = file_nodeoff(cwd, name);
         }
     }
     if (!file_exist(node_off)) {
@@ -396,23 +418,17 @@ int list_dir(Msg *m) {
     }
 }
 
-int is_absolute_path(const char *path) {
-    if (path[0] == '/') {
-        return true;
-    }
-    return false;
-}
 
 int ch_dir(Msg *m) {
-    PCB *aim = (PCB *)m->buf;
-    const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
+    PCB *aim = (PCB *) m->buf;
+    const char *name = simplify_path(aim->cwd_path, (const char *) get_pa(&aim->pdir, m->dev_id));
     // if not specify the list name,
     // using default file path -- current working directory node_off
-    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
+    inode_t cwd = ((FTE *) aim->fd_table[CWD].ft_entry)->node_off;
     inode_t off = cwd;
     assert(off >= inode_start);
     if (name != NULL) {
-        off = file_path(cwd, name);
+        off = file_nodeoff(cwd, name);
         if (!file_exist(off)) {
             m->ret = NO_SUCH;
             return FAIL;
@@ -422,6 +438,7 @@ int ch_dir(Msg *m) {
             free_cwd_path(aim);
             set_cwd_path(aim, name);
         } else {
+            assert(false);
             append_cwd_path(aim, name);
         }
     }
@@ -450,13 +467,13 @@ size_t rw_prepare(Msg *m,
     PCB *aim = (PCB *)m->req_pid;
     char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
     const char *name = (const char *)get_pa(&aim->pdir, m->dev_id);
-    if (invalid_filename(name)) {
+    if (null_filename(name)) {
         return FAIL;
     }
     // if not specify the list name,
     // using default file path -- current working directory node_off
     inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
-    inode_t nodeoff = file_path(cwd, name);
+    inode_t nodeoff = file_nodeoff(cwd, name);
     if (nodeoff < inode_start) {
         return FAIL;
     }

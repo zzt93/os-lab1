@@ -263,7 +263,7 @@ int save_args(Msg *m, char *buf) {
     }
 }
 
-#define BUF_SZ 512
+#define ARGS_MAX_LEN 512
 
 /**
    In my current implementation, pid is not necessarily the
@@ -271,7 +271,7 @@ int save_args(Msg *m, char *buf) {
    -- TODO add lock if necessary
  */
 PCB * kexec(Msg *m) {
-    char args[BUF_SZ] = {0};
+    char args[ARGS_MAX_LEN] = {0};
     PCB *aim = (PCB *)m->i[1];
     // TODO check whether is file is executable before free current process
 

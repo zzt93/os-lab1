@@ -11,7 +11,7 @@ typedef enum {
     NODE_PLAIN,
     NODE_SOFT_LINK,
     NOT_INODE,
-} File_e;
+} ENodeType;
 
 typedef uint32_t block_t;
 
@@ -23,7 +23,7 @@ typedef uint32_t block_t;
 #define THI_INDIRECT (SEC_INDIRECT + 1)
 
 /**
- * inode is the abstraction of file, channel to different storage media
+ * inode is the abstraction of file storage, channel to different storage media
    Notice:
    if you add more members to Dir_entry
    remember that check whether the sizeof(Dir_entry) is
@@ -41,7 +41,7 @@ struct INODE{
 	uint32_t index[FILE_LINK_NUM];
     // count of hard link
     int link_count;
-    File_e type;
+    ENodeType type;
 } __attribute__ ((__aligned__(128)));
 
 typedef struct INODE iNode;

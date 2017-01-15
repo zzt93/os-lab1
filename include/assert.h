@@ -21,4 +21,6 @@
 	} \
 } while(0)
 
+// TODO implement by system call
+
 #endif

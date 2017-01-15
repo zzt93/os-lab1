@@ -80,7 +80,7 @@ void free_cwd_path(PCB *pcb) {
 }
 
 void set_cwd_path(PCB *pcb, const char *name) {
-    int len = strlen(name) + 1;
+    size_t len = strlen(name) + 1;
     assert(len >= 2);
     if (name[len - 2] != '/') {
         // add a '/' if not have
@@ -98,8 +98,8 @@ void set_cwd_path(PCB *pcb, const char *name) {
 void append_cwd_path(PCB *pcb, const char *name) {
     assert(pcb->cwd_path != NULL);
     // add one for '\0'
-    int len1 = strlen(pcb->cwd_path);
-    int len2 = strlen(name) + 1;
+    size_t len1 = strlen(pcb->cwd_path);
+    size_t len2 = strlen(name) + 1;
     char *tmp;
     if (name[len2 - 2] != '/') {
         len2++;

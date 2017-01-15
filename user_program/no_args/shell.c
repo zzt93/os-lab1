@@ -1,17 +1,6 @@
-#include "kernel/syscall.h"
 #include "sys_call/io/io.h"
-#include "lib/string.h"
-#include "error.h"
+#include "shell.h"
 
-
-#define BUF_SZ 256
-// one for command itself
-#define MAX_PARAMETER_NR (10 + 1)
-//#define NAME_LEN 32
-
-const char const * CD = "cd";
-const char const * PWD = "pwd";
-//char *user_name[NAME_LEN] = "zzt@os-lab: ";
 
 bool check_args_num(int real, int target) {
     if (real == target) {
@@ -26,17 +15,18 @@ bool check_args_num(int real, int target) {
 }
 
 int entry() {
-    char cmd[BUF_SZ], copy[BUF_SZ];
+    char cmd[ONE_CMD_MAX_LEN], copy[ONE_CMD_MAX_LEN];
     char *save[MAX_PARAMETER_NR] = {0};
     char *filename = NULL;
     int pid, count, res;
     while(1) {
         prompt();
-        memset(cmd, 0, BUF_SZ);
-        read_line(cmd, BUF_SZ);
-        memcpy(copy, cmd, BUF_SZ);
+        memset(cmd, 0, ONE_CMD_MAX_LEN);
+        read_line(cmd, ONE_CMD_MAX_LEN);
+        u_assert(cmd[0] != ' ', "should not start with space: %s\n", cmd);
+        memcpy(copy, cmd, ONE_CMD_MAX_LEN);
         count = split(copy, ' ', save);
-        user_assert(MAX_PARAMETER_NR >= count);
+        u_assert(MAX_PARAMETER_NR >= count, "%d\n", count);
         if (count < 1) {
             printf("Unknown command: %s\n", cmd);
             continue;
@@ -63,10 +53,11 @@ int entry() {
         // TODO check file existence and whether it is executable -- many be checked by exec
 		// TODO add redirect: <, >, 2>, &>, >>
         // TODO add pipe
-        if((pid = fork()) == 0) {
+        if((pid = fork()) == 0) {// child process go this way
 			// no thread will receive the response of exec, so it failure should be known by waitpid
             int res;
             if (count == 1) {
+                // for example: `ls `
                 res = exec(filename, "");
             } else {
                 res = exec(filename, save[1] - copy + cmd);
@@ -77,7 +68,7 @@ int entry() {
                 filename,
                 get_err_msg(res));
         }
-        else {
+        else {// father wait here
 			// if exec fail, waitpid will fail
             res = waitpid(pid);
             if (res != SUCC) {

@@ -14,7 +14,7 @@ uint32_t inode_start;
 uint32_t inode_area_size;
 
 char assert_iNode_size[sizeof(iNode) % 128 == 0 ? 1 : -1];
-char assert_enum_size[sizeof(File_e) == 4 ? 1 : -1];
+char assert_enum_size[sizeof(ENodeType) == 4 ? 1 : -1];
 
 static inline uint32_t nodei_off(int index) {
     uint32_t new = inode_start + index * inode_size;

@@ -123,8 +123,9 @@ static void PM_job() {
                 close_m.buf = current;
                 close_m.dev_id = fd;
                 close_file(&close_m);
-                // for the thread apply exec is now not exist,
-                // so no need to send back
+                // the thread invoke `exec()` will execute different code,
+                // i.e. will not wait to receive response,
+                // so no need to send response message back
                 continue;
             }
             case PM_ram_exec:
@@ -134,13 +135,14 @@ static void PM_job() {
                     // put in queue
                     add2wake(new);
                 }
-                // for the thread apply exec is now not exist,
-                // so no need to send back
+                // the thread invoke `exec()` will execute different code,
+                // i.e. will not wait to receive response,
+                // so no need to send response message back
                 continue;
             }
             case PM_exit:
                 kexit(&m);
-                // for the thread apply exec is now not exist,
+                // the thread invoke `exit` will not continue to run,
                 // so no need to send back
                 continue;
             case PM_waitpid:

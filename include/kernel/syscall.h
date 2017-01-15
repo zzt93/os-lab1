@@ -11,6 +11,8 @@ void do_syscall(TrapFrame*);
    Add new type system call may need to make clean
    the user program and update with new enum number
    of system call id.
+   Or, the system call id in code binary in ram.c may not match
+   with system call distribution, causing trouble.
  */
 enum {
     SYS_create,
@@ -54,8 +56,10 @@ enum {
     SYS_wait_timer,
     SYS_timer_start,
     SYS_timer_finished,
-    // put prompt -- user name/ prompt
+    // put prompt -- user name/cwd prompt
     SYS_prompt,
+    SYS_assert,
+    // in order to unite all form of context switch
     // for int 0x80 in sleep method
     // @see ./src/kernel/process/schedule.c
     SLEEP,
@@ -78,7 +82,8 @@ int using_edf();
 int prompt();
 
 // FM related system call
-int open(int filename); // return file descriptor
+//int open(int filename); // return file descriptor
+int open(const char *name); // return file descriptor
 int read(int fd, uint8_t *buf, int len);
 int write(int fd, uint8_t *buf, int len);
 int close(int fd);
@@ -88,17 +93,19 @@ int dup2(int oldfd, int newfd);
 
 // hierarchy file system call
 int createfile(const char *name);
-int makedir(const char *name);
+int makedir(const char *dir);
 int delfile(const char *name);
-int deldir(const char *name);
+int deldir(const char *dir);
 // name(with path)
-int listdir(const char *name, char *buf, int len);
-int chdir(const char *name);
+int listdir(const char *dir, char *buf, int len);
+int chdir(const char *dir);
 int print_cwd_path();
 
 int timer_start(int seconds);
 int timer_finished();
 int set_timer(int seconds);
 int wait_timer();
+
+int user_assert(int expr, const char *format, ...);
 
 #endif /* __SYSCALL_H__ */

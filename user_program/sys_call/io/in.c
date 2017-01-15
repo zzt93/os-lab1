@@ -1,13 +1,14 @@
-#include "kernel/syscall.h"
+#include "c_lib.h"
+
 
 int read_line(char *str, int capacity) {
     return syscall(SYS_read_line, str, capacity);
 }
-// TODO change open
-// return file descriptor
-int open(int filename) {
-    return syscall(SYS_open, filename);
-}
+
+// @Deprecated
+//int open(int filename) {
+//    return syscall(SYS_open, filename);
+//}
 
 int read(int fd, uint8_t *buf, int len) {
     return syscall(SYS_read, fd, buf, len);

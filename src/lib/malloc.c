@@ -7,6 +7,8 @@ static int space[ALLOC_SIZE];
 // the index of last free space, words
 int last_i = 0;
 
+void check_header(const int *h);
+
 static int *space_head() {
     return space;
 }
@@ -50,13 +52,14 @@ void *kmalloc(unsigned int size) {
 
     lock();
     int *h = last_i + space_head();
-    assert(*h != 0);
+    check_header(h);
     int *nextH = h + (*h > 0 ? *h : -*h);
     if (*h > 0 &&
         nextH < space_head() + ALLOC_SIZE && *nextH > 0) {
         *h = *h + *nextH;
     }
-    assert(*h != 0);
+    check_header(h);
+
 
     int count = 2;
     while (count) {
@@ -78,10 +81,9 @@ void *kmalloc(unsigned int size) {
         }
         count--;
     }
-    // return null if can't find a place to place it
+    // return null if we can't find a place for it to use
     if (count == 0) {
-        printk(RED"No where to put it\n"RESET);
-        assert(false);
+        panic("Nowhere to allocate it %l", size);
     }
 
     assert(s > 0);
@@ -112,6 +114,12 @@ void *kmalloc(unsigned int size) {
     NOINTR;
     unlock();
     return h + HEAD_SIZE;
+}
+
+void check_header(const int *h) {
+    if (*h >= ALLOC_SIZE || *h == 0 || *h <= -ALLOC_SIZE) {
+        panic("malloc header overwritten! allocate too few or write too much");
+    }
 }
 
 void kfree(void *p) {

@@ -15,23 +15,27 @@ typedef enum {
     SOCKET,
     BLOCK_DEV,
     CHAR_DEV,
-} Node_e;
+} EFileType;
 
 /**
-   if type == CHAR_DEV, node_off, filesize is meaningless
-   if type == FT_DIR, filesize if meaningless for the time being
+   if type == CHAR_DEV, `node_off`, `filesize` is meaningless
+   if type == FT_DIR, `filesize` is meaningless for the time being
 */
 typedef struct {
-    // node offset in ramdisk/disk relative to region node
+    // node offset in ramdisk/disk relative to region start
     uint32_t node_off;
     // file cursor offset relative to start of file
     int offset;
     // uniquely identify a device
     int dev_id;
     int ref_count;
-    Node_e type;
+    EFileType type;
     // cached value -- needing update
     uint32_t filesize;
+
+    // char file_flags; // rwxr-x---. init it use current user compared with file owner
+    // user *owner;
+    // group *own_group;
 } FTE;
 
 // max number for files that all the processes can open

@@ -26,6 +26,9 @@ void init_file_system();
 
 extern int FM;
 
+const char *simplify_path(const char *cwd, const char *path);
+int is_absolute_path(const char *path);
+
 #include "fd.h"
 
 #endif /* __FM_H__ */

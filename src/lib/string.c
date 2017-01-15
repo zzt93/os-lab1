@@ -18,8 +18,8 @@
    if not, buf might be changed
  */
 char *itoa(int a) {
-	static char buf[30];
-	char *p = buf + sizeof(buf) - 1;
+    static char buf[30];
+    char *p = buf + sizeof(buf) - 1;
     if (a < 0) {
         do {
             *--p = '0' - a % 10;
@@ -30,14 +30,17 @@ char *itoa(int a) {
             *--p = '0' + a % 10;
         } while (a /= 10);
     }
-	return p;
+    return p;
 }
 
 /**
-   return: the width of this int
+ * If number is longer than buf_len, number will be truncate, but width
+ * is accurate.
+ * @param buf result buffer
+ * @param buf_len
+ * @return the width of this int
  */
-int itoa_s(int a, char *s, int limit) {
-    int wid = 0;
+int itoa_s(int a, char *buf, int buf_len) {
     if (a < 0) {
         do {
             push('0' - a % 10);
@@ -48,23 +51,30 @@ int itoa_s(int a, char *s, int limit) {
             push('0' + a % 10);
         } while (a /= 10);
     }
-    while(!empty()) {
-        *s++ = pop();
+    int wid = 0;
+    while (!empty()) {
+        if (wid < buf_len - 1) {
+            *buf++ = (char) pop();
+        } else {
+            pop();
+        }
         wid++;
     }
+    *buf = '\0';
     return wid;
 }
+
 int itoh_s(int a, char *s, int limit) {
     return -1;
 }
 
 
 void strcpy(char *d, const char *s) {
-	memcpy(d, s, strlen(s) + 1);
+    memcpy(d, s, strlen(s) + 1);
 }
 
 void print_str(void (*printer)(char), char *str) {
-    while(*str != '\0') {
+    while (*str != '\0') {
         printer(*str);
         str++;
     }
@@ -81,7 +91,7 @@ char to_upper(char c) {
 
 int is_letter(char c) {
     return (c <= 'z' && c >= 'a')
-        || (c <= 'Z' && c >= 'A');
+           || (c <= 'Z' && c >= 'A');
 }
 
 /**
@@ -97,7 +107,7 @@ int find_char(const char *str, int ith, char aim) {
         start = strlen(str);
         while (start--) {
             if (str[start] == aim) {
-                ith ++;
+                ith++;
                 if (ith == 0) {
                     return start;
                 }
@@ -106,17 +116,36 @@ int find_char(const char *str, int ith, char aim) {
     } else if (ith > 0) {
         while (str[start] != '\0') {
             if (str[start] == aim) {
-                ith --;
+                ith--;
                 if (ith == 0) {
                     return start;
                 }
             }
-            start ++;
+            start++;
         }
     }
     return INVALID_INDEX;
 }
 
-bool str_empty(const char * str) {
+bool str_empty(const char *str) {
     return *str == '\0';
+}
+
+/**
+ * compare two string at most len bytes, if either string's size is smaller than len
+ * stop at min {len(f), len(s)}
+ * @param f
+ * @param s
+ * @param len
+ * @return
+ */
+int strncmp(const char *f, const char *s, size_t len) {
+    size_t i = 0;
+    while (f[i] == s[i] && f[i] != '\0') {
+        i++;
+        if (i == len) {
+            return 0;
+        }
+    }
+    return f[i] - s[i];
 }

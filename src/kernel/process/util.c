@@ -124,6 +124,8 @@ void init_proc_test() {
     */
 
     //add2wake(create_kthread(ram_user_process));
+
+    // to avoid deadlock by an empty process
     add2wake(create_kthread(empty));
 }
 
@@ -141,5 +143,7 @@ void init_idle() {
     current->priority = KERNEL_PRI;
     // this is for test_ch_dir and actually not for kernel thread
     set_cwd_path(current, default_cwd_name);
+
+    add_process(current);
  }
 

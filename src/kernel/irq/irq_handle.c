@@ -69,8 +69,8 @@ void irq_handle(TrapFrame *tf) {
     if (irq == 0x80) {// system call int 0x80
         do_syscall(tf);
     } else if (irq < 1000) {
-        printk("Stack :%x %x %x %x ", tf->eip, tf->ebp, tf->xxx, tf->esp);
-        printk("error code: %x ;cr2: %x ", tf->error_code, read_cr2());
+        printk("Stack: %x %x %x %x; ", tf->eip, tf->ebp, tf->xxx, tf->esp);
+        printk("Error code: %x; cr2: %x ", tf->error_code, read_cr2());
         // TODO capture the illegal behaviour of user process and kill it
 //        if (current->type == USER) {
 //            Msg m;
