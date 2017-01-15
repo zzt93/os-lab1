@@ -10,6 +10,7 @@ typedef enum {
     NODE_DIR,
     NODE_PLAIN,
     NODE_SOFT_LINK,
+    NODE_PIPE,
     NOT_INODE,
 } ENodeType;
 

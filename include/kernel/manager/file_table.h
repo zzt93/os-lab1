@@ -10,28 +10,32 @@ typedef enum {
     FT_DIR,
     FT_PLAIN,
     FT_SOFT_LINK,
-    // following has no inode
-    PIPE,
+    PIPE, // named pipe, FIFO file
+    //-------- following has no inode ------
     SOCKET,
-    BLOCK_DEV,
-    CHAR_DEV,
+    BLOCK_DEV, //These files are hardware files most of them are present in /dev
+    CHAR_DEV, //A serial stream of input or output: terminal
 } EFileType;
 
 /**
-   if type == CHAR_DEV, `node_off`, `filesize` is meaningless
+   if type == CHAR_DEV, `node_off`, `offset`, `filesize` is meaningless
    if type == FT_DIR, `filesize` is meaningless for the time being
+   if type == SOCKET, `node_off` is a pointer to socket, `offset` & `filesize` is meaningless
+
+   @see socket
 */
 typedef struct {
     // node offset in ramdisk/disk relative to region start
     uint32_t node_off;
     // file cursor offset relative to start of file
     int offset;
-    // uniquely identify a device
-    int dev_id;
+    uint32_t filesize; // TODO cached value -- needing update
+
+    // ------------------- all file shared property -------------
+
+    int dev_id; // uniquely identify a device
     int ref_count;
     EFileType type;
-    // cached value -- needing update
-    uint32_t filesize;
 
     // char file_flags; // rwxr-x---. init it use current user compared with file owner
     // user *owner;
