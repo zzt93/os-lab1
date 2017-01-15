@@ -7,11 +7,7 @@ sudo: true
 
 before_install:
 - sudo pip install enum34
-- sudo modprobe kvm
-- sudo apt-get install qemu
 
 script:
-- make
-- make user_pro
-- make test
+- make hardDisk
 
