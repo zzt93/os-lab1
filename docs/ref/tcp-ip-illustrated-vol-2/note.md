@@ -22,3 +22,8 @@ From an implementor's point of view, the distinction between a system call and a
 Input processing is different from the output processing just described because the input is asynchronous. Input processing is different from the output processing just described because the input is asynchronous.
 
 In our example program we never specify the local port number for our application. We'll see in Exercise 23.3 that a side effect of writing the first UDP datagram to a socket that has not yet bound a local port number is the automatic assignment by the kernel of a local port number (termed an ephemeral port) to that socket. That's how the inp_lport member of the PCB for our socket gets set to some nonzero value.
+
+# Chapter 2 Mbufs
+## 2.1 Introduction
+
+Networking protocols place many demands on the memory management facilities of the kernel. These demands include easily manipulating buffers of varying sizes, prepending and appending data to the buffers as the lower layers encapsulate data from higher layers, removing data from buffers (as headers are removed as data packets are passed up the protocol stack), and minimizing the amount of data copied for all these operations. The performance of the networking protocols is directly related to the memory management scheme used within the kernel.
