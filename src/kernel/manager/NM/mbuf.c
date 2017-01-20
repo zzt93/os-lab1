@@ -6,7 +6,7 @@
 #include <kernel/network/mbuf.h>
 #include <const.h>
 
-char assert_mbuf_size[sizeof(MBuf) % 128 == 0 ? 1 : -1];
+char assert_mbuf_size[sizeof(MBuf) % MSIZE == 0 ? 1 : -1];
 
 void free_mbuf(MBuf *mBuf) {
 
