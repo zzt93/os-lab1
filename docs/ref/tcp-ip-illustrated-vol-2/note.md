@@ -27,3 +27,7 @@ In our example program we never specify the local port number for our applicatio
 ## 2.1 Introduction
 
 Networking protocols place many demands on the memory management facilities of the kernel. These demands include easily manipulating buffers of varying sizes, prepending and appending data to the buffers as the lower layers encapsulate data from higher layers, removing data from buffers (as headers are removed as data packets are passed up the protocol stack), and minimizing the amount of data copied for all these operations. The performance of the networking protocols is directly related to the memory management scheme used within the kernel.
+
+## 2.4 mbuf Structure
+
+M_EOR is set in an mbuf containingthe end of a record. The Internet protocols (e.g., TCP) never set this flag, since TCP provides a byte-stream service without any record boundaries. The OSI and XNS transport layers, however, do usethis flag. We will encounter this flag in the socket layer, since this layer is protocol independent andhandles data to and from all the transport layers.

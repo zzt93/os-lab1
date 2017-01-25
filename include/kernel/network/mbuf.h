@@ -11,15 +11,30 @@
 typedef struct MB MBuf;
 
 typedef enum {
+    MT_CONTROL, // extra-data protocol message
+    MT_DATA, // dynamic data allocation
+    MT_FREE, // should be on free list
+    MT_FTABLE, // fragment reassembly header
+    MT_HEADER, // packet header
+    MT_HTABLE, // IMP host tables
+    MT_IFADDR, // interface address
+    MT_OOBDATA, // expedited (out-of-band) data
+    MT_PCB, // protocol control block
+    MT_RIGHTS, // access rights
+    MT_RTABLE, // routing tables
     MT_SONAME, // socket name
-    MT_DATA,
-    MT_HEADER
+    MT_SOOPTS, // socket options
+    MT_SOCKET, // socket structure
 } EBufType;
 
 // default represent data flag
-#define M_DEFAULT 0
-#define M_PKTHDR 1
-#define M_EXT (1 << 1)
+typedef enum {
+    M_BCAST, //sent/received as link-level broadcast
+    M_EOR, // end of record
+    M_EXT, // cluster (external buffer) associated with this mbuf
+    M_MCAST, //sent/received as link-level multicast
+    M_PKTHDR, //first mubf that froms a packet (record)
+} EMbufFlags;
 
 #define M_CLUSTER_SIZE 2048
 // max amount of data in mbuf with packet header
@@ -38,45 +53,50 @@ typedef struct {
     size_t mh_len;
     void *mh_data;
     EBufType mh_type;
-    int mh_flags;
-} m_hdr;
+    EMbufFlags mh_flags;
+} MBHeader;
 
 typedef struct {
     int len;
     NetworkInterface *rcvif;
-} pkthdr;
+} PacketHeader;
 
 typedef struct {
     void *ext_buf;
     size_t ext_size;
     void (*ext_free)();
-} m_ext;
+} MBExt;
 
 struct MB {
-    m_hdr m_hdr;
+    MBHeader m_hdr;
     union {
         struct {
-            pkthdr MH_pkthdr;
+            PacketHeader mh_pkthdr;
             union {
-                m_ext MH_ext;
+                MBExt ext;
                 uint8_t mh_data[MHLEN];
             };
         };
         uint8_t data[MLEN];
-    } M_dat;
+    } m_dat;
 };
 
-#define m_next m_hdr.mh_next
-#define m_len m_hdr.mh_len
-#define m_data m_hdr.mh_data
-#define m_type m_hdr.mh_type
-#define m_flags m_hdr.mh_flags
-#define m_nextpkt m_hdr.nextpkt
+//#define m_next MBHeader.mh_next
+//#define m_len MBHeader.mh_len
+//#define m_data MBHeader.mh_data
+//#define m_type MBHeader.mh_type
+//#define m_flags MBHeader.mh_flags
+//#define m_nextpkt MBHeader.nextpkt
+//
+//#define m_pkthdr M_data.MH.MH_
+//#define MBExt M_data.MH.MH_dat.ext
+//#define m_pkidat M_data.MH.MH_dat.mh_data
+//#define m_dat m_dat.M_databuf
 
-#define m_pkthdr M_data.MH.MH_
-#define m_ext M_data.MH.MH_dat.MH_ext
-#define m_pkidat M_data.MH.MH_dat.mh_data
-#define m_dat M_dat.M_databuf
+MBuf *allocate_mbuf(int nowait, int type);
+
+#include "malloc.h"
+
 
 
 typedef struct {
