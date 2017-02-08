@@ -25,7 +25,7 @@ typedef enum {
     MT_SONAME, // socket name
     MT_SOOPTS, // socket options
     MT_SOCKET, // socket structure
-} EBufType;
+} EMBufType;
 
 // default represent data flag
 typedef enum {
@@ -34,7 +34,7 @@ typedef enum {
     M_EXT, // cluster (external buffer) associated with this mbuf
     M_MCAST, //sent/received as link-level multicast
     M_PKTHDR, //first mubf that froms a packet (record)
-} EMbufFlags;
+} EMBufFlags;
 
 #define M_CLUSTER_SIZE 2048
 // max amount of data in mbuf with packet header
@@ -52,8 +52,8 @@ typedef struct {
 
     size_t mh_len;
     void *mh_data;
-    EBufType mh_type;
-    EMbufFlags mh_flags;
+    EMBufType mh_type;
+    EMBufFlags mh_flags;
 } MBHeader;
 
 typedef struct {
@@ -93,7 +93,7 @@ struct MB {
 //#define m_pkidat M_data.MH.MH_dat.mh_data
 //#define m_dat m_dat.M_databuf
 
-MBuf *allocate_mbuf(int nowait, int type);
+MBuf *allocate_mbuf(int nowait, EMBufType type);
 
 #include "malloc.h"
 
