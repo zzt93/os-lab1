@@ -4,22 +4,56 @@
 
 
 #include <kernel/network/mbuf.h>
+#include <kernel/network/mbuf_alloc.h>
 #include "assert.h"
-#include <adt/map.h>
 
 MBuf *m_retry(int nowait, EMBufType type, int times);
 
 void m_reclaim();
 
-char assert_mbuf_size[sizeof(MBuf) % MSIZE == 0 ? 1 : -1];
+MBuf *m_get(int nowait, EMBufType type, int retryCount) ;
 
-void free_mbuf(MBuf *mBuf) {
+char assert_mbuf_size[sizeof(MBuf) % MSIZE == 0 ? 1 : -1];
+char assert_mbuf_header_size[sizeof(MBHeader) % (MSIZE-MLEN) == 0 ? 1 : -1];
+
+void mbuf_free(MBuf *mBuf) {
 
 }
 
+MBuf *mbuf_get(int nowait, EMBufType type) {
+    MBuf *m = m_get(nowait, type, 1);
+    if (m == NULL) {
+        panic("no enough memory to allocate mbuf");
+    }
+    // @see macro `dtom`
+    assert(((uint32_t)m % MSIZE) == 0);
+    return m;
+}
+
+void m_devget(MBuf *mBuf) {
+
+}
+
+/**
+ * <li>rearranges the mbuf chain so that the first N bytes of data
+ * are contiguous in the first mbuf on the chain.</li>
+ * <li>IP reassembly and TCP reassembly</li>
+ * @param mBuf
+ * @param size
+ * @return status code
+ */
+EMBufPullErrorCode m_pullup(MBuf *mBuf, uint16_t size) {
+
+    return MB_PULL_FINE;
+}
+
+/*
+ * -------------------------- static method ------------------------------
+ */
+
 static
 MBuf *m_get(int nowait, EMBufType type, int retryCount) {
-    MBuf *m = kmalloc(sizeof MBuf);
+    MBuf *m = private_mbuf_alloc();
     if (m) {
         m->m_hdr.mh_type = type;
         // TODO MBUFLOCK
@@ -32,15 +66,6 @@ MBuf *m_get(int nowait, EMBufType type, int retryCount) {
     }
     return m;
 }
-
-MBuf *allocate_mbuf(int nowait, EMBufType type) {
-    MBuf *m = m_get(nowait, type, 1);
-    if (m == NULL) {
-        panic("no enough memory to allocate mbuf");
-    }
-    return (m);
-}
-
 static
 MBuf *m_retry(int nowait, EMBufType type, int times) {
     if (times == 0) {

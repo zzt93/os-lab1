@@ -39,10 +39,11 @@ typedef enum {
 #define M_CLUSTER_SIZE 2048
 // max amount of data in mbuf with packet header
 #define MHLEN 100
-// smallest amount of data to put into cluster
-#define M_IN_CL_SIZE 208
 // max amount of data in normal mbuf
 #define MLEN 108
+// smallest amount of data to put into cluster
+// MHLEN + MLEN: two mbuf, first have a header, second not
+#define MIN_CLUSTER_SIZE (MHLEN + MLEN)
 // size of each mbuf
 #define MSIZE 128
 
@@ -50,10 +51,10 @@ typedef struct {
     MBuf *mh_next;
     MBuf *mh_nextpkt;
 
-    size_t mh_len;
     void *mh_data;
     EMBufType mh_type;
-    EMBufFlags mh_flags;
+    uint16_t mh_len;
+    uint16_t mh_flags;
 } MBHeader;
 
 typedef struct {
@@ -64,6 +65,7 @@ typedef struct {
 typedef struct {
     void *ext_buf;
     size_t ext_size;
+
     void (*ext_free)();
 } MBExt;
 
@@ -93,10 +95,9 @@ struct MB {
 //#define m_pkidat M_data.MH.MH_dat.mh_data
 //#define m_dat m_dat.M_databuf
 
-MBuf *allocate_mbuf(int nowait, EMBufType type);
+MBuf *mbuf_get(int nowait, EMBufType type);
 
 #include "malloc.h"
-
 
 
 typedef struct {
@@ -105,4 +106,27 @@ typedef struct {
     int m_drain;
     int m_mtypes;
 } mbstat;
+
+
+// mbuf to data
+#define mtod(m, t) ((t)((m)->m_hdr.mh_data))
+/**
+ * data-to-mbuf
+ * By knowing that MSIZE (128) is a power of 2,
+ * and that mbufs are always
+ * aligned by the kernel's memory allocator on MSIZE byte blocks of memory,
+ * dtom just clears the appropriate low-order bits in its argument pointer
+ * to find the beginning of the mbuf.
+ *
+ * it doesn't work if its argument points to a cluster, or within a cluster.
+ * Since there is no pointer from the cluster back to the mbuf structure, dtom cannotbe used.
+ */
+#define dtom(x) ((MBuf)((int)(x) & ~(MSIZE-1)))
+
+typedef enum {
+    MB_PULL_FINE,
+    MB_PULL_NO_MBUF,
+    MB_PULL_LESS_DATA,
+} EMBufPullErrorCode;
+
 #endif //OS_LAB1_MBUF_H

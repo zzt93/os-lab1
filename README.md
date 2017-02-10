@@ -120,6 +120,7 @@ dynamic allocated bit map( using kmalloc)
 
 
 ### TODO
+- user process memory allocation: heap & malloc
 - load program when it needs -- 缺页
 - command: mkdir, rm, touch, >, vi
 - network: tcp/ip, socket -- ping, traceroute

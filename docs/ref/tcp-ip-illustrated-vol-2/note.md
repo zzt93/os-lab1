@@ -64,3 +64,8 @@ Networking protocols place many demands on the memory management facilities of t
 ## 2.4 mbuf Structure
 
 M_EOR is set in an mbuf containing the end of a record. The Internet protocols (e.g., TCP) never set this flag, since TCP provides a byte-stream service without any record boundaries. The OSI and XNS transport layers, however, do usethis flag. We will encounter this flag in the socket layer, since this layer is protocol independent and handles data to and from all the transport layers.
+
+## 2.6 `m_devget` and `m_pullup` Functions
+
+- m_devget leaves 16 bytes unused at the beginning of the mbuf. Although the 14-byteEthernet header is not stored here, room is allocated for a 14-byte Ethernet header on output,should the same mbuf be used for output. We'll encounter two functions that generate aresponse by using the received mbuf as the outgoing mbuf: icmp_reflect andtcp_respond.
+- The reason 16 bytes are allocated, and not 14, is to have the IP header longword aligned in the mbuf.
