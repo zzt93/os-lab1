@@ -129,3 +129,7 @@ dynamic allocated bit map( using kmalloc)
   - kernel code: protocol impl
   - system call
   - command: ping, traceroute
+
+
+#### Opt
+- kmalloc: not allocate small and large memory request on same block of memory -- avoid memory fragmentation

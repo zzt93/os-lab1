@@ -11,12 +11,16 @@ MBuf *m_retry(int nowait, EMBufType type, int times);
 
 void m_reclaim();
 
-MBuf *m_get(int nowait, EMBufType type, int retryCount) ;
+MBuf *m_get(int nowait, EMBufType type, int retryCount);
 
 char assert_mbuf_size[sizeof(MBuf) % MSIZE == 0 ? 1 : -1];
-char assert_mbuf_header_size[sizeof(MBHeader) % (MSIZE-MLEN) == 0 ? 1 : -1];
+char assert_mbuf_header_size[sizeof(MBHeader) % (MSIZE - MLEN) == 0 ? 1 : -1];
 
-void mbuf_free(MBuf *mBuf) {
+/**
+ * free single mBuf and return the `mBuf->next`
+ * @param mBuf
+ */
+MBuf *mbuf_free(MBuf *mBuf) {
 
 }
 
@@ -26,7 +30,7 @@ MBuf *mbuf_get(int nowait, EMBufType type) {
         panic("no enough memory to allocate mbuf");
     }
     // @see macro `dtom`
-    assert(((uint32_t)m % MSIZE) == 0);
+    assert(((uint32_t) m % MSIZE) == 0);
     return m;
 }
 
@@ -66,6 +70,7 @@ MBuf *m_get(int nowait, EMBufType type, int retryCount) {
     }
     return m;
 }
+
 static
 MBuf *m_retry(int nowait, EMBufType type, int times) {
     if (times == 0) {

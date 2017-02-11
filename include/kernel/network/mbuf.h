@@ -96,8 +96,12 @@ struct MB {
 //#define m_dat m_dat.M_databuf
 
 MBuf *mbuf_get(int nowait, EMBufType type);
+MBuf *mbuf_prepend(int len, int nowait);
+//#define M_BUF_GET_HEADER(nowait, type)
+//#define MH_ALIGN(m, len)
 
-#include "malloc.h"
+void mbuf_adj(MBuf *m, int len);
+void mbuf_cat(MBuf *m, MBuf *n);
 
 
 typedef struct {
