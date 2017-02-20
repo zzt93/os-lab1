@@ -69,3 +69,72 @@ M_EOR is set in an mbuf containing the end of a record. The Internet protocols (
 
 - m_devget leaves 16 bytes unused at the beginning of the mbuf. Although the 14-byteEthernet header is not stored here, room is allocated for a 14-byte Ethernet header on output,should the same mbuf be used for output. We'll encounter two functions that generate aresponse by using the received mbuf as the outgoing mbuf: icmp_reflect andtcp_respond.
 - The reason 16 bytes are allocated, and not 14, is to have the IP header longword aligned in the mbuf.
+
+## 2.8 Summary of Net/3 Networking Data Structures
+
+For a record-based protocol, such as UDP, we can encounter multiple records per queue, but for a protocol such as TCP that has no record boundaries, we'll find only a single record (one mbuf chain possibly consisting of multiple mbufs) per queue.
+
+## 2.9 m_copy and Cluster Reference Counts
+
+An additional advantage with clusters is being able to share a cluster between multiple mbufs. We encounter this with TCP output and the m_copy function, but describe it in more detail now.
+
+In our UDP example in Section 1.9, UDP took the mbuf chain containing the datagram, prepended an mbuf for the protocol headers, and passed the chain to IP output. UDP did not keep the mbuf in its send buffer. TCP cannot do this since TCP is a reliable protocol and it must maintain a copy of thedata that it sends, until the data is acknowledged by the other end.
+
+## Exercises
+### 2.1 Because cluster is no need to be copied, it will be shared across different mbuf
+
+### 2.2
+- Fail to allocate a mbuf if need a new mbuf to put contiguous bytes
+- If the total amount of data in the mbuf chain is less than the requested number of contiguous bytes
+- If `len > MHLEN`, i.e. requested len is impossible to fit in a mbuf
+
+### 2.3 Because cluster is shared, it will have to store multiple back pointer if so
+
+### 2.4 Since the size of an mbuf cluster is a power of 2 (typically 1024 or 2048), space cannot be taken within the cluster for the reference count. Obtain the Net/3 sources (Appendix B) and determine where these reference counts are stored.
+
+The following code is from uipc_mbuf.c & mbuf.h
+```
+union mcluster {
+	union	mcluster *mcl_next;
+	char	mcl_buf[MCLBYTES];
+};
+```
+```
+#define	MCLFREE(p) \
+	MBUFLOCK ( \
+	  if (--mclrefcnt[mtocl(p)] == 0) { \
+		((union mcluster *)(p))->mcl_next = mclfree; \
+		mclfree = (union mcluster *)(p); \
+		mbstat.m_clfree++; \
+	  } \
+	)
+```
+
+```
+/*
+ * Finally, allocate mbuf pool.  Since mclrefcnt is an off-size
+ * we use the more space efficient malloc in place of kmem_alloc.
+ */
+mclrefcnt = (char *)malloc(NMBCLUSTERS+CLBYTES/MCLBYTES,
+               M_MBUF, M_NOWAIT);
+bzero(mclrefcnt, NMBCLUSTERS+CLBYTES/MCLBYTES);
+mb_map = kmem_suballoc(kernel_map, (vm_offset_t *)&mbutl, &maxaddr,
+               VM_MBUF_SIZE, FALSE);
+```
+
+Procedure:
+- `mclfree` is empty
+- when wants a cluster
+  - `mclfree` is linked with some cluster allocated from `mb_map`(a range of virtual space abstraction)
+  - update `mclfree` to next cluster pointer and return `mclfree`
+  - use `mclrefcnt[mtocl(p)]` reference count of cluster and update it
+    ```
+      //  convert pointer within cluster to cluster index #
+      #define	mtocl(x)	(((u_long)(x) - (u_long)mbutl) >> MCLSHIFT)
+    ```
+    - mbutl: init as **min address of mb_map represented virtual address**, when the kernel is initialized in the file machdep.c
+    - mclrefcnt: allocated when the kernel is initialized in the file machdep.c
+    - MCLSHIFT = log(cluster_size)
+    - u_long: `typedef unsigned long	u_long;`
+
+

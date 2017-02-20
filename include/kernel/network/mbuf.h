@@ -37,21 +37,21 @@ typedef enum {
 } EMBufFlags;
 
 #define M_CLUSTER_SIZE 2048
-// max amount of data in mbuf with packet header
-#define MHLEN 100
-// max amount of data in normal mbuf
-#define MLEN 108
+#define MSIZE 128
+// max amount of data in normal mbuf -- 108
+#define MLEN (MSIZE - sizeof(MBHeader))
+// max amount of data in mbuf with packet header -- 100
+#define MHLEN (MLEN - sizeof(PacketHeader))
 // smallest amount of data to put into cluster
 // MHLEN + MLEN: two mbuf, first have a header, second not
 #define MIN_CLUSTER_SIZE (MHLEN + MLEN)
 // size of each mbuf
-#define MSIZE 128
 
 typedef struct {
     MBuf *mh_next;
     MBuf *mh_nextpkt;
 
-    void *mh_data;
+    caddr_t mh_data;
     EMBufType mh_type;
     uint16_t mh_len;
     uint16_t mh_flags;
@@ -63,7 +63,7 @@ typedef struct {
 } PacketHeader;
 
 typedef struct {
-    void *ext_buf;
+    caddr_t ext_buf;
     size_t ext_size;
 
     void (*ext_free)();
@@ -95,21 +95,54 @@ struct MB {
 //#define m_pkidat M_data.MH.MH_dat.mh_data
 //#define m_dat m_dat.M_databuf
 
-MBuf *mbuf_get(int nowait, EMBufType type);
+typedef enum {
+    M_DONTWAIT,
+    M_WAIT,
+} EMBufWait;
+
+MBuf *mbuf_get(EMBufWait nowait, EMBufType type);
+
+/**
+ * get an mbuf and then zeros the 108-bytes buffer
+ */
+MBuf *mbuf_getclr(EMBufWait nowait, EMBufType type);
+
 MBuf *mbuf_prepend(int len, int nowait);
 //#define M_BUF_GET_HEADER(nowait, type)
 //#define MH_ALIGN(m, len)
 
 void mbuf_adj(MBuf *m, int len);
+
 void mbuf_cat(MBuf *m, MBuf *n);
 
+/**
+ * A version of `mbuf_copym` implies M_DONTWAIT
+ */
+MBuf *mbuf_copy(MBuf *m, int offset, int len);
+
+MBuf *mbuf_copym(MBuf *m, int offset, int len, EMBufWait nowait);
+
+void mbuf_copydata(MBuf *m, int offset, int len, caddr_t buf);
+
+void mbuf_copyback(MBuf *m, int offset, int len, caddr_t buf);
+
+MBuf *mbuf_dev_get(char *buf, int len, int off, NetworkInterface *ifp,
+                   void (*copy)(const void *, void *, uint32_t));
+
+MBuf *mbuf_free(MBuf *mBuf);
+
+void mbuf_freem(MBuf *m);
+
+MBuf *m_gethdr(EMBufWait nowait, EMBufType type);
+
+MBuf *mbuf_pullup(MBuf *m, int len);
 
 typedef struct {
     int m_clfree; // free clusters
     int m_clusters; // clusters obtained from page pool
     int m_drain;
     int m_mtypes;
-} mbstat;
+} MBstat;
 
 
 // mbuf to data
@@ -127,10 +160,21 @@ typedef struct {
  */
 #define dtom(x) ((MBuf)((int)(x) & ~(MSIZE-1)))
 
+extern char *mclrefcnt;        /* cluster reference counts */
+
 typedef enum {
     MB_PULL_FINE,
     MB_PULL_NO_MBUF,
     MB_PULL_LESS_DATA,
 } EMBufPullErrorCode;
+
+#include "kernel/semaphore.h"
+
+#define MBUF_LOCK(code) \
+    {\
+        lock();\
+        {code}\
+        unlock();\
+    }
 
 #endif //OS_LAB1_MBUF_H

@@ -17,4 +17,8 @@ typedef          int   off_t;
 
 #define Pri_t int
 
+typedef void * caddr_t;
+
+typedef unsigned long u_long;
+
 #endif

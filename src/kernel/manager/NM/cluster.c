@@ -3,6 +3,26 @@
 //
 
 #include <kernel/network/mbuf.h>
+#include <kernel/network/cluster.h>
 
-MBuf *mcluster_get(int nowait, EMBufType type) {
+
+MCluster mcluster_start[M_CLUSTER_NUM];
+char *mclrefcnt;
+
+
+void mcluster_get(MBuf *m, EMBufWait nowait) {
+
+}
+
+
+/*
+ * -------------- static method ------------------
+ */
+static
+MCluster *mcluster_alloc(EMBufWait how) {
+    MBUF_LOCK(
+            if () {
+
+            }
+    );
 }
