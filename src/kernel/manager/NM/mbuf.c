@@ -21,6 +21,7 @@ char assert_mbuf_header_size[sizeof(MBHeader) % (MSIZE - MLEN) == 0 ? 1 : -1];
  * @param mBuf
  */
 MBuf *mbuf_free(MBuf *mBuf) {
+    MBuf * res = mBuf->m_hdr.mh_next;
 
 }
 
@@ -61,7 +62,7 @@ MBuf *m_get(EMBufWait nowait, EMBufType type, int retryCount) {
     MBuf *m = private_mbuf_alloc();
     if (m) {
         m->m_hdr.mh_type = type;
-        // TODO MBUFLOCK
+        // TODO MBUFLOCK( update mbstat )
         m->m_hdr.mh_next = NULL;
         m->m_hdr.mh_nextpkt = NULL;
         m->m_hdr.mh_data = m->m_dat.data;

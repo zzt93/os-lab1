@@ -8,7 +8,7 @@
 #include "types.h"
 #include "interface.h"
 
-typedef struct MB MBuf;
+typedef struct mbuf MBuf;
 
 typedef enum {
     MT_CONTROL, // extra-data protocol message
@@ -69,7 +69,7 @@ typedef struct {
     void (*ext_free)();
 } MBExt;
 
-struct MB {
+struct mbuf {
     MBHeader m_hdr;
     union {
         struct {
@@ -108,7 +108,8 @@ MBuf *mbuf_get(EMBufWait nowait, EMBufType type);
 MBuf *mbuf_getclr(EMBufWait nowait, EMBufType type);
 
 MBuf *mbuf_prepend(int len, int nowait);
-//#define M_BUF_GET_HEADER(nowait, type)
+MBuf *m_gethdr(EMBufWait nowait, EMBufType type);
+
 //#define MH_ALIGN(m, len)
 
 void mbuf_adj(MBuf *m, int len);
@@ -128,12 +129,11 @@ void mbuf_copyback(MBuf *m, int offset, int len, caddr_t buf);
 
 MBuf *mbuf_dev_get(char *buf, int len, int off, NetworkInterface *ifp,
                    void (*copy)(const void *, void *, uint32_t));
-
+// free single mbuf
 MBuf *mbuf_free(MBuf *mBuf);
-
+// free whole mbuf list
 void mbuf_freem(MBuf *m);
 
-MBuf *m_gethdr(EMBufWait nowait, EMBufType type);
 
 MBuf *mbuf_pullup(MBuf *m, int len);
 
