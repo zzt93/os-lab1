@@ -20,7 +20,7 @@ typedef enum {
      * kernel only, except `IFF_LOOPBACK`
      */
 
-            IFF_BROADCAST,
+    IFF_BROADCAST,
     IFF_MULTICAST,
     IFF_POINT_TO_POINT,
     IFF_LOOPBACK,
@@ -31,14 +31,14 @@ typedef enum {
      * set text
      */
 
-            IFF_LINK0,
+    IFF_LINK0,
     IFF_LINK1,
     IFF_LINK2,
     /*
      * ?
      */
 
-            IFF_ALLMULTI, // the interface is receiving all multicast packet
+    IFF_ALLMULTI, // the interface is receiving all multicast packet
     IFF_DEBUG, // debugging is enabled for the interface
     IFF_NO_ARP, // don't use arp on this interface
     IFF_NO_TRAILERS, // avoid using trailer encapsulation
@@ -128,5 +128,18 @@ void if_prepend(IFQueue *ifQueue, MBuf *mBuf);
 void if_dequeue(IFQueue *ifQueue, MBuf *m);
 
 void if_qflush(IFQueue *ifQueue);
+
+struct ifaddr {
+    struct ifaddr *ifa_next; // next address for this interface
+    NetworkInterface *ifa_to_if; // back pointer to interface
+    struct sockaddr *ifa_addr; // address
+    struct sockaddr *ifa_p2p_dest_addr; // other end of p-to-p link
+#define ifa_broadaddr ifa_p2p-dest_addr /*broadcast address on a broadcast network such as ethernet*/
+    struct sockaddr *ifa_netmask;
+    void (*ifa_router_request)(); // check or clean routes
+    uint16_t ifa_flags;
+    short ifa_ref_cnt; // reference count to this address: shared by interface and routing
+    int ifa_metric; // cost for this interface
+};
 
 #endif //OS_LAB1_INTERFACE_H

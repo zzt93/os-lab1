@@ -89,7 +89,7 @@ dynamic allocated bit map( using kmalloc)
 
 -----------------
 
-## NOTICE in the future:
+## Lessons:
 - the adt itself may not to be synchronized, the user choose whether to synchronize it, like `Vector and ArrayList`?  
 - can add NOINTR to make sure user add synchronization if necessary  
 - the adt seems should not using semaphore and P&V for concurrent use, for it may used in irq which may cause deadlock  
@@ -108,8 +108,32 @@ dynamic allocated bit map( using kmalloc)
 
 - avoid using `void *` for it may hide some bugs because the implicit conversion of different type of pointers.  
 
-- if not sure what type should use, may use macro called like `xxx_t` to make it easy to change  
+- if not sure what type should use, may use typedef/macro type like `xxx_t` to make it easy to change
+- c like interface:
+```
+struct xxx {
+/* procedure handles */
+	int	(*if_init)		/* init routine */
+		__P((int));
+	int	(*if_output)		/* output routine (enqueue) */
+		__P((struct ifnet *, struct mbuf *, struct sockaddr *,
+		     struct rtentry *));
+	int	(*if_start)		/* initiate output routine */
+		__P((struct ifnet *));
+	int	(*if_done)		/* output complete routine */
+		__P((struct ifnet *));	/* (XXX not used; fake prototype) */
+	int	(*if_ioctl)		/* ioctl routine */
+		__P((struct ifnet *, u_long, caddr_t));
+	int	(*if_reset)
+		__P((int));		/* new autoconfig will permit removal */
+	int	(*if_watchdog)		/* timer routine */
+		__P((int));
+};
+```
+- c like abstract class:
+```
 
+```
 
 ## Debug
 - minimize the code where bug might in by comment other parts
