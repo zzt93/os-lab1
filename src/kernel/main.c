@@ -29,6 +29,8 @@ void os_init_cont(void);
 
 void more_frequent();
 
+void init_network();
+
 
 void
 os_init(void) {

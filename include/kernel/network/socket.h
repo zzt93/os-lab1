@@ -16,16 +16,15 @@ typedef enum {
     AF_UNSPEC, // depend on text; In most case, it contains an Ethernet hardware address
 } AddressFamily;
 
-typedef struct sockaddr {
+typedef struct sockaddress {
     uint8_t sa_len;
     uint8_t sa_famliy;
+    /*
+     * This is a common C technique that allows the programmer
+     * to consider the last member in a structure to have a variable length.
+     */
     char sa_data[14]; // actually loner; address value
-};
-
-struct osockaddr {
-    uint8_t sa_family;
-    char sa_data[14];
-};
+} SockAddr;
 
 typedef enum {
 

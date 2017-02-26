@@ -7,6 +7,7 @@
 
 #include <drivers/time.h>
 #include "types.h"
+#include "socket.h"
 
 struct mbuf;
 typedef struct mbuf MBuf;
@@ -95,7 +96,7 @@ typedef struct ifnet {
      */
     int (*if_init)(int); // init routine
     int (*if_output)
-            (struct ifnet *, MBuf *, struct sockaddr *, struct rtentry *);
+            (struct ifnet *, MBuf *, SockAddr *, struct rtentry *);
 
     int (*if_start)(struct ifnet *); // initiate output routine
     int (*if_done)(struct ifnet *); // output complete routine
@@ -129,17 +130,17 @@ void if_dequeue(IFQueue *ifQueue, MBuf *m);
 
 void if_qflush(IFQueue *ifQueue);
 
-struct ifaddr {
+typedef struct ifaddr {
     struct ifaddr *ifa_next; // next address for this interface
     NetworkInterface *ifa_to_if; // back pointer to interface
-    struct sockaddr *ifa_addr; // address
-    struct sockaddr *ifa_p2p_dest_addr; // other end of p-to-p link
+    SockAddr *ifa_addr; // address
+    SockAddr *ifa_p2p_dest_addr; // other end of p-to-p link
 #define ifa_broadaddr ifa_p2p-dest_addr /*broadcast address on a broadcast network such as ethernet*/
-    struct sockaddr *ifa_netmask;
+    SockAddr *ifa_netmask;
     void (*ifa_router_request)(); // check or clean routes
     uint16_t ifa_flags;
     short ifa_ref_cnt; // reference count to this address: shared by interface and routing
     int ifa_metric; // cost for this interface
-};
+} InterfaceAddr;
 
 #endif //OS_LAB1_INTERFACE_H

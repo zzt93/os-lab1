@@ -132,7 +132,12 @@ struct xxx {
 ```
 - c like abstract class:
 ```
-
+The ifnet and ifaddr structures contain general information applicable to all network interfaces
+and protocol addresses. To accommodate additional device and protocol-specific information, each
+driver defines and each protocol allocates a specialized version of the ifnet and ifaddr
+structures. These specialized structures always contain an ifnet or ifaddr structure as their first
+member so that the common information can be accessed without consideration for the additional
+specialized information.
 ```
 
 ## Debug

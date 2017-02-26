@@ -138,3 +138,12 @@ Procedure:
     - u_long: `typedef unsigned long	u_long;`
 
 
+
+
+# Interface Layer
+
+## 3.6 ifnet and ifaddr Specialization
+
+The ifnet and ifaddr structures contain general information applicable to all network interfacesand protocol addresses. To accommodate additional device and protocol-specific information, eachdriver defines and each protocol allocates a specialized version of the ifnet and ifaddrstructures. These specialized structures always contain an ifnet or ifaddr structure as their firstmember so that the common information can be accessed without consideration for the additional specialized information.
+
+![An interface address list containing link-level, Internet, and OSI addresses.](ifnet_ifaddr.png)
