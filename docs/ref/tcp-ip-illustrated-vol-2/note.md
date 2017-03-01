@@ -147,3 +147,18 @@ Procedure:
 The ifnet and ifaddr structures contain general information applicable to all network interfacesand protocol addresses. To accommodate additional device and protocol-specific information, eachdriver defines and each protocol allocates a specialized version of the ifnet and ifaddrstructures. These specialized structures always contain an ifnet or ifaddr structure as their firstmember so that the common information can be accessed without consideration for the additional specialized information.
 
 ![An interface address list containing link-level, Internet, and OSI addresses.](ifnet_ifaddr.png)
+
+## 3.8 Ethernet Initialization
+
+[qemu add network device](https://en.wikibooks.org/wiki/QEMU/Devices/Network)
+```
+qemu-system-i386
+```
+- when no boot img from DVD/CD or ROM,
+- iPXE (PCI) start execution and init network devices
+- network will be configured by [ipxe](http://ipxe.org)
+  - MAC
+  - ipv4/v6, gateway
+
+- may need to write different driver code for different machine
+  - hp_device

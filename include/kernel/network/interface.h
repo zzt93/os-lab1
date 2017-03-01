@@ -11,17 +11,15 @@
 
 struct mbuf;
 typedef struct mbuf MBuf;
-
-typedef struct ifaddr {
-
-} Interface_Address;
+struct ifaddr;
+typedef struct ifaddr InterfaceAddr;
 
 typedef enum {
     /*
      * kernel only, except `IFF_LOOPBACK`
      */
 
-    IFF_BROADCAST,
+            IFF_BROADCAST,
     IFF_MULTICAST,
     IFF_POINT_TO_POINT,
     IFF_LOOPBACK,
@@ -29,17 +27,17 @@ typedef enum {
     IFF_RUNNING, // resources are allocated for this interface
     IFF_SIMPLEX, // the interface cannot receive its transmissions
     /*
-     * set text
+     * according to text
      */
 
-    IFF_LINK0,
+            IFF_LINK0,
     IFF_LINK1,
     IFF_LINK2,
     /*
      * ?
      */
 
-    IFF_ALLMULTI, // the interface is receiving all multicast packet
+            IFF_ALLMULTI, // the interface is receiving all multicast packet
     IFF_DEBUG, // debugging is enabled for the interface
     IFF_NO_ARP, // don't use arp on this interface
     IFF_NO_TRAILERS, // avoid using trailer encapsulation
@@ -50,12 +48,22 @@ typedef enum {
 #define IFF_CANT_CHANGE \
 (IFF_BROADCAST|IFF_MULTICAST|IFF_POINT_TO_POINT|IFF_OACTIVE|IFF_RUNNING|IFF_SIMPLEX)
 
+typedef struct ifqueue {
+    MBuf *ifq_head;
+    MBuf *ifq_tail;
+    int ifq_len; // current len of queue
+    int ifq_maxlen; // maximum len of queue
+    int ifq_drops; // packets dropped because of full queue
+} InterfaceQueue;
+
+#include "if_types.h"
+
 typedef struct ifnet {
     /*
      * ------ implementation information -----------
      */
-    struct ifnet *ifnext;
-    Interface_Address *if_addrlist;
+    struct ifnet *if_next;
+    InterfaceAddr *if_addrlist;
     char *if_name;
     short if_unit; // sub-unit for lower level driver
     uint16_t if_index; // uniquely identifies the interface
@@ -105,13 +113,7 @@ typedef struct ifnet {
     int (*if_reset)(int); // new autoconfig will permit removal
     int (*if_watchdog)(int); // timer routine
 
-    struct ifqueue {
-        MBuf *ifq_head;
-        MBuf *ifq_tail;
-        int ifq_len; // current len of queue
-        int ifq_maxlen; // maximum len of queue
-        int ifq_drops; // packets dropped because of full queue
-    } if_send;
+    InterfaceQueue if_send;
 } NetworkInterface;
 
 #define IFQ_MAXLEN 50
@@ -137,10 +139,15 @@ typedef struct ifaddr {
     SockAddr *ifa_p2p_dest_addr; // other end of p-to-p link
 #define ifa_broadaddr ifa_p2p-dest_addr /*broadcast address on a broadcast network such as ethernet*/
     SockAddr *ifa_netmask;
+
     void (*ifa_router_request)(); // check or clean routes
     uint16_t ifa_flags;
     short ifa_ref_cnt; // reference count to this address: shared by interface and routing
     int ifa_metric; // cost for this interface
 } InterfaceAddr;
+
+
+void if_attach(NetworkInterface *);
+void bpf_attach(caddr_t bpf, NetworkInterface *networkInterface, int, int);
 
 #endif //OS_LAB1_INTERFACE_H
