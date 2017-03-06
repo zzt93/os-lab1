@@ -6,6 +6,7 @@
 #include <const.h>
 #include <macro.h>
 #include "kernel/network/interface_slvar.h"
+#include "kernel/network/interface_loop.h"
 
 PseudoDeviceInit pseudoDeviceInit[] = {
         {sl_attach, 1},

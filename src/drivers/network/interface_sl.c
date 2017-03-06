@@ -7,7 +7,7 @@
 
 SlSoft sl_softc[NSL];
 
-void sl_attach() {
+void sl_attach(int n) {
     SlSoft *sc;
     int i = 0;
     for (sc = sl_softc; i < NSL; sc++, i++) {

@@ -2,11 +2,13 @@
 #define __MALLOC_H__
 
 
+void init_kmalloc();
+
 void *kmalloc(unsigned int size);
+
 void kfree(void *);
 
-void init_kmalloc();
-const int * const allocate_start();
+const int *const allocate_start();
 
 #define ALLOC_SIZE 262144 // 2**20 bytes = 2**18 words
 
@@ -16,11 +18,18 @@ const int * const allocate_start();
 #include "macro.h"
 
 #define ALIG(size) _ALIGN_((size), (ALIGNMENT - 1))
-/*
-typedef struct {
-    listhead link;
-    int start;
-    int size;
-} mem;
-*/
+
+
+typedef enum {
+    M_IFADDR,
+} EAllocType;
+
+typedef enum {
+    M_DONTWAIT,
+    M_WAITOK,
+} EMemoryAllocWait;
+
+void *malloc(uint32_t size, EAllocType allocType, EMemoryAllocWait memoryAllocWait);
+
+
 #endif /* __MALLOC_H__ */

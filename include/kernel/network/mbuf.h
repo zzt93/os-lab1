@@ -7,6 +7,7 @@
 
 #include "types.h"
 #include "interface.h"
+#include "lib/malloc.h"
 
 typedef struct mbuf MBuf;
 
@@ -95,20 +96,17 @@ struct mbuf {
 //#define m_pkidat M_data.MH.MH_dat.mh_data
 //#define m_dat m_dat.M_databuf
 
-typedef enum {
-    M_DONTWAIT,
-    M_WAIT,
-} EMBufWait;
 
-MBuf *mbuf_get(EMBufWait nowait, EMBufType type);
+
+MBuf *mbuf_get(EMemoryAllocWait nowait, EMBufType type);
 
 /**
  * get an mbuf and then zeros the 108-bytes buffer
  */
-MBuf *mbuf_getclr(EMBufWait nowait, EMBufType type);
+MBuf *mbuf_getclr(EMemoryAllocWait nowait, EMBufType type);
 
 MBuf *mbuf_prepend(int len, int nowait);
-MBuf *m_gethdr(EMBufWait nowait, EMBufType type);
+MBuf *m_gethdr(EMemoryAllocWait nowait, EMBufType type);
 
 //#define MH_ALIGN(m, len)
 
@@ -121,7 +119,7 @@ void mbuf_cat(MBuf *m, MBuf *n);
  */
 MBuf *mbuf_copy(MBuf *m, int offset, int len);
 
-MBuf *mbuf_copym(MBuf *m, int offset, int len, EMBufWait nowait);
+MBuf *mbuf_copym(MBuf *m, int offset, int len, EMemoryAllocWait nowait);
 
 void mbuf_copydata(MBuf *m, int offset, int len, caddr_t buf);
 

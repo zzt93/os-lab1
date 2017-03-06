@@ -8,6 +8,8 @@
 #include <drivers/time.h>
 #include "types.h"
 #include "socket.h"
+#include "lib/malloc.h"
+
 
 struct mbuf;
 typedef struct mbuf MBuf;
@@ -64,9 +66,15 @@ typedef struct ifnet {
      */
     struct ifnet *if_next;
     InterfaceAddr *if_addrlist;
+
+    /*
+     * In addition to a numeric index,
+     * each interface has a text name formed from the if_name and if_unit members of the ifnet structure
+     */
     char *if_name;
     short if_unit; // sub-unit for lower level driver
     uint16_t if_index; // uniquely identifies the interface
+
     short if_flags;
     short if_timer; // time until if_watchdog called in seconds
     int if_pcount; // number of promiscuous listeners
@@ -137,7 +145,7 @@ typedef struct ifaddr {
     NetworkInterface *ifa_to_if; // back pointer to interface
     SockAddr *ifa_addr; // address
     SockAddr *ifa_p2p_dest_addr; // other end of p-to-p link
-#define ifa_broadaddr ifa_p2p-dest_addr /*broadcast address on a broadcast network such as ethernet*/
+#define ifa_broadaddr ifa_p2p_dest_addr /*broadcast address on a broadcast network such as ethernet*/
     SockAddr *ifa_netmask;
 
     void (*ifa_router_request)(); // check or clean routes
@@ -147,7 +155,13 @@ typedef struct ifaddr {
 } InterfaceAddr;
 
 
+/**
+ * complete initialization of the interface's ifnet structure;
+ * and to insert the structure on the list of previously configured interfaces;
+ * the kernel initializes and assigns each interface a link-level address
+ */
 void if_attach(NetworkInterface *);
+
 void bpf_attach(caddr_t bpf, NetworkInterface *networkInterface, int, int);
 
 #endif //OS_LAB1_INTERFACE_H

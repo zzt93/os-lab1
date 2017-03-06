@@ -5,13 +5,12 @@
 
 #include <kernel/network/mbuf.h>
 #include <kernel/network/mbuf_alloc.h>
-#include "assert.h"
 
-MBuf *m_retry(EMBufWait nowait, EMBufType type, int times);
+MBuf *m_retry(EMemoryAllocWait nowait, EMBufType type, int times);
 
 void m_reclaim();
 
-MBuf *m_get(EMBufWait nowait, EMBufType type, int retryCount);
+MBuf *m_get(EMemoryAllocWait nowait, EMBufType type, int retryCount);
 
 char assert_mbuf_size[sizeof(MBuf) % MSIZE == 0 ? 1 : -1];
 char assert_mbuf_header_size[sizeof(MBHeader) % (MSIZE - MLEN) == 0 ? 1 : -1];
@@ -25,7 +24,7 @@ MBuf *mbuf_free(MBuf *mBuf) {
 
 }
 
-MBuf *mbuf_get(EMBufWait nowait, EMBufType type) {
+MBuf *mbuf_get(EMemoryAllocWait nowait, EMBufType type) {
     MBuf *m = m_get(nowait, type, 1);
     if (m == NULL) {
         panic("no enough memory to allocate mbuf");
@@ -58,7 +57,7 @@ EMBufPullErrorCode m_pullup(MBuf *mBuf, uint16_t size) {
  */
 
 static
-MBuf *m_get(EMBufWait nowait, EMBufType type, int retryCount) {
+MBuf *m_get(EMemoryAllocWait nowait, EMBufType type, int retryCount) {
     MBuf *m = private_mbuf_alloc();
     if (m) {
         m->m_hdr.mh_type = type;
@@ -74,7 +73,7 @@ MBuf *m_get(EMBufWait nowait, EMBufType type, int retryCount) {
 }
 
 static
-MBuf *m_retry(EMBufWait nowait, EMBufType type, int times) {
+MBuf *m_retry(EMemoryAllocWait nowait, EMBufType type, int times) {
     if (times == 0) {
         return NULL;
     }

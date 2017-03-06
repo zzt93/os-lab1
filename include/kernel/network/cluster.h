@@ -30,7 +30,7 @@ extern MCluster *mcluster_start;        /* virtual address of mclusters */
 // i.e. x may be not the start of cluster, so can't just minus it with start
 #define    mtocl(x)    (((u_long)(x) - (u_long)mcluster_start) >> MCLSHIFT)
 
-void mcluster_get(MBuf *m, EMBufWait nowait);
+void mcluster_get(MBuf *m, EMemoryAllocWait nowait);
 
 
 #endif //OS_LAB1_CLUSTER_H

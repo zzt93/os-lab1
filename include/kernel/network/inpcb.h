@@ -5,7 +5,6 @@
 #ifndef OS_LAB1_INPCB_H
 #define OS_LAB1_INPCB_H
 
-#include <netinet/in.h>
 
 typedef struct internet_protocol_control_block Inpcb;
 

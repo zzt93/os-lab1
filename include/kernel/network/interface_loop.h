@@ -13,4 +13,6 @@ int (*lo_ioctl)(struct ifnet *, int, caddr_t);
 int (*lo_output)
         (struct ifnet *, MBuf *, SockAddr *, struct rtentry *);
 
+void loop_attach(int n);
+
 #endif //OS_LAB1_INTERFACE_LOOP_H

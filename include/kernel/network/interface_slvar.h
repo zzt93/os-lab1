@@ -27,7 +27,7 @@ typedef struct sl_softc {
     caddr_t sc_bpf; // BPF data
 } SlSoft;
 
-void sl_attach();
+void sl_attach(int n);
 
 #define NSL 1
 // 20-byte IP header, 20-byte TCP, 256 bytes user data

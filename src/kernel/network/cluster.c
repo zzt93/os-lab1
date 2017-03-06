@@ -10,7 +10,7 @@ MCluster mcluster_start[M_CLUSTER_NUM];
 char *mclrefcnt;
 
 
-void mcluster_get(MBuf *m, EMBufWait nowait) {
+void mcluster_get(MBuf *m, EMemoryAllocWait nowait) {
 
 }
 
@@ -19,7 +19,7 @@ void mcluster_get(MBuf *m, EMBufWait nowait) {
  * -------------- static method ------------------
  */
 static
-MCluster *mcluster_alloc(EMBufWait how) {
+MCluster *mcluster_alloc(EMemoryAllocWait how) {
     MBUF_LOCK(
             if () {
 
