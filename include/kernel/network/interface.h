@@ -156,6 +156,9 @@ typedef struct ifaddr {
 
 
 /**
+ * share by all interfaces, which all started with a NetworkInterface,
+ * then following it's specific content
+ *
  * complete initialization of the interface's ifnet structure;
  * and to insert the structure on the list of previously configured interfaces;
  * the kernel initializes and assigns each interface a link-level address
@@ -163,5 +166,7 @@ typedef struct ifaddr {
 void if_attach(NetworkInterface *);
 
 void bpf_attach(caddr_t bpf, NetworkInterface *networkInterface, int, int);
+
+#define IFNET_SLOWHZ 1
 
 #endif //OS_LAB1_INTERFACE_H

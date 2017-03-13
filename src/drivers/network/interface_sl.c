@@ -21,7 +21,7 @@ void sl_attach(int n) {
         sc->sc_if.if_ioctl = sl_ioctl;
         sc->sc_if.if_output = sl_output;
         sc->sc_if.if_send.ifq_maxlen = 50;
-        sc->sc_fastq.ifq_maxlen = 32;
+        sc->sc_interactive_out_q.ifq_maxlen = 32;
         if_attach(&sc->sc_if);
 //        bpf_attach()
     }

@@ -70,7 +70,7 @@ int le_attach(struct device *device) {
     ifp->if_output = ether_output;
     ifp->if_start = le_start;
     ifp->if_flags = IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST;
-    bpf_attach(&ifp->if_bpf, ifp, );
+//    bpf_attach(&ifp->if_bpf, ifp, );
     if_attach(ifp);
     return 1;
 }

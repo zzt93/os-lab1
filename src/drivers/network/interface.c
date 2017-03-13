@@ -6,10 +6,15 @@
 #include <kernel/network/interface.h>
 #include <kernel/network/interface_dl.h>
 #include <lib/string.h>
+#include <kernel/semaphore.h>
 
 InterfaceAddr *ifnet_addrs[];
 static uint16_t if_index = 0;
 NetworkInterface *if_head;
+
+void ether_if_attach(NetworkInterface *ifp);
+
+void if_slow_timeout(void *arg);
 
 void if_attach(NetworkInterface *ifp) {
     unsigned socksize, ifaddr_size;
@@ -95,7 +100,34 @@ void if_attach(NetworkInterface *ifp) {
 
         /* XXX -- Temporary fix before changing 10 ethernet drivers */
         if (ifp->if_output == ether_output) {
-//            ether_ifattach(ifp);
+            ether_if_attach(ifp);
         }
     }
+}
+
+void if_init() {
+    NetworkInterface *ifp;
+
+    for(ifp = ifnet_addrs; ifp; ifp = ifp->if_next) {
+        if (ifp->if_send.ifq_maxlen == 0) {
+            ifp->if_send.ifq_maxlen = IFQ_MAXLEN;
+        }
+    }
+    if_slow_timeout(0);
+}
+
+void if_slow_timeout(void *arg) {
+    NetworkInterface *ifp;
+    lock();
+
+    for (ifp = ifnet_addrs; ifp; ifp = ifp->if_next) {
+        if (ifp->if_timer == 0 || --ifp->if_timer) {
+            continue;
+        }
+        if (ifp->if_watchdog) {
+            (*ifp->if_watchdog)(ifp->if_unit);
+        }
+    }
+    unlock();
+//    timeout(if_slow_timeout, NULL, HZ/IFNET_SLOWHZ);
 }

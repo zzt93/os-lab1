@@ -162,3 +162,24 @@ qemu-system-i386
 
 - may need to write different driver code for different machine
   - hp_device
+
+
+## Exercises
+###3.1 netstat -i
+Iface      MTU    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+enp0s25   1500        0      0      0 0             0      0      0      0 BMU
+lo       65536   150788      0      0 0        150788      0      0      0 LRU
+virbr0    1500        0      0      0 0             0      0      0      0 BMU
+wlp3s0    1500   187285      0      0 0        152950      0      0      0 BMRU
+
+### 3.3 Why is SLIP's interactive queue shorter than SLIP's standard output queue?
+Guess: interactive queue have more restrict speed requirement than standard output queue. If the queue is too long, will not so interactive.
+
+### 3.4 Why aren't if_hdrlen and if_addrlen initialized in slattach?
+Because it is initialized when program start because it is global variable
+```
+SlSoft sl_softc[NSL];
+
+```
+
+### 3.5 Draw a picture similar to Figure 3.38 for the SLIP and loopback devices.

@@ -5,6 +5,7 @@
 #ifndef OS_LAB1_INTERFACE_SLVAR_H
 #define OS_LAB1_INTERFACE_SLVAR_H
 
+#include <drivers/tty/tty.h>
 #include "interface.h"
 
 typedef enum {
@@ -16,7 +17,8 @@ typedef enum {
 
 typedef struct sl_softc {
     NetworkInterface sc_if;
-    InterfaceQueue sc_fastq; // interactive output queue
+    // interactive output queue, which require low latency
+    InterfaceQueue sc_interactive_out_q;
     Console *sc_tty;
     uint8_t *sc_mp; // pointer to next available buf char of SLIP packet
     uint8_t *sc_ep; // pointer to last available buf char of SLIP packet
