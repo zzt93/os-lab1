@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/zzt93/os-lab1.svg?branch=dev-sound)](https://travis-ci.org/zzt93/os-lab1)
+[![Build Status](https://travis-ci.org/zzt93/os-lab1.svg?branch=master)](https://travis-ci.org/zzt93/os-lab1)
 
 # os-lab1
 os-lab1
@@ -8,65 +8,64 @@ Try to learn os by lab
 ------------------------------
 
 ## Aim:
-[Big picture](docs/pic/aim.png)
+![Big picture](docs/pic/aim.png)
 
 
 ## Running requirement
 - make  
 - qemu( I am using `qemu-system-i386` in makefile)  
 - gcc  
-`
+
 ----------------------
 
 Sep 26 2015 update:
 
 ## The functionalities that I have already implemented:
 
-###Mis
-printk -- printf in kernel  
-kmalloc -- malloc in kernel -- using next-fit algorithm  
-the key press interrupt handler  
-a simple maze game running without os  
-the context switch between threads  
-the creation of kernel thread  
-the schedule of thread -- now using Round-Robin algorithm  
-the sleep and wake_up of thread  
-the semaphore(P&V) and lock(cli&sti) to slove critical section  
-the send and receive message between threads  -- send it asynchronized and will always succeed; receive is synchronized and may be blocked   
-add timer-- clock diver, ide-- hard disk driver, tty -- terminal driver  
-very very simple file system -- name is number, size is fixed  
-create user process  
-using page dynamic allocation  -- using bit-map algorithm  
-add page protection  
-put user in ring3  
-wait(int second) -- system call  
-random number  
-
-non-blocked timer -- used to make a process run specific seconds, i.e. counting its running time  
-LCM and GCD  
+### Mis
+- printk -- printf in kernel  
+- kmalloc -- malloc in kernel -- using next-fit algorithm  
+- the key press interrupt handler  
+- a simple maze game running without os  
+- the context switch between threads  
+- the creation of kernel thread  
+- the schedule of thread -- now using Round-Robin algorithm  
+- the sleep and wake_up of thread  
+- the semaphore(P&V) and lock(cli&sti) to slove critical section  
+- the send and receive message between threads  -- send it asynchronized and will always succeed; receive is synchronized and may be blocked   
+- add timer-- clock diver, ide-- hard disk driver, tty -- terminal driver  
+- very very simple file system -- name is number, size is fixed  
+- create user process  
+- using page dynamic allocation  -- using bit-map algorithm  
+- add page protection  
+- put user in ring3  
+- wait(int second) -- system call  
+- random number  
+- non-blocked timer -- used to make a process run specific seconds, i.e. counting its running time  
+- LCM and GCD  
 
 ### process
-fork a process  
-exec a command  
-exit a user process  
-waitpid  
-a simple shell  
+- fork a process  
+- exec a command  
+- exit a user process  
+- waitpid  
+- a simple shell  
 
 ### file system
-upgrade file system: change file system name to string; size is variable  
-create a file(file name max is 28 bytes @see f_dir.h)  
-make a directory(directory depth max is 16 @see f_dir.h)  
-delete a file  
-delete a directory  
-change current working directory  
-list files under a folder  
-open a file  
-close a file  
-read a file  
-write a file  
-lseek a file: i.e. change the cursor for reading/writing  
+- upgrade file system: change file system name to string; size is variable  
+- create a file(file name max is 28 bytes @see f_dir.h)  
+- make a directory(directory depth max is 16 @see f_dir.h)  
+- delete a file  
+- delete a directory  
+- change current working directory  
+- list files under a folder  
+- open a file  
+- close a file  
+- read a file  
+- write a file  
+- lseek a file: i.e. change the cursor for reading/writing  
 
-###shell utility:
+### shell utility:
 - cd
 - pwd
 - ls
@@ -74,14 +73,14 @@ lseek a file: i.e. change the cursor for reading/writing
 - echo arguments and wait 5 seconds
 
 
-###Implement some ADT:  
-circular queue  
-[BST](docs/ADT/BST.md)  
-[map](docs/ADT/map.md)  
-linked-list  
-bit map  
-dynamic allocated bit map( using kmalloc)  
-[heap](docs/ADT/heap.md)
+### Implement some ADT:  
+- circular queue  
+- [BST](docs/ADT/BST.md)  
+- [map](docs/ADT/map.md)  
+- linked-list  
+- bit map  
+- dynamic allocated bit map( using kmalloc)  
+- [heap](docs/ADT/heap.md)
 
 ---------------------
 
