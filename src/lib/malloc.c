@@ -13,7 +13,7 @@ static int *space_head() {
     return space;
 }
 
-const int * const allocate_start() {
+const int *const allocate_start() {
     return space;
 }
 
@@ -21,7 +21,6 @@ void init_kmalloc() {
     int *h = space_head();
     *h = ALLOC_SIZE - HEAD_SIZE;
 }
-
 
 
 /**
@@ -43,7 +42,7 @@ void init_kmalloc() {
 
 */
 void *kmalloc(unsigned int size) {
-    assert (ALIG(size + 4 * HEAD_SIZE)%4 == 0);
+    assert (ALIG(size + 4 * HEAD_SIZE) % 4 == 0);
     unsigned int s = ALIG(size + 4 * HEAD_SIZE) / 4;
     // return null if the size is to large
     if (s >= ALLOC_SIZE) {
@@ -64,7 +63,7 @@ void *kmalloc(unsigned int size) {
     int count = 2;
     while (count) {
         while (h < space_head() + ALLOC_SIZE && // valid address
-            (*h < 0 || (*h > 0 && *h < s)) ) {
+               (*h < 0 || (*h > 0 && *h < s))) {
             //printk("in loop\n");
             if (*h < 0) {
                 h += -(*h);
@@ -123,8 +122,8 @@ void check_header(const int *h) {
 }
 
 void kfree(void *p) {
-    int *h = (int *)p - HEAD_SIZE;
-    if(*h > 0 || *h <= - ALLOC_SIZE) {
+    int *h = (int *) p - HEAD_SIZE;
+    if (*h > 0 || *h <= -ALLOC_SIZE) {
         assert(0);
     }
     lock();

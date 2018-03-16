@@ -36,6 +36,7 @@ int block_dir_num;
 #define BLOCK_INDEX_DEEPTH 3
 // add one for the direct block not have index
 int block_index_range[BLOCK_INDEX_DEEPTH + 1];
+
 void init_block(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size) {
     lock();
     block_map_start = mstart;
@@ -89,13 +90,14 @@ void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size);
 const uint32_t super_start = 1511936;
 
 #define SUPER_BUF 512
+
 void load_super_block() {
     char buf[SUPER_BUF];
     //n_dev_read(now_disk, FM, buf, super_start, SUPER_BUF);
     n_dev_read(now_disk, FM, buf, super_start, sizeof(uint32_t) * 8);
     // the following may change if we save more info in the super
     // block
-    uint32_t *b = (uint32_t *)buf;
+    uint32_t *b = (uint32_t *) buf;
     // @checked the super block content is the same with
     // the parameter in makeimg.py
     init_inode(b[0], b[1], b[4], b[5]);

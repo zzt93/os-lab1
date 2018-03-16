@@ -3,7 +3,7 @@
 
 
 #define str(x) #x
-#define conc(str1,str2) str1 ## str2
+#define conc(str1, str2) str1 ## str2
 
 #define RED     "\x1b[31m"
 #define GREEN   "\x1b[32m"

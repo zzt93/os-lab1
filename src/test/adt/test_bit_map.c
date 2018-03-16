@@ -27,7 +27,7 @@ void test_bit_map() {
     for (i = BITS; i < SIZE; i++) {
         set_val(i, 1);
         assert(is_val(i, 1));
-        assert(1 << (i-32) == free[1]);
+        assert(1 << (i - 32) == free[1]);
         assert(first_val(1) == i);
         set_val(i, 0);
         assert(is_val(i, 0));
@@ -42,8 +42,8 @@ void test_bit_map() {
     set_val(9, USED);
     set_val(20, USED);
     assert(free[0] ==
-        (   (1 << 20) +
+           ((1 << 20) +
             (1 << 3) +
             (1 << 4) +
-            (1 << 9) ));
+            (1 << 9)));
 }

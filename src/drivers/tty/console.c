@@ -16,18 +16,18 @@ static const char *ttynames[NR_TTY] = {"tty1", "tty2", "tty3", TTY4};
 
 // for tty4
 //Console *terminal = ttys + NR_TTY - 1;
-extern char * user_name;
+extern char *user_name;
 
 // real memory of screen
 // memory-mapped io: screen
-static uint16_t *vmem = (void*)pa_to_va(0xb8000);
+static uint16_t *vmem = (void *) pa_to_va(0xb8000);
 
 static uint16_t vbuf[NR_TTY][SCR_W * SCR_H * 2];
 
 char banner[SCR_W + 1];
 
 
-const char*
+const char *
 get_current_tty(void) {
     return current_consl->name;
 }
@@ -41,12 +41,12 @@ static void
 scrup(Console *c) {
     int i;
     if (c->scr + c->wh >= c->vbuf + c->size) {
-        for (i = c->w; i < c->size; i ++)
+        for (i = c->w; i < c->size; i++)
             c->vbuf[i - c->w] = c->vbuf[i];
         c->scr -= c->w;
         c->pos -= c->w;
     }
-    for (i = 0; i < c->w; i ++)
+    for (i = 0; i < c->w; i++)
         c->scr[c->wh + i] = draw(' ');
     c->scr += c->w;
 }
@@ -57,7 +57,7 @@ next(Console *c) {
     if (c->vbuf + c->pos == c->scr + c->wh - 1) {
         scrup(c);
     }
-    c->pos ++;
+    c->pos++;
 }
 
 // put char on now position
@@ -87,7 +87,7 @@ lf(Console *c) {
 
 static void
 del(Console *c) {
-    c->pos --;
+    c->pos--;
     putc(c, ' ');
 }
 
@@ -98,8 +98,8 @@ del(Console *c) {
 static bool
 movl(Console *c) {
     if (c->i != 0) {
-        c->i --;
-        c->pos --;
+        c->i--;
+        c->pos--;
         return true;
     }
     return false;
@@ -108,8 +108,8 @@ movl(Console *c) {
 static bool
 movr(Console *c) {
     if (c->lbuf[c->i] != 0) {
-        c->i ++;
-        c->pos ++;
+        c->i++;
+        c->pos++;
         return true;
     }
     return false;
@@ -125,7 +125,7 @@ consl_sync(Console *c) {
     int i;
     lock();
     // write banner
-    for (i = 0; i < SCR_W; i ++) {
+    for (i = 0; i < SCR_W; i++) {
         vmem[i] = (C_BLUE << 12) | (C_LWHITE << 8) | banner[i];
     }
     if (current_consl == c) {
@@ -142,13 +142,14 @@ consl_sync(Console *c) {
 
 static void
 removec(Console *c) {
-    char *ptr = &c->lbuf[-- c->i];
+    char *ptr = &c->lbuf[--c->i];
     uint16_t *scr = &c->vbuf[c->pos - 1];
     while (*ptr != 0) {// move late chars back when delete a char in
         // the middle of input array
         *ptr = *(ptr + 1);
         *scr = *(scr + 1);
-        ptr ++; scr ++;
+        ptr++;
+        scr++;
     }
 }
 
@@ -195,6 +196,7 @@ wait_sometime() {
 }
 
 #include "drivers/time.h"
+
 static void
 backsp(Console *c) {
     if (c->i > 0) {
@@ -202,10 +204,9 @@ backsp(Console *c) {
         if (c->lbuf[c->i] == 0) {
             del(c);
         } else {
-            c->pos --;
+            c->pos--;
         }
-    }
-    else {// c->i == 0, i.e. at the start of the line buffer
+    } else {// c->i == 0, i.e. at the start of the line buffer
         /* Insert code here to play some warning sound */
         /* may change to rather thread to make sound, rather than
            blocking TTY
@@ -232,15 +233,15 @@ get_cooked(Console *c, pid_t pid, char *buf, int count) {
     // move it to dev_rw -- move it is wrong
     // convertion have to be in the target process and
     // dev_rw is at source process
-    char *aim = get_pa(&fetch_pcb(pid)->pdir, (uint32_t)buf);
+    char *aim = get_pa(&fetch_pcb(pid)->pdir, (uint32_t) buf);
     int nread = 0;
-    while (count --) {
+    while (count--) {
         if (c->cbuf[c->f] == 0) {// out of range of cooked buffer
             //c->f = (c->f + 1) % CBUF_SZ;
             break;
         }
-        memcpy(aim ++, c->cbuf + c->f, 1);
-        nread ++;
+        memcpy(aim++, c->cbuf + c->f, 1);
+        nread++;
         c->f = (c->f + 1) % CBUF_SZ;
     }
     return nread;
@@ -258,7 +259,7 @@ read_request(Msg *m) {
     if (c->f == c->r) {
         if (c->rtop == RSTK_SZ) panic("too many read request");
         // just copy the message when no more input in cooked buffer
-        memcpy(&c->rstk[c->rtop ++], m, sizeof(Msg));
+        memcpy(&c->rstk[c->rtop++], m, sizeof(Msg));
     } else {// get newly added a line(end with an enter)
         pid_t dest = m->src;
         int nread = get_cooked(c, m->req_pid, m->buf, m->len);
@@ -273,15 +274,14 @@ size_t handle_write_request(Msg *m) {
     if (m->dev_id >= tty_start && m->dev_id < NR_TTY + tty_start) {
         PCB *req_pcb = fetch_pcb(m->req_pid);
         assert(req_pcb != NULL);
-        char *src = get_pa(&(req_pcb->pdir), (uint32_t)m->buf);
+        char *src = get_pa(&(req_pcb->pdir), (uint32_t) m->buf);
         // copy from the message buffer one by one
-        for (i = 0; i < m->len; i ++) {
+        for (i = 0; i < m->len; i++) {
             // FIXED: m->buf need changing to physical address
             consl_writec(&ttys[m->dev_id - tty_start], *(src + i));
         }
         consl_sync(&ttys[m->dev_id]);
-    }
-    else {
+    } else {
         assert(0);
     }
     return i;
@@ -291,7 +291,7 @@ size_t handle_write_request(Msg *m) {
 int put_prompt(Msg *m) {
     m->dev_id = d_ttyi[NOW_TERMINAL];
     m->req_pid = current->pid;
-    PCB *req_pcb = (PCB *)m->buf;
+    PCB *req_pcb = (PCB *) m->buf;
     char *str = user_name;
     int len1 = strlen(str);
     int len2 = strlen(req_pcb->cwd_path);
@@ -329,9 +329,10 @@ cook(Console *c) {
     }
     // set the line buffer clear by set the first char to '\0'
     c->lbuf[c->i = 0] = 0;
-    cr(c); lf(c);
+    cr(c);
+    lf(c);
     if (c->rtop != 0) {
-        c->rtop --;
+        c->rtop--;
         read_request(&c->rstk[c->rtop]);
     }
     //put_user_name(c);
@@ -344,7 +345,8 @@ consl_writec(Console *c, char ch) {
             cr(c);
             break;
         case '\n':// print a '\n' just change of cursor position
-            cr(c); lf(c);
+            cr(c);
+            lf(c);
             break;
         default:
             putc(c, ch);
@@ -356,8 +358,8 @@ void
 consl_accept(Console *c, char ch) {
     int i, cc = 0;
     // find the first empty char
-    for (; c->lbuf[c->i + cc] != 0; cc ++);
-    for (i = cc + 1; i > 0; i --) {
+    for (; c->lbuf[c->i + cc] != 0; cc++);
+    for (i = cc + 1; i > 0; i--) {
         if (c->i + i >= LBUF_SZ) panic("line buffer full");
         // for insert -- move the content after i one place
         c->lbuf[c->i + i] = c->lbuf[c->i + i - 1];
@@ -370,7 +372,7 @@ consl_accept(Console *c, char ch) {
     next(c);
     if (c->i >= LBUF_SZ) panic("line buffer full");
     // put the char in the line buffer
-    c->lbuf[c->i ++] = ch;
+    c->lbuf[c->i++] = ch;
     consl_sync(c);
 }
 
@@ -397,8 +399,12 @@ consl_feed(Console *c, int key) {
         case K_END:
             while (movr(c));
             break;
-        case K_F1: case K_F2: case K_F3:
-        case K_F4: case K_F5: case K_F6:
+        case K_F1:
+        case K_F2:
+        case K_F3:
+        case K_F4:
+        case K_F5:
+        case K_F6:
             if (key - K_F1 < NR_TTY) {
                 c = current_consl = ttys + key - K_F1;
             }
@@ -421,7 +427,7 @@ init_consl(int tty_index) {
     c->lbuf[0] = 0;
 
     int i;
-    for (i = 0; i < SCR_W * SCR_H; i ++) {
+    for (i = 0; i < SCR_W * SCR_H; i++) {
         c->scr[i] = draw(' ');
     }
     c->i = c->r = c->f = 0;
@@ -445,6 +451,7 @@ send_updatemsg(void) {
 
 int d_ttyi[NR_TTY];
 int tty_start;
+
 /**
    init banner on the screen
    init console for each tty_
@@ -454,7 +461,7 @@ void init_console(void) {
     memset(banner, ' ', sizeof(banner));
     banner[SCR_W] = 0;
     int i;
-    for (i = 0; i < NR_TTY; i ++) {
+    for (i = 0; i < NR_TTY; i++) {
         init_consl(i);
         // TTY? it is the device pid, and we send to main TTY thread
         // register the pid of drivers thread

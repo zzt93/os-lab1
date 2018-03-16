@@ -38,11 +38,11 @@ static int next(int bits) {
       对于x86平台的gcc编译器，最高位移入1，也就是仍保持负数的符号位，
       这种处理方式对负数仍然保持了“右移1位相当于除以2”的性质。
      */
-    return (int)(next >> (48 - bits));
+    return (int) (next >> (48 - bits));
 }
 
 double next_double() {
-    return (((long long int)next(26) << 27) + next(27)) * DOUBLE_UNIT;
+    return (((long long int) next(26) << 27) + next(27)) * DOUBLE_UNIT;
 }
 
 /**
@@ -53,7 +53,7 @@ int next_int(int bound) {
         assert(0);
     }
     if (!(bound & (bound - 1))) {  // i.e., bound is a power of 2
-        return (int)((bound * (long long int)next(31)) >> 31);
+        return (int) ((bound * (long long int) next(31)) >> 31);
     }
     /*'
       if bound is not the power of 2, just using modulus may
@@ -64,7 +64,7 @@ int next_int(int bound) {
         // always be positive number
         bits = next(31);
         val = bits % bound;
-    } while (bits - val + (bound-1) < 0);
+    } while (bits - val + (bound - 1) < 0);
     return val;
 }
 

@@ -4,7 +4,7 @@
 
 #define NUM_MBR 512
 
-extern PCB* current;
+extern PCB *current;
 
 void read_MBR() {
     char buf[NUM_MBR];
@@ -24,7 +24,7 @@ void read_MBR() {
     }
 }
 
-static void set_mes(Msg* m, char *buf) {
+static void set_mes(Msg *m, char *buf) {
     m->type = FM_ram_read;
     m->src = current->pid;
     m->dest = FM;

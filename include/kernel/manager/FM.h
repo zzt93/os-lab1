@@ -21,12 +21,15 @@ enum {
 };
 
 void init_FM();
-size_t ram_read_file(Msg*);
+
+size_t ram_read_file(Msg *);
+
 void init_file_system();
 
 extern int FM;
 
 const char *simplify_path(const char *cwd, const char *path);
+
 int is_absolute_path(const char *path);
 
 #include "fd.h"

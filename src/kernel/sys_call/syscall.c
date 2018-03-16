@@ -9,9 +9,10 @@
 #include "kernel/init_proc.h"
 
 
-
 int to_ddl_get(int pid);
+
 int to_ddl_update(int pid, int to_ddl);
+
 /**
    NOTICE:
    if the parameters contains address, may be you need
@@ -21,7 +22,7 @@ int to_ddl_update(int pid, int to_ddl);
    ie, in the target process/server
  */
 void do_syscall(TrapFrame *tf) {
-	int id = tf->eax; // system call id
+    int id = tf->eax; // system call id
     Msg m;
     m.src = current->pid;
     NOINTR;
@@ -57,18 +58,18 @@ void do_syscall(TrapFrame *tf) {
                 // tf->ecx -- buffer
                 // tf->edx -- len
                 init_msg(&m,
-                    current->pid,
-                    FM_read,
-                    (pid_t)current, tf->ebx, (void *)tf->ecx, 0, tf->edx);
+                         current->pid,
+                         FM_read,
+                         (pid_t) current, tf->ebx, (void *) tf->ecx, 0, tf->edx);
                 break;
             case SYS_write:
                 // tf->ebx -- fd
                 // tf->ecx -- buffer
                 // tf->edx -- len
                 init_msg(&m,
-                    current->pid,
-                    FM_write,
-                    (pid_t)current, tf->ebx, (void *)tf->ecx, 0, tf->edx);
+                         current->pid,
+                         FM_write,
+                         (pid_t) current, tf->ebx, (void *) tf->ecx, 0, tf->edx);
                 break;
             case SYS_close:
                 m.type = FM_close;
@@ -93,7 +94,7 @@ void do_syscall(TrapFrame *tf) {
                 break;
             case SYS_dup2:
                 m.type = FM_dup2;
-                m.i[2] = (int)current;
+                m.i[2] = (int) current;
                 // old_fd
                 m.i[0] = tf->ebx;
                 // new_fd in dev_id
@@ -115,7 +116,7 @@ void do_syscall(TrapFrame *tf) {
                 m.buf = current;
                 break;
             case SYS_pwd:
-                kprintf("%s\n", (void **)&current->cwd_path);
+                kprintf("%s\n", (void **) &current->cwd_path);
                 tf->eax = 1;
                 return;
             default:
@@ -136,18 +137,18 @@ void do_syscall(TrapFrame *tf) {
                 m.type = PM_exec;
                 // file name -- char * -- need get_pa
                 m.i[0] = tf->ebx;
-                m.i[1] = (int)current;
+                m.i[1] = (int) current;
                 // arguments address
-                m.buf = (void *)tf->ecx;
+                m.buf = (void *) tf->ecx;
                 break;
             case SYS_ram_exec: // execute binary executable in kernel code/memory
                 m.type = PM_ram_exec;
                 // file name -- int
                 m.i[0] = tf->ebx;
                 // current PCB*
-                m.i[1] = (int)current;
+                m.i[1] = (int) current;
                 // args address
-                m.buf = (void *)tf->ecx;
+                m.buf = (void *) tf->ecx;
                 break;
             case SYS_exit:
                 m.type = PM_exit;
@@ -181,8 +182,8 @@ void do_syscall(TrapFrame *tf) {
             {
                 int new_ddl = to_ddl_get(current->pid) + tf->ebx;
                 tf->eax = to_ddl_update(current->pid, new_ddl);
-				current->priority = USER_PRI - new_ddl;
-				// no need to find it in the heap for it not in the heap when running
+                current->priority = USER_PRI - new_ddl;
+                // no need to find it in the heap for it not in the heap when running
 //                kset_edf_priority(current, USER_PRI - new_ddl);
                 return;
             }
@@ -205,13 +206,13 @@ void do_syscall(TrapFrame *tf) {
                 printk(RED"%s "RESET, tf->ebx);
                 break;
             case SYS_printf:
-                kprintf((const char *)tf->ebx, (void **)tf->ecx);
+                kprintf((const char *) tf->ebx, (void **) tf->ecx);
                 break;
             case SYS_read_line:
                 tf->eax = n_dev_read(d_ttyi[NOW_TERMINAL],
-                    current->pid,
-                    (void *)tf->ebx,
-                    0, tf->ecx);
+                                     current->pid,
+                                     (void *) tf->ebx,
+                                     0, tf->ecx);
                 break;
             case SYS_wait:
                 m.type = NEW_TIMER;
@@ -244,7 +245,7 @@ void do_syscall(TrapFrame *tf) {
                 break;
             case SYS_assert:
                 // print error message
-                kprintf((const char *)tf->ebx, (void **)tf->ecx);
+                kprintf((const char *) tf->ebx, (void **) tf->ecx);
                 // then exit
                 m.type = PM_exit;
                 // current PCB*

@@ -11,7 +11,7 @@ typedef enum {
     FT_PLAIN,
     FT_SOFT_LINK,
     // following has no inode
-    PIPE,
+            PIPE,
     SOCKET,
     BLOCK_DEV,
     CHAR_DEV,
@@ -41,7 +41,8 @@ typedef struct {
 // max number for files that all the processes can open
 #define MAX_FILE 128
 
-FTE * add_fte(iNode *node, uint32_t offset);
+FTE *add_fte(iNode *node, uint32_t offset);
+
 int free_fte(void *p);
 
 extern FTE *stdin;
@@ -50,11 +51,13 @@ extern FTE *stderr;
 extern FTE *default_cwd;
 
 void init_file_table();
+
 void init_thread_cwd();
 
 #include "kernel/message.h"
 
 size_t write_file(Msg *m);
+
 size_t n_read_file(Msg *m);
 
 #endif /* __FILE_TABLE_H__ */

@@ -7,6 +7,7 @@
 #include "kernel/message.h"
 
 void init_ram();
-int read_ram(Msg*);
+
+int read_ram(Msg *);
 
 #endif /* __RAM_H__ */

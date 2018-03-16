@@ -15,8 +15,10 @@ enum {
 };
 
 void init_PM();
-PCB *create_process(Msg*);
-void * user_stack_pa(PCB *, uint32_t);
+
+PCB *create_process(Msg *);
+
+void *user_stack_pa(PCB *, uint32_t);
 
 extern int PM;
 

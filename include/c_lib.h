@@ -12,5 +12,4 @@
 #include "kernel/manager/f_dir.h"
 
 
-
 #endif //OS_LAB1_C_LIB_H_H

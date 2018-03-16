@@ -1,12 +1,12 @@
 #include "kernel/memory.h"
 #include "kernel/manager/MM.h"
 
-PTE * get_ptable(CR3 *pdir, uint32_t va) {
+PTE *get_ptable(CR3 *pdir, uint32_t va) {
     uint32_t pdir_idx = va >> 22;
     uint32_t ptable_idx = (va >> 12) & 0x3ff;
-    PDE *pde = (PDE *)(pdir->page_directory_base << 12) + pdir_idx;
+    PDE *pde = (PDE *) (pdir->page_directory_base << 12) + pdir_idx;
     assert(pde->present == 1);
-    PTE *pte = (PTE *)page_frame_to_address(pde) + ptable_idx;
+    PTE *pte = (PTE *) page_frame_to_address(pde) + ptable_idx;
     assert(pte->present == 1);
     return pte;
 }
@@ -14,7 +14,7 @@ PTE * get_ptable(CR3 *pdir, uint32_t va) {
 /**
    @return: return the address readable for kernel, so get_pa is not so accurate
  */
-void * get_pa(CR3 *cr3, uint32_t va) {
+void *get_pa(CR3 *cr3, uint32_t va) {
     uint32_t page_off = va & 0xfff;
     PTE *pte = get_ptable(cr3, va);
     assert(pte->present == 1);
@@ -24,7 +24,7 @@ void * get_pa(CR3 *cr3, uint32_t va) {
     if (cr3->page_directory_base ==
         get_kcr3()->page_directory_base) {
         assert(pa == va - KOFFSET || pa == va);
-        return (void *)pa;
+        return (void *) pa;
     }
-    return (void *)pa;
+    return (void *) pa;
 }

@@ -19,7 +19,7 @@ int entry() {
     char *save[MAX_PARAMETER_NR] = {0};
     char *filename = NULL;
     int pid, count, res;
-    while(1) {
+    while (1) {
         prompt();
         memset(cmd, 0, ONE_CMD_MAX_LEN);
         read_line(cmd, ONE_CMD_MAX_LEN);
@@ -32,7 +32,7 @@ int entry() {
             continue;
         }
         // check shell built-in command
-        if (strcmp(save[0], CD) == 0)  {
+        if (strcmp(save[0], CD) == 0) {
             if (!check_args_num(count, 2)) {
                 continue;
             }
@@ -51,10 +51,10 @@ int entry() {
         filename = save[0];
 
         // TODO check file existence and whether it is executable -- many be checked by exec
-		// TODO add redirect: <, >, 2>, &>, >>
+        // TODO add redirect: <, >, 2>, &>, >>
         // TODO add pipe
-        if((pid = fork()) == 0) {// child process go this way
-			// no thread will receive the response of exec, so it failure should be known by waitpid
+        if ((pid = fork()) == 0) {// child process go this way
+            // no thread will receive the response of exec, so it failure should be known by waitpid
             int res;
             if (count == 1) {
                 // for example: `ls `
@@ -65,11 +65,10 @@ int entry() {
             // if run to here, means fail to replace
             // the forked process, so just remind.
             printf("No such file or not executable: %s -- %s",
-                filename,
-                get_err_msg(res));
-        }
-        else {// father wait here
-			// if exec fail, waitpid will fail
+                   filename,
+                   get_err_msg(res));
+        } else {// father wait here
+            // if exec fail, waitpid will fail
             res = waitpid(pid);
             if (res != SUCC) {
                 printf("Unknown command or wrong args: %s\n", cmd);

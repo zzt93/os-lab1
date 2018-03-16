@@ -5,24 +5,31 @@
 
 #define KOFFSET 0xC0000000
 
-CR3* get_kcr3();
-PDE* get_kpdir();
-PTE* get_kptable();
+CR3 *get_kcr3();
+
+PDE *get_kpdir();
+
+PTE *get_kptable();
 
 void make_invalid_pde(PDE *);
+
 void make_invalid_pte(PTE *);
+
 void make_pde(PDE *, void *);
+
 void make_specific_pde(PDE *, void *, int us, int rw);
+
 void make_pte(PTE *, void *);
+
 void make_specific_pte(PTE *, void *, int us, int rw);
 
 void set_tss_esp0(uint32_t);
 
 #define va_to_pa(addr) \
-	((void*)(((uint32_t)(addr)) - KOFFSET))
+    ((void*)(((uint32_t)(addr)) - KOFFSET))
 
 #define pa_to_va(addr) \
-	((void*)(((uint32_t)(addr)) + KOFFSET))
+    ((void*)(((uint32_t)(addr)) + KOFFSET))
 
 /* the maxinum kernel size is 16MB */
 #define KMEM    (16 * 1024 * 1024)
@@ -49,6 +56,7 @@ void set_tss_esp0(uint32_t);
 #define PAGE_R 0
 
 #include "macro.h"
+
 #define ALIGN_PAGE_SZ(size) _ALIGN_((size), (PAGE_SIZE - 1))
 #define ALIGN_PTABLE_SZ(size) _ALIGN_((size), (PT_SIZE - 1))
 

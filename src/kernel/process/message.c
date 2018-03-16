@@ -6,6 +6,7 @@
 
 
 char assert_msg_res[SUCC == 0 ? 1 : -1];
+
 /**
    Intenal:
    send() message to A will copy to A's list
@@ -22,17 +23,17 @@ char assert_msg_res[SUCC == 0 ? 1 : -1];
    multi-threaded -- must local variable or parameter to reply
  */
 
-void add_message(PCB* p, Msg* msg) {
+void add_message(PCB *p, Msg *msg) {
     NOINTR;
-    Msg* m = kmalloc(sizeof(Msg));
+    Msg *m = kmalloc(sizeof(Msg));
     memcpy(m, msg, sizeof(Msg));
     list_add_after(&(p->mes), &(m->list));
 }
 
-static int has_message(PCB* p, pid_t id) {
-    ListHead* head = &(p->mes);
-    ListHead* ptr = NULL;
-    Msg* tmp = NULL;
+static int has_message(PCB *p, pid_t id) {
+    ListHead *head = &(p->mes);
+    ListHead *ptr = NULL;
+    Msg *tmp = NULL;
     NOINTR;
     list_foreach(ptr, head) {
         assert(ptr != NULL);
@@ -45,10 +46,10 @@ static int has_message(PCB* p, pid_t id) {
     return ptr != head;
 }
 
-static Msg* find_message(PCB* p, pid_t id) {
-    ListHead* head = &(p->mes);
-    ListHead* ptr = NULL;
-    Msg* tmp = NULL;
+static Msg *find_message(PCB *p, pid_t id) {
+    ListHead *head = &(p->mes);
+    ListHead *ptr = NULL;
+    Msg *tmp = NULL;
     list_foreach(ptr, head) {
         assert(ptr != NULL);
         tmp = list_entry(ptr, Msg, list);
@@ -62,17 +63,18 @@ static Msg* find_message(PCB* p, pid_t id) {
     assert(ptr != head);
     return tmp;
 }
+
 /**
    get a message from process p's message list, with the right
    id, then copy to m.
  */
-void get_message(PCB* p, pid_t id, Msg* m) {
+void get_message(PCB *p, pid_t id, Msg *m) {
     // find and delete aim message
     Msg *tmp = find_message(p, id);
     printk("#%d get_message: src %d, dest %d\n", current->pid, tmp->src, tmp->dest);
     assert(tmp != NULL
-        && (tmp->src == id || id == ANY)
-        && tmp->dest == current->pid);
+           && (tmp->src == id || id == ANY)
+           && tmp->dest == current->pid);
     // copy to m
     memcpy(m, tmp, sizeof(Msg));
     kfree(tmp);
@@ -87,7 +89,7 @@ void send(pid_t dest, Msg *m) {
     //printk("%d:----send to %d------\n", current->pid, dest);
     lock();
     NOINTR;
-    PCB* de = fetch_pcb(dest);
+    PCB *de = fetch_pcb(dest);
     NOINTR;
     // message source not always equal to current
     printk("#%d sd:-------#%d send to #%d------\n", current->pid, m->src, dest);
@@ -108,7 +110,7 @@ void send(pid_t dest, Msg *m) {
 void receive(pid_t src, Msg *m) {
     printk("#%d rcv:--------receive from %d----------\n", current->pid, src);
     lock();
-    printk("Msg count: %d; ", list_size(&(current->mes)) );
+    printk("Msg count: %d; ", list_size(&(current->mes)));
     NOINTR;
     while (!has_message(current, src)) {// no requested message
         // go to sleep
@@ -128,10 +130,10 @@ void receive(pid_t src, Msg *m) {
 }
 
 void init_msg(
-    Msg *m,
-    pid_t src,
-    int tr,
-    pid_t r, int d, void *b, off_t o, size_t l) {
+        Msg *m,
+        pid_t src,
+        int tr,
+        pid_t r, int d, void *b, off_t o, size_t l) {
     m->src = src;
     m->type = tr;
     m->req_pid = r;

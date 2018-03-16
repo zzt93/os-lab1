@@ -13,9 +13,8 @@ static void ram_disk_job() {
     while (true) {
         receive(ANY, &m);
         pid_t dest = m.src;
-        switch(m.type) {
-            case DEV_READ:
-            {
+        switch (m.type) {
+            case DEV_READ: {
                 int res = read_ram(&m);
                 SET_IF_SUCC(m, res);
                 break;
@@ -30,7 +29,7 @@ static void ram_disk_job() {
 }
 
 void init_ramdisk() {
-    PCB* p = create_kthread(ram_disk_job);
+    PCB *p = create_kthread(ram_disk_job);
     RAM_DISK = p->pid;
     hal_register(ram, RAM_DISK, &d_ramdisk);
     add2wake(p);

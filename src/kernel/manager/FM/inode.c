@@ -83,6 +83,7 @@ int inode_free(uint32_t offset) {
 #define FINE 0
 #define NO_DATA_BLOCK 1
 extern const int default_file_block;
+
 static inline
 int invalid_block(iNode *node, int index) {
     if (index < default_file_block) {
@@ -117,7 +118,7 @@ uint32_t get_block(iNode *node, int index) {
     if (index < block_index_range[0]) {// using direct data link
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
             ALLOC_CHECK(node->index[index], block_alloc,
-                EMPTY_FREE_STATEMENT);
+                        EMPTY_FREE_STATEMENT);
         }
         res = node->index[index];
     } // one level indirect link -- read once
@@ -125,20 +126,20 @@ uint32_t get_block(iNode *node, int index) {
         uint32_t first_off = (index - block_index_range[0]) * sizeof(uint32_t);
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
             ALLOC_CHECK(res, block_alloc,
-                EMPTY_FREE_STATEMENT);
+                        EMPTY_FREE_STATEMENT);
             if (first_off == 0) {// the first time use first-level indirect link
                 ALLOC_CHECK(
-                    node->index[FIRST_INDIRECT], block_alloc,
-                    block_free(res);
-                            );
+                        node->index[FIRST_INDIRECT], block_alloc,
+                        block_free(res);
+                );
             }
             block_in_range_check(node->index[FIRST_INDIRECT] + first_off);
             // write address of content block to index block
             n_dev_write(now_disk, FM, &res,
-                node->index[FIRST_INDIRECT] + first_off, sizeof res);
+                        node->index[FIRST_INDIRECT] + first_off, sizeof res);
         } else { // block index in range, just read it
             n_dev_read(now_disk, FM, &res,
-                node->index[FIRST_INDIRECT] + first_off, sizeof res);
+                       node->index[FIRST_INDIRECT] + first_off, sizeof res);
         }
     } // two level indirect link -- read twice
     else if (index < block_index_range[2]) {
@@ -151,87 +152,89 @@ uint32_t get_block(iNode *node, int index) {
         uint32_t second;
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
             ALLOC_CHECK(res, block_alloc,
-                EMPTY_FREE_STATEMENT);
+                        EMPTY_FREE_STATEMENT);
             if (second_off == 0) { // first time to access it, must be write
                 ALLOC_CHECK(second, block_alloc,
-                    block_free(res);
-                            );
+                            block_free(res);
+                );
                 if (first_off == 0) {
                     ALLOC_CHECK(
-                        node->index[SEC_INDIRECT], block_alloc,
-                        {
-                            block_free(res);
-                            block_free(second);
-                        }
-                        );
+                            node->index[SEC_INDIRECT], block_alloc,
+                            {
+                                block_free(res);
+                                block_free(second);
+                            }
+                    );
                 }
                 block_in_range_check(node->index[SEC_INDIRECT] + first_off);
                 n_dev_write(now_disk, FM, &second,
-                    node->index[SEC_INDIRECT] + first_off, sizeof second);
+                            node->index[SEC_INDIRECT] + first_off, sizeof second);
             } else {
                 block_in_range_check(node->index[SEC_INDIRECT] + first_off);
                 n_dev_read(now_disk, FM, &second,
-                    node->index[SEC_INDIRECT] + first_off, sizeof second);
+                           node->index[SEC_INDIRECT] + first_off, sizeof second);
             }
             block_in_range_check(second + second_off);
             n_dev_write(now_disk, FM, &res,
-                second + second_off, sizeof res);
+                        second + second_off, sizeof res);
         } else {
             n_dev_read(now_disk, FM, &second,
-                node->index[SEC_INDIRECT] + first_off, sizeof second);
+                       node->index[SEC_INDIRECT] + first_off, sizeof second);
             n_dev_read(now_disk, FM, &res,
-                second + second_off, sizeof res);
+                       second + second_off, sizeof res);
         }
     } //three level indirect link -- read three time
     else if (index < block_index_range[3]) {
         uint32_t more = index - block_index_range[2];
         uint32_t first_off = (more / (indirect_datalink_nr * indirect_datalink_nr)) * sizeof(uint32_t);
-        uint32_t second_off = (more % (indirect_datalink_nr * indirect_datalink_nr)) / indirect_datalink_nr * sizeof(uint32_t);
-        uint32_t thi_off = ((more % (indirect_datalink_nr * indirect_datalink_nr)) % indirect_datalink_nr) * sizeof(uint32_t);
+        uint32_t second_off =
+                (more % (indirect_datalink_nr * indirect_datalink_nr)) / indirect_datalink_nr * sizeof(uint32_t);
+        uint32_t thi_off =
+                ((more % (indirect_datalink_nr * indirect_datalink_nr)) % indirect_datalink_nr) * sizeof(uint32_t);
         uint32_t second, thi;
         if (invalid_block(node, index) == NO_DATA_BLOCK) {
             ALLOC_CHECK(res, block_alloc, EMPTY_FREE_STATEMENT);
             if (thi_off == 0) {
                 ALLOC_CHECK(thi, block_alloc,
-                    block_free(res);
-                            );
+                            block_free(res);
+                );
                 if (second_off == 0) {
                     ALLOC_CHECK(second, block_alloc,
-                        {
-                            block_free(res);
-                            block_free(thi);
-                        }
-                                );
+                                {
+                                    block_free(res);
+                                    block_free(thi);
+                                }
+                    );
                     if (first_off == 0) {
                         ALLOC_CHECK(node->index[THI_INDIRECT], block_alloc,
-                            {
-                                block_free(res);
-                                block_free(thi);
-                                block_free(second);
-                            }
-                                    );
+                                    {
+                                        block_free(res);
+                                        block_free(thi);
+                                        block_free(second);
+                                    }
+                        );
                     }
                     n_dev_write(now_disk, FM, &second,
-                        node->index[THI_INDIRECT] + first_off, sizeof second);
+                                node->index[THI_INDIRECT] + first_off, sizeof second);
                 } else {
                     n_dev_read(now_disk, FM, &second,
-                        node->index[THI_INDIRECT] + first_off, sizeof second);
+                               node->index[THI_INDIRECT] + first_off, sizeof second);
                 }
                 n_dev_write(now_disk, FM, &thi,
-                    second + second_off, sizeof thi);
+                            second + second_off, sizeof thi);
             } else {
                 n_dev_read(now_disk, FM, &thi,
-                    second + second_off, sizeof thi);
+                           second + second_off, sizeof thi);
             }
             n_dev_write(now_disk, FM, &res,
-                thi + thi_off, sizeof res);
+                        thi + thi_off, sizeof res);
         } else {
             n_dev_read(now_disk, FM, &second,
-                node->index[THI_INDIRECT] + first_off, sizeof second);
+                       node->index[THI_INDIRECT] + first_off, sizeof second);
             n_dev_read(now_disk, FM, &thi,
-                second + second_off, sizeof thi);
+                       second + second_off, sizeof thi);
             n_dev_read(now_disk, FM, &res,
-                thi + thi_off, sizeof res);
+                       thi + thi_off, sizeof res);
         }
     } else {
         assert(0);
@@ -250,7 +253,7 @@ uint32_t get_block(iNode *node, int index) {
  */
 static
 size_t rw_file_block(char *buf, iNode *node, uint32_t offset, int len,
-    size_t (*n_dev_rw)(int, pid_t, void *, off_t, size_t)) {
+                     size_t (*n_dev_rw)(int, pid_t, void *, off_t, size_t)) {
     assert(len > 0);
     int block_i = offset / block_size;
     int block_inner_off = offset % block_size;
@@ -269,7 +272,7 @@ size_t rw_file_block(char *buf, iNode *node, uint32_t offset, int len,
         // FM as request pid, which should be
         // the owner of buffer
         rw += n_dev_rw(now_disk, FM, buf + rw, block_off, to_rw);
-        block_i ++;
+        block_i++;
         to_rw = MIN(len - rw, block_size);
     }
     return rw;
@@ -332,7 +335,7 @@ size_t write_block_file(int dev_id, inode_t nodeoff, uint32_t offset, char *buf,
     if (offset + write > node.size) {
         node.size = offset + write;
         n_dev_write(now_disk, FM,
-            &node, nodeoff, sizeof(iNode));
+                    &node, nodeoff, sizeof(iNode));
     }
     return write;
 }
@@ -363,7 +366,7 @@ uint32_t get_dir_e_off(iNode *dir, inode_t aim) {
     int num_files = dir->size / sizeof(Dir_entry);
     assert(dir->size % sizeof(Dir_entry) == 0);
     Dir_entry entries[num_files];
-    rw_file_block((char *)entries, dir, 0, dir->size, n_dev_read);
+    rw_file_block((char *) entries, dir, 0, dir->size, n_dev_read);
     int i;
     for (i = 0; i < num_files; i++) {
         if (aim == entries[i].inode_off) {
@@ -376,7 +379,7 @@ uint32_t get_dir_e_off(iNode *dir, inode_t aim) {
 size_t del_block_file_dir(inode_t father, inode_t aim) {
     iNode file;
     n_dev_read(now_disk, FM,
-        &file, father, sizeof(iNode));
+               &file, father, sizeof(iNode));
     uint32_t offset = get_dir_e_off(&file, aim);
     // if offset == -1, the following would also fail
     size_t to_rw = sizeof(Dir_entry);

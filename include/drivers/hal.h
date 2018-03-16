@@ -15,24 +15,26 @@ enum {
 void add_irq_handle(int, void (*)(void));
 
 typedef struct Device {
-	const char *name;
-	pid_t pid;
-	int dev_id;
+    const char *name;
+    pid_t pid;
+    int dev_id;
 
-	ListHead list;
+    ListHead list;
 } Dev;
 
-size_t n_dev_read(int dev_id, pid_t reqst_pid, void *buf ,off_t offset, size_t len);
-size_t n_dev_write(int dev_id, pid_t reqst_pid, void *buf ,off_t offset, size_t len);
+size_t n_dev_read(int dev_id, pid_t reqst_pid, void *buf, off_t offset, size_t len);
+
+size_t n_dev_write(int dev_id, pid_t reqst_pid, void *buf, off_t offset, size_t len);
 
 void hal_register(const char *name, pid_t pid, int *dev_id);
+
 //void hal_get_id(const char *name, pid_t *pid, int *dev_id);
 void hal_list(void);
 
 // devices' name
-extern const char* hda ;// pid
-extern const char* timer;
-extern const char* ram;
+extern const char *hda;// pid
+extern const char *timer;
+extern const char *ram;
 
 extern int d_ramdisk;
 extern int d_ide;

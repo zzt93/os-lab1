@@ -12,7 +12,7 @@
 
 int first_fd(PCB *start, void *value);
 
-FDE * get_fde(PCB *aim, int i) {
+FDE *get_fde(PCB *aim, int i) {
     assert(i >= 0 && i < PROCESS_MAX_FD);
     return aim->fd_table + i;
 }
@@ -25,6 +25,7 @@ static inline
 int file_exist(inode_t off) {
     return off >= inode_start && off < inode_start + inode_area_size;
 }
+
 /**
    TODO how to handle link file:
 
@@ -33,15 +34,15 @@ int file_exist(inode_t off) {
    - add entry to process fd table
  */
 int open_file(Msg *m) {
-    PCB *aim = (PCB *)m->buf;
-    PCB *own_name = (PCB *)m->req_pid;
+    PCB *aim = (PCB *) m->buf;
+    PCB *own_name = (PCB *) m->req_pid;
     const char *name = simplify_path(own_name->cwd_path,
                                      (const char *) get_pa(&own_name->pdir, m->dev_id));
     if (null_filename(name)) {
         m->ret = INVALID_FILENAME;
         return INVALID_FD_I;
     }
-    inode_t cwd = ((FTE *)aim->fd_table[CWD].ft_entry)->node_off;
+    inode_t cwd = ((FTE *) aim->fd_table[CWD].ft_entry)->node_off;
     uint32_t node_off = file_nodeoff(cwd, name);
     if (!file_exist(node_off)) {
         m->ret = node_off;
@@ -50,7 +51,7 @@ int open_file(Msg *m) {
 
     iNode node;
     n_dev_read(now_disk, FM,
-        &node, node_off, sizeof node);
+               &node, node_off, sizeof node);
     // add an entry in system opened file table
     // TODO only adding link target to file table; for reading
     // and writing to it become convenient(no more change)
@@ -72,13 +73,13 @@ int open_file(Msg *m) {
    - free system opened file if necessary
  */
 int close_file(Msg *m) {
-    PCB *aim = (PCB *)m->buf;
-    int i =  m->dev_id;
+    PCB *aim = (PCB *) m->buf;
+    int i = m->dev_id;
     FDE *fd = get_fde(aim, i);
     if (is_invalid_fd(fd)) {
         return INVALID_FD_I;
     }
-    FTE *fte = (FTE *)fd->ft_entry;
+    FTE *fte = (FTE *) fd->ft_entry;
     detach_fte(fd, fte);
 
     m->ret = SUCC;
@@ -91,7 +92,7 @@ int close_file(Msg *m) {
  */
 int dup_file(Msg *m) {
     int i = m->dev_id;
-    PCB *aim = (PCB *)m->buf;
+    PCB *aim = (PCB *) m->buf;
     FDE *src = get_fde(aim, i);
     if (is_invalid_fd(src)) {
         return INVALID_FD_I;
@@ -111,7 +112,7 @@ int dup_file(Msg *m) {
    On error, -1 is returned
  */
 int dup2_file(Msg *m) {
-    PCB *aim = (PCB *)m->i[2];
+    PCB *aim = (PCB *) m->i[2];
     int i = m->i[0];
     FDE *src = get_fde(aim, i);
     if (is_invalid_fd(src)) {

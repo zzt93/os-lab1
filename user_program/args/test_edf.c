@@ -25,7 +25,7 @@ void task(const char *name, int exe_time, int period) {
 
 static
 int can_edf(int *arg) {
-    int lcm = LCM( LCM(arg[1], arg[3]), arg[5]);
+    int lcm = LCM(LCM(arg[1], arg[3]), arg[5]);
     int i, j;
     int sum = 0;
     for (i = 0; i < NUM_TASKS; i++) {
@@ -61,7 +61,7 @@ int entry(char *args) {
     for (i = 0; i < count; i++) {
         i_arg[i] = to_int(save[i]);
     }
-    if(!can_edf(i_arg)) {
+    if (!can_edf(i_arg)) {
         printf("wrong arguments: can't make a edf schedule\n");
         return 0;
     }

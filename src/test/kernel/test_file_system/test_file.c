@@ -8,6 +8,7 @@
 #include "error.h"
 
 #define SZ 512
+
 /**
    test the state of hard-disk by list file name
  */
@@ -16,9 +17,9 @@ void test_list(char *name) {
     int size = SZ / sizeof(Dir_entry);
     Dir_entry entry[size];
     init_msg(&m,
-        current->pid,
-        FM_lsdir,
-        (int)entry, (int)name, current, INVALID_ID, SZ);
+             current->pid,
+             FM_lsdir,
+             (int) entry, (int) name, current, INVALID_ID, SZ);
     m.ret = FM_ERR;
     size = list_dir(&m);
     assert(m.ret <= SUCC);
@@ -42,7 +43,7 @@ int set_name_msg(const char *name, int (*f)(Msg *)) {
     Msg m;
     m.ret = FM_ERR;
     m.buf = current;
-    m.dev_id = (int)name;
+    m.dev_id = (int) name;
     f(&m);
     test_list(NULL);
     return m.ret;
@@ -120,6 +121,7 @@ void test_ch() {
 }
 
 static char repeat[] = "repeat";
+
 void test_mk_del() {
     int res;
     int count = 100000;

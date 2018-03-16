@@ -32,31 +32,31 @@ void pid_free(int pid) {
 }
 
 
-static void init_kernel_tf(TrapFrame* frame, void* fun) {
+static void init_kernel_tf(TrapFrame *frame, void *fun) {
     // using xxx to represent the second pushed esp
-    frame->xxx = (uint32_t)(&(frame->xxx) + 5);// see pushal
+    frame->xxx = (uint32_t) (&(frame->xxx) + 5);// see pushal
     frame->ebp = 0;// @see PM_syscall.c:kfork fork ebp
-    assert (frame->xxx == (uint32_t)(&frame->gs));
+    assert (frame->xxx == (uint32_t) (&frame->gs));
     frame->cs = SELECTOR_KERNEL(SEG_KERNEL_CODE);
     frame->ds = SELECTOR_KERNEL(SEG_KERNEL_DATA);
     frame->es = SELECTOR_KERNEL(SEG_KERNEL_DATA);
     frame->fs = SELECTOR_KERNEL(SEG_KERNEL_DATA);
     frame->gs = SELECTOR_KERNEL(SEG_KERNEL_DATA);
-    frame->eip = (uint32_t)fun;
+    frame->eip = (uint32_t) fun;
 
     frame->eflags = 0x200;// set IF = 1, that is enable interrupt
 }
 
-static void init_user_tf(TrapFrame* frame, void* fun) {
-    frame->xxx = (uint32_t)(&(frame->xxx) + 5);// see pushal
+static void init_user_tf(TrapFrame *frame, void *fun) {
+    frame->xxx = (uint32_t) (&(frame->xxx) + 5);// see pushal
     frame->ebp = 0;// @see PM_syscall.c:kfork fork ebp
-    assert (frame->xxx == (uint32_t)(&frame->gs));
+    assert (frame->xxx == (uint32_t) (&frame->gs));
     frame->cs = SELECTOR_USER(SEG_USER_CODE);
     frame->ds = SELECTOR_USER(SEG_USER_DATA);
     frame->es = SELECTOR_USER(SEG_USER_DATA);
     frame->fs = SELECTOR_USER(SEG_USER_DATA);
     frame->gs = SELECTOR_USER(SEG_USER_DATA);
-    frame->eip = (uint32_t)fun;
+    frame->eip = (uint32_t) fun;
 
     frame->eflags = 0x200;// set IF = 1, that is enable interrupt
 }
@@ -120,7 +120,7 @@ void append_cwd_path(PCB *pcb, const char *name) {
 
 extern const char *const default_cwd_name;
 
-static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
+static void init_pcb_content(PCB *pcb, uint32_t val, Thread_t type, FTE *cwd) {
     //NOINTR;
     lock();
     pcb->pid = new_id();
@@ -154,11 +154,11 @@ static void init_pcb_content(PCB* pcb, uint32_t val, Thread_t type, FTE *cwd) {
 }
 
 
-PCB*
+PCB *
 create_kthread(void *fun) {
     // malloc PCB
     //NOINTR;
-    PCB* pcb = kmalloc(PCB_SIZE);
+    PCB *pcb = kmalloc(PCB_SIZE);
     //NOINTR;
     // allocate frame at the end of stack, ie frame is [base + all_size - frame_size, base + all_size)
     /**
@@ -173,7 +173,7 @@ create_kthread(void *fun) {
        notice that in kernel thread, ss3 and esp3 will not be poped
        by hardware so esp will not exactly at the end of kernel stack (kstack)
     */
-    TrapFrame *frame = (TrapFrame*)((char *)(pcb->kstack) + KSTACK_SIZE - sizeof(TrapFrame));
+    TrapFrame *frame = (TrapFrame *) ((char *) (pcb->kstack) + KSTACK_SIZE - sizeof(TrapFrame));
     //init trap frame
     init_kernel_tf(frame, fun);
     pcb->tf = frame;
@@ -194,12 +194,13 @@ void store_vir(PCB *pcb, ListHead *link) {
     list_del(link);
 }
 
-PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListHead *vir, FTE *cwd) {
-    PCB* pcb = kmalloc(PCB_SIZE);
+PCB *create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListHead *vir, FTE *cwd) {
+    PCB *pcb = kmalloc(PCB_SIZE);
     /**
        trapFrame is always located on the kernel stack
     */
-    TrapFrame *frame = (TrapFrame*)((char *)(pcb->kstack) + KSTACK_SIZE - sizeof(TrapFrame)); // allocate frame at the end of stack
+    TrapFrame *frame = (TrapFrame *) ((char *) (pcb->kstack) + KSTACK_SIZE -
+                                      sizeof(TrapFrame)); // allocate frame at the end of stack
     //init trap frame for user
     init_user_tf(frame, f);
     pcb->tf = frame;
@@ -222,8 +223,8 @@ PCB* create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListH
    doesn't contain `esp0` and `ss`.
  */
 // TODO test
-PCB* create_kthread_with_args(void* fun, int arg) {
-    PCB* pcb = create_kthread(fun);
+PCB *create_kthread_with_args(void *fun, int arg) {
+    PCB *pcb = create_kthread(fun);
     TrapFrame *frame = pcb->tf;
 
     frame->esp = arg;
@@ -232,6 +233,6 @@ PCB* create_kthread_with_args(void* fun, int arg) {
 
 
 void set_esp(PCB *p, uint32_t esp) {
-    ((TrapFrame *)p->tf)->esp = esp;
+    ((TrapFrame *) p->tf)->esp = esp;
 }
 

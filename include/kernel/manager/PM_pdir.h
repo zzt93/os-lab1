@@ -7,9 +7,11 @@ typedef struct {
     PDE dir[NR_PDE];
 } Pdir;
 
-PDE* pdir_alloc();
+PDE *pdir_alloc();
+
 void pdir_free(void *);
-void init_kernel_image(PDE*);
+
+void init_kernel_image(PDE *);
 
 #define PDIR_MEM PAGE_SIZE
 #define PDIR_NUM (KMEM / PDIR_MEM / 32)

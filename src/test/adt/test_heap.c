@@ -40,34 +40,56 @@ void test_heap() {
         assert(test_heap_size() == SIZE - i);
         assert(test_pop_max() == i);
     }
-    test_add(2);test_add(0);test_add(1);
+    test_add(2);
+    test_add(0);
+    test_add(1);
     three_test();
-    test_add(1);test_add(2);test_add(0);
+    test_add(1);
+    test_add(2);
+    test_add(0);
     three_test();
-    test_add(1);test_add(0);test_add(2);
+    test_add(1);
+    test_add(0);
+    test_add(2);
     three_test();
-    test_add(0);test_add(1);test_add(2);
+    test_add(0);
+    test_add(1);
+    test_add(2);
     three_test();
-    test_add(0);test_add(2);test_add(1);
+    test_add(0);
+    test_add(2);
+    test_add(1);
     three_test();
 
     // test heap.update()
-    test_add(0);test_add(2);test_add(1);
+    test_add(0);
+    test_add(2);
+    test_add(1);
     // set the largest to another number
     test_update(0, 3);
     // should change to 1, 2, 3
     contiguous_test(1);
 
     // test percolate down
-    test_add(1);test_add(0);test_add(2);test_add(3);test_add(4);
-    test_add(6);test_add(5);
+    test_add(1);
+    test_add(0);
+    test_add(2);
+    test_add(3);
+    test_add(4);
+    test_add(6);
+    test_add(5);
     test_update(0, 7);
     // should change to 1~7
     contiguous_test(1);
 
     // test percolate up
-    test_add(1);test_add(7);test_add(2);test_add(3);test_add(4);
-    test_add(6);test_add(5);
+    test_add(1);
+    test_add(7);
+    test_add(2);
+    test_add(3);
+    test_add(4);
+    test_add(6);
+    test_add(5);
     int j = 0, num = 0;
     heap_each(j, num) {
         if (num == 7) {

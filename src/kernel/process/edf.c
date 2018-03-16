@@ -2,8 +2,8 @@
 #include "adt/heap.h"
 
 static
-int cmp_pri(PCB* a, PCB* b) {
-	if (a->priority < b->priority) {
+int cmp_pri(PCB *a, PCB *b) {
+    if (a->priority < b->priority) {
         return -1;
     } else if (a->priority > b->priority) {
         return 1;
@@ -26,7 +26,7 @@ MAP(int, int, to_ddl);
    - how to get the period? -- update in task not in here
    - how to find if it is finished
 */
-PCB* edf() {
+PCB *edf() {
     /*
       for each thread, update priority by deadline -- done by
       task itself
@@ -44,7 +44,7 @@ void to_ddl_each_update() {
     int i, old;
     for (i = 0; i < res; i++) {
         old = to_ddl_get(pids[i]);
-        to_ddl_update(pids[i],  old - 1);
+        to_ddl_update(pids[i], old - 1);
     }
 }
 

@@ -14,9 +14,9 @@
    @see harddisk/makeimg.py
  */
 typedef struct {
-	char filename[MAX_FILENAME_LEN];
+    char filename[MAX_FILENAME_LEN];
     // inode offset relative to very beginning of hard disk
-	inode_t inode_off;
+    inode_t inode_off;
 } Dir_entry;
 
 
@@ -31,10 +31,10 @@ extern const char *const default_cwd_name;
 #include "error.h"
 
 
-
 uint32_t get_dir_e_off(iNode *dir, inode_t aim);
 
 #include "lib/string.h"
+
 static inline
 bool null_filename(const char *name) {
     return name == NULL;
@@ -50,9 +50,13 @@ inode_t file_nodeoff(inode_t cwd, const char *const name);
 #include "kernel/message.h"
 
 int list_dir(Msg *m);
+
 int ch_dir(Msg *m);
+
 int delete_file(Msg *m);
+
 int make_dir(Msg *m);
+
 int create_file(Msg *m);
 
 

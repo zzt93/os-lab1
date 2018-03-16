@@ -4,7 +4,7 @@
 
 MAP(int, char*, num)
 
-static void print_tree(TNode_num* root) {
+static void print_tree(TNode_num *root) {
     if (root == NULL) {
         return;
     }
@@ -29,7 +29,7 @@ void test_put() {
 
 void test_get() {
     print_tree(left(num_head));
-    char * one = num_get(1);
+    char *one = num_get(1);
     assert(strcmp(one, one_s) == 0);
     char *two = num_get(2);
     assert(strcmp(two, two_s) == 0);
@@ -48,7 +48,7 @@ void test_map() {
     int res = num_values(numbers, count);
     assert(res == 3);
     int i;
-    for (i = 0; i < count ; i++) {
+    for (i = 0; i < count; i++) {
         printk("%s ", numbers[i]);
     }
 }

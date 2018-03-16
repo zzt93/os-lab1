@@ -6,6 +6,7 @@
 #include "x86/cpu.h"
 
 #include "manager/Virtual_mem.h"
+
 #define KSTACK_SIZE 4096
 #define PCB_SIZE (sizeof (PCB))
 
@@ -13,9 +14,9 @@ typedef enum {
     IDLE, WAKED,
     EDF,
     // add new state before this
-    NOT_SLEEPED,
+            NOT_SLEEPED,
     // always be the last
-    SLEEPED = 100,
+            SLEEPED = 100,
 } PROCESS_STATE;
 
 typedef enum {
@@ -96,24 +97,35 @@ typedef struct {
 extern PCB *current;
 
 // implemented in schedule.c
-void add2wake(PCB*);
-void add2sleeped(PCB*);
+void add2wake(PCB *);
+
+void add2sleeped(PCB *);
+
 void sleep();
-void sleep_to(ListHead*, void (*)(ListHead*, PCB*));
-void wake_up_from(ListHead*, PCB* (*)(ListHead*));
-void wake_up_lock(PCB*, int);
-void wake_up(PCB*);
-void delete_ref(PCB*);
+
+void sleep_to(ListHead *, void (*)(ListHead *, PCB *));
+
+void wake_up_from(ListHead *, PCB *(*)(ListHead *));
+
+void wake_up_lock(PCB *, int);
+
+void wake_up(PCB *);
+
+void delete_ref(PCB *);
 
 // implement in process.c
-PCB* fetch_pcb(int);
-void add_process(PCB*);
+PCB *fetch_pcb(int);
+
+void add_process(PCB *);
+
 int remove_process(PCB *pcb);
+
 size_t pcb_size();
+
 int fetch_all_pcb(PCB **pcbs, int capacity);
 
-static inline void * get_pdir_addr(PCB *p) {
-    return (void *)(p->pdir.page_directory_base << 12);
+static inline void *get_pdir_addr(PCB *p) {
+    return (void *) (p->pdir.page_directory_base << 12);
 }
 
 static inline
@@ -143,4 +155,5 @@ void put_by_state(PCB *);
 //#define CWD_PATH_LENGTH 32
 
 #include "init_proc.h"
+
 #endif

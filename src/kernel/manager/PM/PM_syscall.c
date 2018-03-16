@@ -6,7 +6,7 @@
 
 #include "kernel/manager/fd.h"
 
-static void s_copy(PCB* src, PCB* dest) {
+static void s_copy(PCB *src, PCB *dest) {
     dest->state = src->state;
     dest->count_of_lock = src->count_of_lock;
     dest->type = src->type;
@@ -32,11 +32,11 @@ static void s_copy(PCB* src, PCB* dest) {
 // TODO work for only user thread to fork??
 void copy_kstack(PCB *father, PCB *child) {
     // handle the content in the first TrapFrame, ebp, xxx
-    TrapFrame * s_frame = ((TrapFrame *)father->tf);
-    uint32_t* ebp = (uint32_t *)s_frame->ebp;
+    TrapFrame *s_frame = ((TrapFrame *) father->tf);
+    uint32_t *ebp = (uint32_t *) s_frame->ebp;
     while (*ebp >= KERNEL_VA_START) {
-        assert(*ebp > (uint32_t)ebp);
-        ebp = (uint32_t *)*ebp;
+        assert(*ebp > (uint32_t) ebp);
+        ebp = (uint32_t *) *ebp;
     }
     // 4 bytes for ebp, 4 bytes for `call` pushed eip, 4 bytes for `push %esp` esp
     /* The ebp in first TrapFrame point to the
@@ -45,31 +45,32 @@ void copy_kstack(PCB *father, PCB *child) {
     f_frame->ebp += gap;
     */
     int32_t gap = child->kstack - father->kstack;
-    TrapFrame *child_frame = (TrapFrame *)((char *)ebp + 4 + 4 + 4 + gap);
-    assert((char *)child_frame - gap == (char *)father->kstack + KSTACK_SIZE - sizeof(TrapFrame));
+    TrapFrame *child_frame = (TrapFrame *) ((char *) ebp + 4 + 4 + 4 + gap);
+    assert((char *) child_frame - gap == (char *) father->kstack + KSTACK_SIZE - sizeof(TrapFrame));
     uint32_t copy_size = sizeof(TrapFrame);
-    memcpy(child_frame, (char *)child_frame - gap, copy_size);
+    memcpy(child_frame, (char *) child_frame - gap, copy_size);
     child_frame->xxx += gap;
     // set return value of fork
     child_frame->eax = 0;
     child->tf = child_frame;
     // for it is occasion two, count_of_lock should be change
-    child->count_of_lock --;
+    child->count_of_lock--;
 }
 
 // this function can't use until finish the conversion
 // of every parameter which is address
 void copy_kstack_full(PCB *father, PCB *child) {
     // @checked size: [tf, (char *)father->kstack + KSTACK_SIZE)
-    uint32_t copy_size = (char *)father->kstack + KSTACK_SIZE - (char *)father->tf;
+    uint32_t copy_size = (char *) father->kstack + KSTACK_SIZE - (char *) father->tf;
     // this assert is not so accurate for
     // 1. I ignore the function backtrace
     // 2. The second TrapFrame hasn't push `ss` and `esp`
     assert(copy_size > 2 * sizeof(TrapFrame));
-    assert((uint32_t)father->tf < (uint32_t)father->kstack + KSTACK_SIZE
-        && (uint32_t)father->tf > (uint32_t)father->kstack);
+    assert((uint32_t) father->tf<(uint32_t) father->kstack + KSTACK_SIZE
+                                 && (uint32_t) father->tf>(uint32_t)
+                   father->kstack);
     // allocate trapframe, and function invoke stack to the end of stack
-    void *second_frame = (void *)((char *)(child->kstack) + KSTACK_SIZE - copy_size);
+    void *second_frame = (void *) ((char *) (child->kstack) + KSTACK_SIZE - copy_size);
     // @see ram_user_process_fork.jpg: father's tf is now point to the second TrapFrame
     memcpy(second_frame, father->tf, copy_size);
     child->tf = second_frame;
@@ -86,17 +87,17 @@ void copy_kstack_full(PCB *father, PCB *child) {
      */
     int32_t gap = child->kstack - father->kstack;
     // handle epb, esp in the later TrapFrame
-    TrapFrame * s_frame = ((TrapFrame *)second_frame);
+    TrapFrame *s_frame = ((TrapFrame *) second_frame);
     // first change it to point to right place, store the pointer to next ebp
     s_frame->ebp += gap;
     s_frame->xxx += gap;
-    uint32_t* ebp = (uint32_t *)s_frame->ebp;
+    uint32_t *ebp = (uint32_t *) s_frame->ebp;
     while (*ebp >= KERNEL_VA_START) {
         // @checked addition of uint32_t and int32_t
         // addition is safe, but compare is dangerous
         *ebp += gap;
-        assert(*ebp > (uint32_t)ebp);
-        ebp = (uint32_t *)*ebp;
+        assert(*ebp > (uint32_t) ebp);
+        ebp = (uint32_t *) *ebp;
     }
     // 4 bytes for ebp, 4 bytes for `call` pushed eip, 4 bytes for `push %esp` esp
     /* The ebp in first TrapFrame point to the
@@ -126,7 +127,7 @@ void copy_user_stack(PCB *father, PCB *child) {
    @see init_proc.c; process.h
  */
 // return the pid of child process
-PCB * kfork(Msg* m) {
+PCB *kfork(Msg *m) {
     PCB *father = m->buf;
     PCB *child = kmalloc(PCB_SIZE);
     // shallow copy: privilege, sign, pid, fd_table
@@ -139,9 +140,9 @@ PCB * kfork(Msg* m) {
     // It will re-use read-only page which save memory and time: for example, code segment
     // and read-only data.
     init_msg(m,
-        current->pid,
-        COPY_page,
-        (int)father, (int)child, NULL, INVALID_ID, INVALID_ID);
+             current->pid,
+             COPY_page,
+             (int) father, (int) child, NULL, INVALID_ID, INVALID_ID);
     send(MM, m);
     receive(MM, m);
 
@@ -174,10 +175,10 @@ int free_process(PCB *aim) {
     Msg m;
     // free page, then page table, then page directory
     init_msg(
-        &m,
-        current->pid,
-        FREE_page,
-        INVALID_ID, INVALID_ID, aim, INVALID_ID, INVALID_ID);
+            &m,
+            current->pid,
+            FREE_page,
+            INVALID_ID, INVALID_ID, aim, INVALID_ID, INVALID_ID);
     pdir_free(get_pdir_addr(aim));
     // free message queue
     list_free(&aim->mes, Msg, list);
@@ -201,7 +202,7 @@ int free_process(PCB *aim) {
 }
 
 int save_args(Msg *m, char *buf) {
-    switch(m->type) {
+    switch (m->type) {
         case PM_exec:
             /**
                user stack state at the beginning:
@@ -246,14 +247,14 @@ int save_args(Msg *m, char *buf) {
             // for kernel can read the address of user process,
             // so just read it in user memory and not copy it to
             // kernel
-            char *src = get_pa(&((PCB *)m->i[1])->pdir, (uint32_t)m->buf);
+            char *src = get_pa(&((PCB *) m->i[1])->pdir, (uint32_t) m->buf);
             // just take a place of address, not real address
-            *(uint32_t *)buf = 0;
+            *(uint32_t *) buf = 0;
             size_t len = strlen(src) + 1;
             memcpy(buf + sizeof src, src, len);
             size_t all = ALIG(len + sizeof src);
             // set real address
-            *(uint32_t *)buf = USER_STACK_BASE - all + sizeof src;
+            *(uint32_t *) buf = USER_STACK_BASE - all + sizeof src;
             return all;
         }
         default:
@@ -270,10 +271,10 @@ int save_args(Msg *m, char *buf) {
    same for the process before exec and after it
    -- TODO add lock if necessary
  */
-PCB * kexec(Msg *m) {
+PCB *kexec(Msg *m) {
     char args[ARGS_MAX_LEN] = {0};
-    PCB *aim = (PCB *)m->i[1];
-    // TODO check whether is file is executable before free current process
+    PCB *aim = (PCB *) m->i[1];
+    // TODO check whether the file is executable before free current process
 
     // save arguments if necessary
     size_t len;
@@ -319,7 +320,7 @@ void notify_wait(PCB *aim) {
 }
 
 int kexit(Msg *m) {
-    PCB *aim = (PCB *)m->buf;
+    PCB *aim = (PCB *) m->buf;
     notify_wait(aim);
     int i;
     for (i = 0; i < PROCESS_MAX_FD; i++) {
@@ -337,7 +338,7 @@ void kwaitpid(Msg *m) {
     if (aim == NULL) {
         m->src = current->pid;
         m->ret = FAIL;
-        send(((PCB *)m->buf)->pid, m);
+        send(((PCB *) m->buf)->pid, m);
         return;
     }
     Waiting *w = kmalloc(sizeof(Waiting));

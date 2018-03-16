@@ -21,6 +21,7 @@ int pow(int a, int p) {
 
 #define BCD8421_UNIT 4
 #define BYTE 8
+
 int BCD8421_to_int(unsigned int d) {
     int loop = BYTE * sizeof(d) / BCD8421_UNIT;
     int res = 0;

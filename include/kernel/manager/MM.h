@@ -12,7 +12,8 @@ enum {
 };
 
 void init_MM();
-int init_va(Msg*);
+
+int init_va(Msg *);
 
 extern int MM;
 

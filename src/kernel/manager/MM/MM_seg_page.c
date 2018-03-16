@@ -4,7 +4,7 @@
 
 #include "kernel/memory.h"
 
-extern PCB* current;
+extern PCB *current;
 
 /**
    对于进程需要用到的每一个虚拟地址va, 我们来模拟地址转换的过程,
@@ -20,22 +20,22 @@ extern PCB* current;
 
    allocate new virtual page to a process
  */
-int init_va(Msg* m) {
-    unsigned int off = (unsigned int)m->offset;
+int init_va(Msg *m) {
+    unsigned int off = (unsigned int) m->offset;
     //assert(m->i[1] == m->dev_id);
     assert(off >= 0 && off < KERNEL_VA_START);
     assert(m->len > 0);
-    assert(((int)m->buf & 0xfff) == 0);
+    assert(((int) m->buf & 0xfff) == 0);
 
     int US = m->i[1] >> 2;
     int RW = (m->i[1] >> 1) & 0x1;
     int count = 0;
 
-    PDE *pdir = (PDE*)m->buf;
+    PDE *pdir = (PDE *) m->buf;
     PTE *ptable = NULL;
     Page *page = NULL;
 
-	uint32_t pdir_idx, ptable_idx;
+    uint32_t pdir_idx, ptable_idx;
     //pdir_idx = off >> 22;
     //ptable_idx = (off >> 12) & 0x3ff;
     // TODO @see seg_free to simplify this loop: off + page_size?
@@ -44,10 +44,10 @@ int init_va(Msg* m) {
         ptable_idx = (off >> 12) & 0x3ff;
         if (pdir[pdir_idx].present == 0) {
             ptable = alloc_page();
-            assert((((int)ptable & 0xfff) == 0) && ptable != NULL);
+            assert((((int) ptable & 0xfff) == 0) && ptable != NULL);
             make_pde(&pdir[pdir_idx], ptable);
         } else {
-            ptable = (PTE*)(pdir[pdir_idx].page_frame << 12);
+            ptable = (PTE *) (pdir[pdir_idx].page_frame << 12);
         }
         if (ptable[ptable_idx].present == 0) {
             page = alloc_page();
@@ -55,7 +55,7 @@ int init_va(Msg* m) {
             if (count == 1) {
                 m->buf = page;
             }
-            assert((((int)page & 0xfff) == 0) && page != NULL);
+            assert((((int) page & 0xfff) == 0) && page != NULL);
             make_specific_pte(&ptable[ptable_idx], page, US, RW);
         }
     }

@@ -21,8 +21,9 @@
    to register a handler. */
 
 struct IRQ_t {
-	void (*routine)(void);
-	struct IRQ_t *next;
+    void (*routine)(void);
+
+    struct IRQ_t *next;
 };
 
 static struct IRQ_t handle_pool[NR_IRQ_HANDLE];
@@ -35,24 +36,25 @@ static struct IRQ_t *handles[NR_HARD_INTR];
 static int handle_count = 0;
 
 void
-add_irq_handle(int irq, void (*func)(void) ) {
-	struct IRQ_t *ptr;
-	assert(irq < NR_HARD_INTR);
-	if (handle_count > NR_IRQ_HANDLE) {
-		panic("Too many irq registrations!");
-	}
-	ptr = &handle_pool[handle_count ++]; /* get a free handler */
-	ptr->routine = func;
+add_irq_handle(int irq, void (*func)(void)) {
+    struct IRQ_t *ptr;
+    assert(irq < NR_HARD_INTR);
+    if (handle_count > NR_IRQ_HANDLE) {
+        panic("Too many irq registrations!");
+    }
+    ptr = &handle_pool[handle_count++]; /* get a free handler */
+    ptr->routine = func;
     /*
       if this irq number is already have some handler,
       not to override it but to attach the next.
      */
-	ptr->next = handles[irq]; /* insert into the linked list */
-	handles[irq] = ptr;
+    ptr->next = handles[irq]; /* insert into the linked list */
+    handles[irq] = ptr;
 }
 
 void schedule();
-extern PCB* current;
+
+extern PCB *current;
 
 void irq_handle(TrapFrame *tf) {
     printk(RED" interrupt "RESET);
@@ -60,11 +62,11 @@ void irq_handle(TrapFrame *tf) {
     assert(current != NULL);
     current->count_of_lock++;
     NOINTR;
-	int irq = tf->irq;
+    int irq = tf->irq;
 
-	if (irq < 0) {
-		panic("Unhandled exception!");
-	}
+    if (irq < 0) {
+        panic("Unhandled exception!");
+    }
 
     if (irq == 0x80) {// system call int 0x80
         do_syscall(tf);
@@ -80,23 +82,24 @@ void irq_handle(TrapFrame *tf) {
 //            return;
 //        }
 
-		extern uint8_t logo[];
-		panic("Unexpected exception #%d\n\33[1;31mHint: The machine is always right! For more details about exception #%d, see\n%s\n\33[0m", irq, irq, logo);
-	} else if (irq >= 1000) {
-		/* The following code is to handle external interrupts.
-		 * You will use this code in Lab2.  */
-		int irq_id = irq - 1000;
-		assert(irq_id < NR_HARD_INTR);
-		struct IRQ_t *f = handles[irq_id];
+        extern uint8_t logo[];
+        panic("Unexpected exception #%d\n\33[1;31mHint: The machine is always right! For more details about exception #%d, see\n%s\n\33[0m",
+              irq, irq, logo);
+    } else if (irq >= 1000) {
+        /* The following code is to handle external interrupts.
+         * You will use this code in Lab2.  */
+        int irq_id = irq - 1000;
+        assert(irq_id < NR_HARD_INTR);
+        struct IRQ_t *f = handles[irq_id];
         /* call handlers for this irq one by one */
-		while (f != NULL) {
-			f->routine();
+        while (f != NULL) {
+            f->routine();
             NOINTR;
-			f = f->next;
-		}
-	}
+            f = f->next;
+        }
+    }
     // save the trap frame pointer for the old process
-	current->tf = tf;
-	schedule();
+    current->tf = tf;
+    schedule();
 }
 

@@ -24,7 +24,7 @@ Sem wake_lock, sleeped_lock;
 //void vecsys();
 
 static
-int cmp_pid(PCB* a, PCB* b) {
+int cmp_pid(PCB *a, PCB *b) {
     if (a->pid < b->pid) {
         return -1;
     } else if (a->pid > b->pid) {
@@ -38,15 +38,15 @@ QUEUE(PCB*, 256, wake)
 BI_TREE(PCB*, cmp_pid, sleeped)
 
 PCB idle = {
-    .pid = IDLE_ID,
-    .state = IDLE,
+        .pid = IDLE_ID,
+        .state = IDLE,
 };
 PCB *current = &idle;
 
 /**
    using different choose_process for different schedule algorithm
  */
-static PCB* choose_process() {
+static PCB *choose_process() {
     if (wake_is_empty()) {
         // for the process using wake_queue are kernel process
         // so has higher priority
@@ -55,12 +55,12 @@ static PCB* choose_process() {
         }
         return &idle;
     }
-    PCB* tmp = wake_dequeue();
+    PCB *tmp = wake_dequeue();
     return tmp;
 }
 
 
-void print_tree(TNode_sleeped* root) {
+void print_tree(TNode_sleeped *root) {
     if (root == NULL) {
         return;
     }
@@ -77,7 +77,7 @@ void print_tree(TNode_sleeped* root) {
 void put_by_state(PCB *p) {
     NOINTR;
     int s = p->state;
-    switch(s) {
+    switch (s) {
         // sleeped state is not same with other state
         // for other can participate schedule, but sleep can't
         /*
@@ -124,7 +124,7 @@ void prepare_current() {
     */
     // set tss esp0 for current thread
     //-- return from user stack to kernel stack
-    set_tss_esp0((uint32_t)(current->kstack + KSTACK_SIZE));
+    set_tss_esp0((uint32_t) (current->kstack + KSTACK_SIZE));
 
 
     //printk("in queue %d\n", tail-head);
@@ -138,6 +138,7 @@ void prepare_current() {
     //unlock();
     current->count_of_lock--;
 }
+
 /**
    关于页目录, 它是通过CR3寄存器寻找到的.
    由于每个进程都拥有自己的页目录, 所以在进行上下文切换的时候,
@@ -145,7 +146,7 @@ void prepare_current() {
  */
 void
 schedule(void) {
-	/* implement process/thread schedule here */
+    /* implement process/thread schedule here */
     NOINTR;
     PROCESS_STATE s = current->state;
     if (s >= SLEEPED) { // i.e. go to sleep now
@@ -160,14 +161,15 @@ schedule(void) {
 }
 
 
-void add2wake(PCB* p) {
+void add2wake(PCB *p) {
     lock();
     p->state = WAKED;
     wake_enqueue(p);
     add_process(p);
     unlock();
 }
-void add2sleeped(PCB* p) {
+
+void add2sleeped(PCB *p) {
     lock();
     assert(p->state < NOT_SLEEPED);
     p->state += SLEEPED;
@@ -192,8 +194,8 @@ void add2sleeped(PCB* p) {
    cause critical problem.(the other thread may be switched
    when enqueue current thread)
 */
-void sleep_to(ListHead* l,
-    void (*enqueue)(ListHead*, PCB*)) {
+void sleep_to(ListHead *l,
+              void (*enqueue)(ListHead *, PCB *)) {
     //print_tree(left(sleeped_head));
     current->state += SLEEPED;
     enqueue(l, current);
@@ -222,8 +224,8 @@ void sleep() {
     //for no eip, cs, eflags is pushed
 }
 
-void wake_up_from(ListHead* l, PCB* (*dequeue)(ListHead* l)) {
-    PCB* wake = dequeue(l);
+void wake_up_from(ListHead *l, PCB *(*dequeue)(ListHead *l)) {
+    PCB *wake = dequeue(l);
     if (wake == NULL) {
         printk(RED"Invalid wake up"RESET"\n");
         return;
@@ -244,7 +246,7 @@ void wake_up_lock(PCB* p) {
 }
 */
 
-void wake_up(PCB* p) {
+void wake_up(PCB *p) {
     lock();
     //delete from sleeped queue
     //printk("#%d in wake\n", current->pid);

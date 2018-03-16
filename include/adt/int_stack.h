@@ -4,11 +4,13 @@
 #include "adt/linklist.h"
 
 LINKLIST_DEF(Stack)
-int c;
+    int c;
 LINKLIST_DEF_FI(Stack)
 
 int empty();
+
 void push(int);
+
 int pop();
 
 #endif /* __CHAR_STACK_H__ */

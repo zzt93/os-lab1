@@ -11,6 +11,7 @@
 int FM;
 
 int now_disk;
+
 /**
    The message sent to FM should specify:
    m->type -- FM_ram_read
@@ -39,7 +40,7 @@ static void FM_job() {
         // a detailed error or become a succ
         m.ret = FM_ERR;
         int res;
-        switch(type) {
+        switch (type) {
             case FM_ram_read:
                 ram_read_file(&m);
                 break;
@@ -90,8 +91,7 @@ static void FM_job() {
             case FM_del:
                 delete_file(&m);
                 break;
-            case FM_lsdir:
-            {
+            case FM_lsdir: {
                 /**
                    @param m->req_pid -- (char *) buffer to store ls result
                    @param m->dev_id -- (char *) file name to list
@@ -142,7 +142,7 @@ void init_file_system() {
 }
 
 void init_FM() {
-    PCB* p = create_kthread(FM_job);
+    PCB *p = create_kthread(FM_job);
     FM = p->pid;
     add2wake(p);
 }

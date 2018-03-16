@@ -11,10 +11,15 @@
 void test();
 
 void test_list_entry();
+
 void test_tree();
+
 void test_map();
+
 void test_bit_map();
+
 void test_d_bit_map();
+
 void test_heap();
 
 void test_string();

@@ -2,8 +2,8 @@
 #include "assert.h"
 
 
-static int f(int* a, int *b) {
-    if(*a < *b) {
+static int f(int *a, int *b) {
+    if (*a < *b) {
         return -1;
     } else if (*a > *b) {
         return 1;
@@ -13,7 +13,7 @@ static int f(int* a, int *b) {
 
 BI_TREE(int*, f, t)
 
-static void print_tree(TNode_t* root) {
+static void print_tree(TNode_t *root) {
     if (root == NULL) {
         return;
     }
@@ -85,7 +85,7 @@ void test_tree() {
 
     }
     */
-    
+
     printk("----------test add--------\n");
     t_add(c);
     t_add(b);
@@ -137,5 +137,5 @@ void test_tree() {
     t_add(d);
     t_add(e);
     print_tree(left(t_head));
-    
+
 }

@@ -11,28 +11,28 @@
 #define RSTK_SZ        16
 
 typedef struct Console {
-	const char *name;
+    const char *name;
     // the buffer in memory
-	uint16_t *vbuf;
+    uint16_t *vbuf;
     // the memory mapped screen
-	uint16_t *scr;
+    uint16_t *scr;
     // width, height, square
-	int w, h, wh;
+    int w, h, wh;
     // buffer size and position of cursor
-	int size, pos;
+    int size, pos;
     // line buffer of user input(not include output)
-	char lbuf[LBUF_SZ + 1];
+    char lbuf[LBUF_SZ + 1];
     // cooked buffer -- all the user input(except the new line)
     // that not handled for the time being
-	char cbuf[CBUF_SZ + 1];
+    char cbuf[CBUF_SZ + 1];
     // r -- the index for cooked buffer
     // f -- the index for already handled char in cooked buf
     // i -- the index for line buffer
-	int i, f, r;
+    int i, f, r;
     // the index for message stack?
-	int rtop;
+    int rtop;
     // the request message stack
-	Msg rstk[RSTK_SZ];
+    Msg rstk[RSTK_SZ];
 } Console;
 
 extern pid_t TTY;
@@ -40,18 +40,25 @@ extern Console ttys[];
 extern Console *current_consl;
 
 void consl_sync(Console *c);
+
 void consl_writec(Console *c, char ch);
+
 void consl_feed(Console *c, int key);
+
 void consl_accept(Console *c, char ch);
+
 void readkey(void);
+
 void update_banner(void);
+
 void read_request(Msg *m);
+
 size_t handle_write_request(Msg *m);
 
 int put_prompt(Msg *m);
 
 #define TTY4 "tty4"
-// the now main output/input terminal index
+// the index for shell output/input terminal
 // now is last tty
 #define NOW_TERMINAL (NR_TTY-1)
 // device id

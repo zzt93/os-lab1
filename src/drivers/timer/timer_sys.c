@@ -14,7 +14,7 @@
    to receive later, but time is not accurate any more.
    So had better receive() before your time run out
  */
-extern PCB* current;
+extern PCB *current;
 
 static
 void set_timer(Timer *t, int time, int pid) {
@@ -69,7 +69,7 @@ void update_timer() {
     int i = 0;
     Timer *tmp;
     heap_each(i, tmp) {
-        tmp->time --;
+        tmp->time--;
     }
 }
 

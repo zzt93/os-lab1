@@ -31,14 +31,14 @@ typedef uint32_t block_t;
    @see inode.c: assert_iNode_size
    @see harddisk/makeimg.py
  */
-struct INODE{
-	//char filename[32];
+struct INODE {
+    //char filename[32];
     // file size in bytes
-	size_t size;
+    size_t size;
     // ram or hda
     int dev_id;
     // store the index of disk block
-	uint32_t index[FILE_LINK_NUM];
+    uint32_t index[FILE_LINK_NUM];
     // count of hard link
     int link_count;
     ENodeType type;
@@ -59,6 +59,7 @@ uint32_t get_block(iNode *node, int index);
 
 #define W_LAST_BYTE -1
 #define R_LAST_BYTE -1
+
 // this one is metaphor for `=` assignment, but for unify read
 // and write change it to write like
 //size_t read_block_file(char *buf, iNode *node, uint32_t offset, int len);
@@ -66,9 +67,11 @@ size_t read_block_file(int dev_id, inode_t nodeoff, uint32_t offset, char *buf, 
 
 // write to current file cursor's position
 size_t write_block_file(int dev_id, inode_t nodeoff, uint32_t offset, char *buf, int len);
+
 size_t del_block_file_dir(inode_t fileoff, inode_t aim);
 
 uint32_t inode_alloc();
+
 int inode_free(uint32_t);
 
 static inline

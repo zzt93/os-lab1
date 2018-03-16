@@ -4,7 +4,7 @@
 #include "drivers/ramdisk/ram.h"
 #include "assert.h"
 
-extern PCB* current;
+extern PCB *current;
 
 static int do_read(uint8_t *buf, off_t offset, size_t len) {
     assert(buf > 0);
@@ -24,7 +24,7 @@ static int file_check(Msg *m) {
     return SUCC;
 }
 
-size_t ram_read_file(Msg* m) {
+size_t ram_read_file(Msg *m) {
     size_t res = 0;
     if (file_check(m)) {
         res = do_read(m->buf, m->offset + m->dev_id * NR_FILE_SIZE, m->len);

@@ -8,11 +8,14 @@
 #include "error.h"
 
 void test_list(char *name);
+
 int set_name_msg(const char *name, int (*f)(Msg *));
+
 static char first_doc[] = "test";
 static char second_doc[] = "test2";
 static char thi_doc[] = "test3";
 static char fou_doc[] = "test4";
+
 void test_create() {
     int res;
     /*
@@ -92,9 +95,9 @@ static int test_open(const char *name) {
     int fd;
     Msg m;
     m.ret = FM_ERR;
-    m.req_pid = (int)current;
+    m.req_pid = (int) current;
     m.buf = current;
-    m.dev_id = (int)name;
+    m.dev_id = (int) name;
     fd = open_file(&m);
     test_list(NULL);
     return fd;
@@ -111,9 +114,9 @@ static int test_dup2(int old_fd, int new_fd) {
     int dup_fd;
     Msg m;
     m.ret = FM_ERR;
-    m.i[2] = (int)current;
-    m.i[0] = (int)old_fd;
-    m.i[1] = (int)new_fd;
+    m.i[2] = (int) current;
+    m.i[0] = (int) old_fd;
+    m.i[1] = (int) new_fd;
     dup_fd = dup2_file(&m);
     assert(m.ret == SUCC);
     test_list(NULL);
@@ -126,9 +129,9 @@ static int test_dup2(int old_fd, int new_fd) {
 static
 void set_rw_msg(Msg *m, int fd, char *buffer) {
     m->ret = FM_ERR;
-    m->i[0] = (pid_t)current;
+    m->i[0] = (pid_t) current;
     m->i[1] = fd;
-    m->i[2] = (int)buffer;
+    m->i[2] = (int) buffer;
     m->i[4] = LEN;
 }
 
@@ -147,7 +150,7 @@ void create_read_write(const char *name, int ram_id) {
     Msg m;
     // get executable file
     int len = -1;
-    char *buf = (char *)get_a_ram_file(ram_id, &len);
+    char *buf = (char *) get_a_ram_file(ram_id, &len);
     set_rw_msg(&m, fd, buf);
     m.i[4] = len;
     write_file(&m);
@@ -172,6 +175,7 @@ const char shell[] = "/bin/sh";
 const char exit[] = "exit";
 const char echo[] = "echo";
 const char ls[] = "ls";
+
 void read_ram_write_disk() {
     int res;
     // change directory to /bin/

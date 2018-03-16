@@ -21,10 +21,10 @@ void B () {
 }
 */
 
-extern PCB* a;
-extern PCB* b;
-extern PCB* c;
-extern PCB* d;
+extern PCB *a;
+extern PCB *b;
+extern PCB *c;
+extern PCB *d;
 
 /**
    if this thread is interrupted exactly after

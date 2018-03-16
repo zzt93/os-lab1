@@ -2,7 +2,7 @@
 #include "assert.h"
 
 static inline void aligned_to_page(void *p) {
-    assert(((uint32_t)p & 0xfff) == 0);
+    assert(((uint32_t) p & 0xfff) == 0);
 }
 
 

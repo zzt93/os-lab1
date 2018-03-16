@@ -25,7 +25,7 @@ void add_node_to_fte(FTE *fte, iNode *node, uint32_t node_off) {
     assert(node->type != NOT_INODE);
     fte->type = node->type;
     fte->node_off = node_off;
-    switch(fte->type) {
+    switch (fte->type) {
         case FT_DIR:
             // TODO add file size for directory here?
             break;
@@ -37,7 +37,7 @@ void add_node_to_fte(FTE *fte, iNode *node, uint32_t node_off) {
     }
 }
 
-FTE * add_fte(iNode *node, uint32_t node_off) {
+FTE *add_fte(iNode *node, uint32_t node_off) {
     // find the first free
     lock();
     int i = first_val(FREE);
@@ -55,7 +55,7 @@ FTE * add_fte(iNode *node, uint32_t node_off) {
 /**
    Add file type: fifo -- pipe, socket, character device, block device
  */
-FTE * add_special_file_to_fte(uint32_t offset, int dev_id, EFileType type) {
+FTE *add_special_file_to_fte(uint32_t offset, int dev_id, EFileType type) {
     // find the first free
     lock();
     int i = first_val(FREE);
@@ -79,18 +79,18 @@ FTE * add_special_file_to_fte(uint32_t offset, int dev_id, EFileType type) {
 
 int free_fte(void *p) {
     assert(p != NULL);
-    FTE *fte = (FTE *)p;
+    FTE *fte = (FTE *) p;
     lock();
     set_val(fte - file_table, FREE);
     unlock();
     return 1;
 }
 
-FDE * get_fde(PCB *, int );
+FDE *get_fde(PCB *, int);
 
-FTE * get_fte(PCB *aim, int fd) {
+FTE *get_fte(PCB *aim, int fd) {
     FDE *fde = get_fde(aim, fd);
-    return (FTE *)fde->ft_entry;
+    return (FTE *) fde->ft_entry;
 }
 
 void init_file_table() {
@@ -107,7 +107,7 @@ void init_file_table() {
     inode_t aim = file_nodeoff(0, default_cwd_name);
     assert(aim == inode_start);
     iNode node;
-    n_dev_read(now_disk, FM, (char *)&node, aim, sizeof node);
+    n_dev_read(now_disk, FM, (char *) &node, aim, sizeof node);
     // for it is a directory, so the size for it is meaningless
     default_cwd = add_fte(&node, aim);
     NOINTR;
@@ -117,7 +117,7 @@ int detach_fte(FDE *fd, FTE *fte) {
     make_invalid(fd);
     assert(fte != NULL);
     // decrease file table count
-    fte->ref_count --;
+    fte->ref_count--;
     assert(fte->ref_count >= 0);
     if (fte->ref_count == 0) {
         free_fte(fte);
@@ -142,11 +142,11 @@ void init_thread_cwd() {
   directory in fte for its size is already set invalid
  */
 size_t rw_prepare(Msg *m,
-    size_t (*rw_block_file)(int, inode_t, uint32_t, char *buf, int len),
-    size_t (*rw_char_dev_file)(int dev_id, char *buf, int len)) {
-    PCB *aim = (PCB *)m->req_pid;
-    assert(aim >= (PCB *)KOFFSET);
-    char *buf = (char *)get_pa(&aim->pdir, (uint32_t)m->buf);
+                  size_t (*rw_block_file)(int, inode_t, uint32_t, char *buf, int len),
+                  size_t (*rw_char_dev_file)(int dev_id, char *buf, int len)) {
+    PCB *aim = (PCB *) m->req_pid;
+    assert(aim >= (PCB *) KOFFSET);
+    char *buf = (char *) get_pa(&aim->pdir, (uint32_t) m->buf);
     int fd = m->dev_id;
     if (is_invalid_fd(&aim->fd_table[fd])) {
         m->ret = NO_SUCH;
@@ -154,12 +154,12 @@ size_t rw_prepare(Msg *m,
     }
     // if not specify the list name,
     // using default file path -- current working directory node_off
-    FTE *fte = ((FTE *)aim->fd_table[fd].ft_entry);
+    FTE *fte = ((FTE *) aim->fd_table[fd].ft_entry);
     // read and write directory should not through this method
     // write: user can't write to directory
     // read: user should call list_dir
     if (fte->type != FT_PLAIN) {
-        switch(fte->type) {
+        switch (fte->type) {
             case FT_DIR:
                 m->ret = IS_DIR;
                 return 0;

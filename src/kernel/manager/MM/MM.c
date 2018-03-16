@@ -28,7 +28,7 @@ static void MM_job() {
         receive(ANY, &m);
 
         pid_t dest = m.src;
-        switch(m.type) {
+        switch (m.type) {
             //case NEW_PDIR:
             case NEW_PAGE:
                 init_va(&m);
@@ -49,7 +49,7 @@ static void MM_job() {
 }
 
 void init_MM() {
-    PCB* p = create_kthread(MM_job);
+    PCB *p = create_kthread(MM_job);
     MM = p->pid;
     add2wake(p);
 }

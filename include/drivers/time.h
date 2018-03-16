@@ -4,8 +4,8 @@
 #define HZ        100
 
 typedef struct Time {
-	int year, month, day;
-	int hour, minute, second;
+    int year, month, day;
+    int hour, minute, second;
 } Time;
 
 enum {
@@ -30,11 +30,14 @@ typedef struct {
 #include "kernel/message.h"
 
 int kwait(Msg *m);
+
 void update_timer();
 
 
 int kstart_non_block_timer(int seconds);
+
 int knon_block_timer_finished();
+
 void update_non_block_timer();
 
 // driver id of timer

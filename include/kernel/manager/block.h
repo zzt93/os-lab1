@@ -9,7 +9,9 @@
 extern const int block_size;
 
 #include "common.h"
+
 extern const uint32_t super_start;
+
 void load_super_block();
 
 
@@ -21,6 +23,7 @@ extern uint32_t block_area_size;
 #define INVALID_ALLOC -1
 
 uint32_t block_alloc();
+
 int block_free(uint32_t offset);
 
 // const -- how many offset can a block store
@@ -46,6 +49,7 @@ extern int block_index_range[];
 static inline
 void block_in_range_check(uint32_t off) {
     assert(off >= block_start &&
-        off < block_start + block_area_size);
+           off < block_start + block_area_size);
 }
+
 #endif /* __BLOCK_H__ */

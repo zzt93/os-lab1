@@ -15,7 +15,7 @@ static inline void assign_fte(FDE *d, FTE *t) {
         detach_fte(d, d->ft_entry);
     }
     d->ft_entry = t;
-    t->ref_count ++;
+    t->ref_count++;
 }
 
 #endif /* __FD_FT_H__ */

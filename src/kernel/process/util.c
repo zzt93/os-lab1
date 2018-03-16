@@ -23,10 +23,10 @@ void init_proc() {
 }
 */
 
-PCB* a;
-PCB* b;
-PCB* c;
-PCB* d;
+PCB *a;
+PCB *b;
+PCB *c;
+PCB *d;
 
 /*
 void
@@ -61,9 +61,9 @@ void init_proc() {
 void ram_user_process() {
     Msg m;
     init_msg(&m,
-        current->pid,
-        PM_CREATE,
-        0, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
+             current->pid,
+             PM_CREATE,
+             0, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
     // 0 is the name of shell binary file in ramdisk
     send(PM, &m);
     receive(PM, &m);
@@ -81,9 +81,9 @@ void ram_user_process() {
 void user_process() {
     Msg m;
     init_msg(&m,
-        current->pid,
-        PM_CREATE,
-        (int)shell, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
+             current->pid,
+             PM_CREATE,
+             (int) shell, INVALID_ID, NULL, INVALID_ID, INVALID_ID);
     send(PM, &m);
     receive(PM, &m);
 }
@@ -102,8 +102,8 @@ void init_driver_test() {
 static
 void empty() {
     current->state = EDF;
-	current->priority = 0;
-    while(true) {
+    current->priority = 0;
+    while (true) {
         wait_intr();
     }
 }
@@ -145,5 +145,5 @@ void init_idle() {
     set_cwd_path(current, default_cwd_name);
 
     add_process(current);
- }
+}
 

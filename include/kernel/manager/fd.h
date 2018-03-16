@@ -32,19 +32,23 @@ static inline void make_invalid(FDE *fde) {
 
 static inline int assign_fd(FDE *f, FDE *s) {
     f->ft_entry = s->ft_entry;
-    FTE *aim = (FTE *)s->ft_entry;
+    FTE *aim = (FTE *) s->ft_entry;
     if (aim == NULL) {
         return 0;
     }
-    aim->ref_count ++;
+    aim->ref_count++;
     return 1;
 }
 
 
 int open_file(Msg *);
+
 int close_file(Msg *);
+
 int dup2_file(Msg *);
+
 int dup_file(Msg *);
+
 int lseek_file(Msg *);
 
 #endif /* __FD_H__ */

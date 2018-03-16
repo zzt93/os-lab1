@@ -4,7 +4,7 @@
 
 #include "kernel/process.h"
 
-char * user_name = "zzt@os_lab:";
+char *user_name = "zzt@os_lab:";
 
 
 static char buf[BUF_SIZE];
@@ -13,7 +13,7 @@ static int len = 0;
 
 void terminal_job() {
 
-    while(1) {
+    while (1) {
     }
 }
 

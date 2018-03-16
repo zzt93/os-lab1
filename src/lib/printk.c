@@ -2,10 +2,13 @@
 #include "lib/string.h"
 
 #include "adt/int_stack.h"
+
 #define HEXA_BI 4
 
 void lock();
+
 void unlock();
+
 /**
    Lock or not???
  */
@@ -19,11 +22,11 @@ void vfprintf(void (*printer)(char), const char *ctl, void **tmp) {
 //
 //	str = ": vfprintf() is not implemented!\n";
 //	for(;*str != '\0'; str ++) printer(*str);
-    int *args = (int*)tmp;
-	for (; *ctl != '\0'; ctl++) {
-		if (*ctl != '%') {
+    int *args = (int *) tmp;
+    for (; *ctl != '\0'; ctl++) {
+        if (*ctl != '%') {
             printer(*ctl);
-		} else {
+        } else {
             /**
                why switch (cmp) then interrupt comes print
                go to the default option
@@ -31,7 +34,7 @@ void vfprintf(void (*printer)(char), const char *ctl, void **tmp) {
             //lock();
             char c = *(++ctl);
             //unlock();
-            switch(c) {
+            switch (c) {
                 case 'x'://TODO suppose x is for int32
                 {
                     printHexadecimal(printer, *args);
@@ -41,15 +44,13 @@ void vfprintf(void (*printer)(char), const char *ctl, void **tmp) {
                 case 'c':
                     printer(*args++);
                     break;
-                case 'd':
-                {
-                    char * str = itoa(*args++);
+                case 'd': {
+                    char *str = itoa(*args++);
                     print_str(printer, str);
                     break;
                 }
-                case 's':
-                {
-                    char **str = (char**)args;
+                case 's': {
+                    char **str = (char **) args;
                     args++;
                     print_str(printer, *str);
                     break;
@@ -60,7 +61,7 @@ void vfprintf(void (*printer)(char), const char *ctl, void **tmp) {
                     break;
             }
         }
-	}
+    }
 }
 
 extern void serial_printc(char);
@@ -77,9 +78,9 @@ extern void serial_printc(char);
 */
 void __attribute__((__noinline__))
 printk(const char *ctl, ...) {
-	void **args = (void **)&ctl + 1;
+    void **args = (void **) &ctl + 1;
     //lock();
-	vfprintf(serial_printc, ctl, args);
+    vfprintf(serial_printc, ctl, args);
     //unlock();
 }
 
@@ -97,9 +98,9 @@ void printHexadecimal(void (*printer)(char), int c) {
     printer('0');
     printer('x');
     unsigned int i;
-    for ( i = 0; i < (sizeof c) * 2; ++i) {
+    for (i = 0; i < (sizeof c) * 2; ++i) {
         int tmp = c & and;
-        switch(tmp) {
+        switch (tmp) {
             case 10:
                 push('a');
                 break;

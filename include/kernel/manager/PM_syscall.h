@@ -6,9 +6,12 @@
 
 #include "adt/list.h"
 
-PCB * kfork(Msg *);
-PCB * kexec(Msg *);
+PCB *kfork(Msg *);
+
+PCB *kexec(Msg *);
+
 int kexit(Msg *);
+
 void kwaitpid(Msg *);
 
 typedef struct {
@@ -21,4 +24,5 @@ init_wait(Waiting *w, PCB *p) {
     list_init(&w->link);
     w->wait = p;
 }
+
 #endif /* __PM_SYSCALL_H__ */
