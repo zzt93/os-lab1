@@ -51,20 +51,11 @@ bool invalid_fd_i(int fd) {
  */
 typedef struct {
     /**
-       void *tf must be the first item of PCB,
-       see do_irq.S
+       void *tf must be the first item of PCB? @see do_irq.S
+       TrapFrame store the thread context info @see memory.h
      */
-    void *tf; // the value is esp, pushl esp before call irq_handle
-    /* the content in the trapFrame, ie *tf
-    // context info
-    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-    uint32_t gs, fs, ed, ds;
-    int irq;
-    int error_code;
-    unsigned int eip;
-    uint32_t cs;
-    unsigned int eflags;
-    */
+    void *tf;
+
     // stack of user
     uint8_t kstack[KSTACK_SIZE];
     // pid

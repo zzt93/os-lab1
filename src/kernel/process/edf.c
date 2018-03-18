@@ -64,6 +64,6 @@ void kset_edf_priority(PCB *p, Pri_t priority) {
     }
 }
 
-int process_heap_empty() {
+int edf_priority_queue_empty() {
     return process_pri_empty();
 }

@@ -81,9 +81,12 @@ void get_message(PCB *p, pid_t id, Msg *m) {
 }
 
 /**
-   can't use P() & V() in send
-   and message for P() and V() can
-   happen one after another, may cause deadlocks
+ * TODO change to use semaphore
+   Can't use P() & V() in send & receive now:
+   because P&V use `lock` & `unlock`, and current
+   lock implementation can't handle lock in interrupt
+   handling process (in which send & receive is used),
+   otherwise, would cause early `sli`.
  */
 void send(pid_t dest, Msg *m) {
     //printk("%d:----send to %d------\n", current->pid, dest);
@@ -112,11 +115,16 @@ void receive(pid_t src, Msg *m) {
     lock();
     printk("Msg count: %d; ", list_size(&(current->mes)));
     NOINTR;
-    while (!has_message(current, src)) {// no requested message
-        // go to sleep
-        // if some thread send message to it, it will wake_up this,
-        // so return from here and continue
+    while (!has_message(current, src)) {
+        // No requested message so go to sleep.
+        // If some thread send message to it,
+        // it will wake_up this thread and
+        // return from sleep
         printk(".");
+        // No need to call `unlock` here
+        // because current lock implementation
+        // will not block other thread to enter
+        // like normal monitor & semaphore
         sleep();
     }
     //P(s);

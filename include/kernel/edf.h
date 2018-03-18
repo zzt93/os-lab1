@@ -6,7 +6,7 @@ void process_pri_add(PCB *p);
 
 PCB *edf();
 
-int process_heap_empty();
+int edf_priority_queue_empty();
 
 #endif /* __EDF_H__ */
 

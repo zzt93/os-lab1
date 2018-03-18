@@ -86,8 +86,7 @@ void irq_handle(TrapFrame *tf) {
         panic("Unexpected exception #%d\n\33[1;31mHint: The machine is always right! For more details about exception #%d, see\n%s\n\33[0m",
               irq, irq, logo);
     } else if (irq >= 1000) {
-        /* The following code is to handle external interrupts.
-         * You will use this code in Lab2.  */
+        /* The following code is to handle external interrupts. */
         int irq_id = irq - 1000;
         assert(irq_id < NR_HARD_INTR);
         struct IRQ_t *f = handles[irq_id];
@@ -101,5 +100,10 @@ void irq_handle(TrapFrame *tf) {
     // save the trap frame pointer for the old process
     current->tf = tf;
     schedule();
+    // to balance the lock at the beginning of method
+    // TODO why shouldn't use `unlock()`
+    //unlock();
+    NOINTR;
+    current->count_of_lock--;
 }
 

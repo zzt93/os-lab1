@@ -115,15 +115,17 @@ typedef struct GateDescriptor {
 
 /**
  * @see do_irq.S#asm_do_irq to see the order of registers
+ * Because the stack grow from high address to low address
+ * space, so its push order is the reverse of following order
  */
 typedef struct TrapFrame {
-    uint32_t edi, esi, ebp, xxx, // <--- xxx is original ESP before `pushal`
-            ebx, edx, ecx, eax;    // GPRs
-    uint32_t gs, fs, es, ds;                            // data segment registers
-    int32_t irq;                                        // #irq
-    uint32_t error_code;                                // error code
-    uint32_t eip, cs, eflags;                            // execution state saved by hardware
-    uint32_t esp, ss;                                    // only uses when DPL = 3
+    uint32_t edi, esi, ebp, xxx,// <--- xxx is original ESP before `pushal`
+            ebx, edx, ecx, eax; // GPRs
+    uint32_t gs, fs, es, ds;    // data segment registers
+    int32_t irq;                // #irq
+    uint32_t error_code;        // error code
+    uint32_t eip, cs, eflags;   // execution state saved by hardware
+    uint32_t esp, ss;           // only uses when DPL = 3
 } TrapFrame;
 
 #endif

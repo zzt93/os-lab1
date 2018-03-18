@@ -43,7 +43,7 @@
 	.string	"%x\n"
 
 	asm_do_irq:
-    # have to use cli, for using lock change some registers values
+    # have to use cli, for using `lock()` change some registers values
     cli
 	pushl %ds
 	pushl %es
@@ -55,7 +55,7 @@
 	movw %ax, %ds
 	movw %ax, %es
 
-	pushl %esp #the parameter of irq_handle, tf
+	pushl %esp #the parameter of irq_handle, start of tf
 	call irq_handle
 
     # the following is push parameter to printk

@@ -49,8 +49,9 @@ PCB *current = &idle;
 static PCB *choose_process() {
     if (wake_is_empty()) {
         // for the process using wake_queue are kernel process
-        // so has higher priority
-        if (!process_heap_empty()) {
+        // which has higher priority, so only enter here when
+        // `wake_is_empty`
+        if (!edf_priority_queue_empty()) {
             return edf();
         }
         return &idle;
@@ -87,7 +88,6 @@ void put_by_state(PCB *p) {
           break; */
         // ---------------------------------//
         case IDLE:
-            //        case SLEEPED:
         case WAKED:
             wake_enqueue(p);
             break;
@@ -132,11 +132,6 @@ void prepare_current() {
     //printk("after add:\n");
     //print_tree(left(sleeped_head));
     printk("Now: current is #%d\n", current->pid);
-    NOINTR;
-    // to balance the lock in do_irq
-    // can't use unlock, for interrupt procedure is not finished!!!
-    //unlock();
-    current->count_of_lock--;
 }
 
 /**

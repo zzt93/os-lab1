@@ -14,7 +14,9 @@
 #define RESET   "\x1b[0m"
 
 #define IF_MASK 0x200
+// not locked
 #define INTR assert(read_eflags() & IF_MASK)
+// locked
 #define NOINTR assert(~read_eflags() & IF_MASK)
 
 #define _ALIGN_(x, a) (((x) + (a)) & ~(a))

@@ -23,25 +23,29 @@ Sep 26 2015 update:
 ## The functionalities that I have already implemented:
 
 ### Mis
-- printk -- printf in kernel  
-- kmalloc -- malloc in kernel -- using next-fit algorithm  
-- the key press interrupt handler  
+- printk: printf in kernel  
+- kmalloc: malloc in kernel, using next-fit algorithm. If write memory out of the requested range, may crash the `kmalloc`, so this can be only used by kernel. User space `malloc` should be guarded by virtual page protection.
+- the key press interrupt handler: handler have to be short and fast; have to disable interrupt; 
 - a simple maze game running without os  
 - the context switch between threads  
-- the creation of kernel thread  
-- the schedule of thread -- now using Round-Robin algorithm  
-- the sleep and wake_up of thread  
-- the semaphore(P&V) and lock(cli&sti) to slove critical section  
-- the send and receive message between threads  -- send it asynchronized and will always succeed; receive is synchronized and may be blocked   
-- add timer-- clock diver, ide-- hard disk driver, tty -- terminal driver  
-- very very simple file system -- name is number, size is fixed  
+- the creation of kernel thread: the core is to init a faked `TrapFrame`, which is allocated on `kstack`.
+- the schedule of thread: now using Round-Robin algorithm; add EDF algo.
+- the sleep and wake_up of thread: add process to separate `Binary Tree` when schedule.
+- the semaphore(`P`&`V`) and lock(`cli`&`sti`) to solve critical section problem.
+    - nested lock: counter
+    - sleep during lock: per thread counter
+    - locking in interrupts: increase counter when enter interrupt handle; decrease when leave. `lock & unlock` have to in pair!
+- the send and receive message between threads: send is asynchronous and will always succeed; receive is synchronous and may be blocked.
+
+- add timer -- clock diver, ide -- hard disk driver, tty -- terminal driver  
+- very very simple file system: name is number, size is fixed; upgrade to ext2-like version
 - create user process  
-- using page dynamic allocation  -- using bit-map algorithm  
+- using page dynamic allocation: using bit-map algorithm  
 - add page protection  
 - put user in ring3  
 - wait(int second) -- system call  
 - random number  
-- non-blocked timer -- used to make a process run specific seconds, i.e. counting its running time  
+- non-blocked timer: used to make a process run specific seconds, i.e. counting its running time  
 - LCM and GCD  
 
 ### process
@@ -79,7 +83,7 @@ Sep 26 2015 update:
 - [map](docs/ADT/map.md)  
 - linked-list  
 - bit map  
-- dynamic allocated bit map( using kmalloc)  
+- dynamic allocated bit map (using kmalloc)  
 - [heap](docs/ADT/heap.md)
 
 ---------------------
@@ -117,8 +121,12 @@ Sep 26 2015 update:
 - print more if bug is related to interrupt and not so easy to repeat
 - exceptions like 14, 13: 1. printed stack info 2. error code with i386 manual
 
+### Bug
+- no newline for shell error message
+- a single enter no prompt
 
 ### TODO
+- make `lock()` support in interrupt handling
 - load program when it needs -- 缺页
 - command: mkdir, rm, touch, >, vi
 - network: tcp/ip, socket -- ping, traceroute
@@ -127,3 +135,13 @@ Sep 26 2015 update:
   - kernel code: protocol impl
   - system call
   - command: ping, traceroute
+  
+  
+---
+
+## Run
+```bash
+$ make run
+
+# press F1~F4 to change tty, the last tty has the shell
+```
