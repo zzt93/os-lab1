@@ -66,9 +66,8 @@ void copy_kstack_full(PCB *father, PCB *child) {
     // 1. I ignore the function backtrace
     // 2. The second TrapFrame hasn't push `ss` and `esp`
     assert(copy_size > 2 * sizeof(TrapFrame));
-    assert((uint32_t) father->tf<(uint32_t) father->kstack + KSTACK_SIZE
-                                 && (uint32_t) father->tf>(uint32_t)
-                   father->kstack);
+    assert((uint32_t) father->tf < (uint32_t) father->kstack + KSTACK_SIZE
+                                   && (uint32_t) father->tf > (uint32_t) father->kstack);
     // allocate trapframe, and function invoke stack to the end of stack
     void *second_frame = (void *) ((char *) (child->kstack) + KSTACK_SIZE - copy_size);
     // @see ram_user_process_fork.jpg: father's tf is now point to the second TrapFrame

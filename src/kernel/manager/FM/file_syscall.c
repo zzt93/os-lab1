@@ -78,7 +78,7 @@ static inode_t contain_file(inode_t dir_node_off, const char *name) {
  */
 inode_t file_nodeoff(inode_t cwd, const char *const name) {
     assert(name != NULL);
-    // assume it as a absolute  path
+    // assume it as a absolute path
     // set node_off as the root
     // this assume root is always the first
     // inode of my file system
@@ -156,7 +156,7 @@ inode_t make_empty_file(ENodeType type, const char *fname, PCB *aim,
             name[last_slash] = '\0';
             if (name[last_slash + 1] == '\0') {
                 // e.g. make a directory: /media/
-                // TODO use simplified path invalidate this occasion
+                // Fixed: use simplified path invalidate this occasion
                 assert(false);
                 if (type == NODE_PLAIN) {
                     return FAIL;

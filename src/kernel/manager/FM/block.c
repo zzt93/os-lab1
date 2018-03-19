@@ -84,7 +84,8 @@ void init_inode(uint32_t mstart, uint32_t msize, uint32_t start, uint32_t size);
 
 /**
    Notice:
-   not change the following line
+   not update the following line manually, it updated
+   by script
    @see harddisk/update_super_block.sh
  */
 const uint32_t super_start = 1511936;
@@ -95,8 +96,7 @@ void load_super_block() {
     char buf[SUPER_BUF];
     //n_dev_read(now_disk, FM, buf, super_start, SUPER_BUF);
     n_dev_read(now_disk, FM, buf, super_start, sizeof(uint32_t) * 8);
-    // the following may change if we save more info in the super
-    // block
+    // the following may change if we save more info in the super block
     uint32_t *b = (uint32_t *) buf;
     // @checked the super block content is the same with
     // the parameter in makeimg.py

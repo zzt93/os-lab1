@@ -292,21 +292,6 @@ PCB *create_process(Msg *m) {
     // initialize the va for stack
     // set the page directory, page table for user stack
     // and allocate page
-    /*    va = (unsigned char*)USER_STACK_POINTER;
-    assert(va == (unsigned char*)0xbffff000);
-    init_msg(m,
-        current->pid,
-        NEW_PAGE,
-        INVALID_ID, INVALID_ID, pdir, (int)va, USER_STACK_SIZE);
-
-    send(MM, m);
-    receive(MM, m);
-    // which segment, although all segment are
-    // the same for time being
-    uint32_t ss = SELECTOR_USER(SEG_USER_DATA);
-    uint32_t esp = (uint32_t)(va + USER_STACK_SIZE);
-    assert(esp == KOFFSET);
-    */
     uint32_t ss = 0;
     uint32_t esp = 0;
     create_va_stack(pdir, &ss, &esp);

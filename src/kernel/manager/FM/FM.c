@@ -13,21 +13,23 @@ int FM;
 int now_disk;
 
 /**
-   The message sent to FM should specify:
-   m->type -- FM_ram_read
-        m->buf
-        m->dev_id -- file name in int
-        m->offset
-        m->len
-
-        The message send from FM specify:
-        m->ret -- len successfully read
-
-   m->type -- FM_read
-        m->req_pid
-        m->dev_id
-        m->buf
-        m->len
+ *The message sent to FM should specify:
+ *  m->type -- FM_ram_read
+ *  m->buf
+ *  m->dev_id -- file name in int
+ *  m->offset
+ *  m->len
+ *
+ *  m->type -- FM_read
+ *  m->req_pid
+ *  m->dev_id -- file descriptor
+ *  m->buf
+ *  m->len
+ *
+ *  more can be found in method's comment
+ *
+ *The message send from FM will specify:
+ *  m->ret -- len of bytes that are successfully read
  */
 static void FM_job() {
     static Msg m;
@@ -124,16 +126,16 @@ void load_super_block();
 /**
    init by super block(start and size of each region)
    init inode bit map; init block bit map
-   initialize STD*** in file table
+   initialize standard file descriptor
+   (STDIN, STDOUT, STDERR) in file table
  */
 void init_file_system() {
     now_disk = d_ide;
     // init each region start and size
     load_super_block();
-    /**
-       default system opened file -- load_super_block() have to
-       before init_file_table(); for file_table will use inode_start
-    */
+    // init default system opened file:
+    // load_super_block() have to before init_file_table();
+    // for file_table will use `inode_start`
     init_file_table();
     // for many already initialized thread is initialized with
     // uinitialized default_cwd -- `0`, so

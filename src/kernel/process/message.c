@@ -89,7 +89,6 @@ void get_message(PCB *p, pid_t id, Msg *m) {
    otherwise, would cause early `sli`.
  */
 void send(pid_t dest, Msg *m) {
-    //printk("%d:----send to %d------\n", current->pid, dest);
     lock();
     NOINTR;
     PCB *de = fetch_pcb(dest);

@@ -37,23 +37,23 @@ Sep 26 2015 update:
     - locking in interrupts: increase counter when enter interrupt handle; decrease when leave. `lock & unlock` have to in pair!
 - the send and receive message between threads: send is asynchronous and will always succeed; receive is synchronous and may be blocked.
 
-- add timer -- clock diver, ide -- hard disk driver, tty -- terminal driver  
-- very very simple file system: name is number, size is fixed; upgrade to ext2-like version
-- create user process  
-- using page dynamic allocation: using bit-map algorithm  
-- add page protection  
-- put user in ring3  
+- add timer (implemented by priority queue) -- clock diver, ide -- hard disk driver, tty -- terminal driver  
+- very very simple file system in ram: name is number, size is fixed; upgrade to ext2-like version.
+- create user process: user's stack is stored in `TrapFrame`. 
+- using memory page dynamic allocation: using bit-map algorithm  
+- add page protection: use page table & page directory with flag specified.
+- put user in ring3: page protection & register `ss`
 - wait(int second) -- system call  
 - random number  
 - non-blocked timer: used to make a process run specific seconds, i.e. counting its running time  
 - LCM and GCD  
 
 ### process
-- fork a process  
-- exec a command  
-- exit a user process  
-- waitpid  
-- a simple shell  
+- fork a process: share fd, read-only page etc.
+- exec a command: free process resource + create process
+- exit a user process: free process resource
+- waitpid: waiting util a process exit.
+- a simple shell: a user process called fork and exce.
 
 ### file system
 - upgrade file system: change file system name to string; size is variable  

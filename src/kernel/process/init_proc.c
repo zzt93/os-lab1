@@ -189,16 +189,16 @@ create_kthread(void *fun) {
     return pcb;
 }
 
-void store_vir(PCB *pcb, ListHead *link) {
-    list_add_after(link, &(pcb->vir_mem));
-    list_del(link);
+void store_vir(PCB *pcb, ListHead *vir_fake_head) {
+    // insert pcb's list head after original fake head
+    list_add_after(vir_fake_head, &(pcb->vir_mem));
+    // remove the link of fake head
+    list_del(vir_fake_head);
 }
 
 PCB *create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListHead *vir, FTE *cwd) {
     PCB *pcb = kmalloc(PCB_SIZE);
-    /**
-       trapFrame is always located on the kernel stack
-    */
+    // trapFrame is always located on the kernel stack
     TrapFrame *frame = (TrapFrame *) ((char *) (pcb->kstack) + KSTACK_SIZE -
                                       sizeof(TrapFrame)); // allocate frame at the end of stack
     //init trap frame for user
@@ -207,10 +207,8 @@ PCB *create_user_thread(void *f, uint32_t pdir, uint32_t ss, uint32_t esp, ListH
 
     init_pcb_content(pcb, pdir, USER, cwd);
     store_vir(pcb, vir);
-    /**
-       in order to switch back to user stack
-       after interrupt handle
-    */
+    // in order to switch back to user stack
+    // after interrupt handle
     set_user_stack(pcb, ss, esp);
     return pcb;
 }
