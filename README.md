@@ -33,8 +33,8 @@ Sep 26 2015 update:
 - the sleep and wake_up of thread: add process to separate `Binary Tree` when schedule.
 - the semaphore(`P`&`V`) and lock(`cli`&`sti`) to solve critical section problem.
     - nested lock: counter
-    - sleep during lock: per thread counter
-    - locking in interrupts: increase counter when enter interrupt handle; decrease when leave. `lock & unlock` have to in pair!
+    - A lock, A sleep; B wakeup, B should be able to be interruptted: per thread counter
+    - locking in interrupts (should not invoke method because it will affect register and cause exception): increase counter when enter interrupt handle; decrease when leave. `lock & unlock` have to in pair!
 - the send and receive message between threads: send is asynchronous and will always succeed; receive is synchronous and may be blocked.
 
 - add timer (implemented by priority queue) -- clock diver, ide -- hard disk driver, tty -- terminal driver  
